@@ -238,9 +238,10 @@ void AC_AttitudeControl::input_quaternion(Quaternion attitude_desired_quat)
 // Command an euler roll and pitch angle and an euler yaw rate with angular velocity feedforward and smoothing
 void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
 {
+    // Mathaus Edited
     // Convert from centidegrees on public interface to radians
-    float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
-    float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);
+    float euler_roll_angle = 0*radians(euler_roll_angle_cd * 0.01f);
+    float euler_pitch_angle = 0*radians(euler_pitch_angle_cd * 0.01f);
     float euler_yaw_rate = radians(euler_yaw_rate_cds * 0.01f);
 
     // calculate the attitude target euler angles
@@ -289,9 +290,10 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_euler_rate_yaw(float euler
 // Command an euler roll, pitch and yaw angle with angular velocity feedforward and smoothing
 void AC_AttitudeControl::input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw)
 {
+    //Mathaus
     // Convert from centidegrees on public interface to radians
-    float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
-    float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);
+    float euler_roll_angle = 0*radians(euler_roll_angle_cd * 0.01f);
+    float euler_pitch_angle = 0*radians(euler_pitch_angle_cd * 0.01f);
     float euler_yaw_angle = radians(euler_yaw_angle_cd * 0.01f);
 
     // calculate the attitude target euler angles
@@ -307,8 +309,9 @@ void AC_AttitudeControl::input_euler_angle_roll_pitch_yaw(float euler_roll_angle
         // When acceleration limiting and feedforward are enabled, the sqrt controller is used to compute an euler
         // angular velocity that will cause the euler angle to smoothly stop at the input angle with limited deceleration
         // and an exponential decay specified by _input_tc at the end.
-        _attitude_target_euler_rate.x = input_shaping_angle(wrap_PI(euler_roll_angle - _attitude_target_euler_angle.x), _input_tc, euler_accel.x, _attitude_target_euler_rate.x, _dt);
-        _attitude_target_euler_rate.y = input_shaping_angle(wrap_PI(euler_pitch_angle - _attitude_target_euler_angle.y), _input_tc, euler_accel.y, _attitude_target_euler_rate.y, _dt);
+        //Mathaus
+        _attitude_target_euler_rate.x = input_shaping_angle(0*wrap_PI(euler_roll_angle - _attitude_target_euler_angle.x), _input_tc, euler_accel.x, _attitude_target_euler_rate.x, _dt);
+        _attitude_target_euler_rate.y = input_shaping_angle(0*wrap_PI(euler_pitch_angle - _attitude_target_euler_angle.y), _input_tc, euler_accel.y, _attitude_target_euler_rate.y, _dt);
         _attitude_target_euler_rate.z = input_shaping_angle(wrap_PI(euler_yaw_angle - _attitude_target_euler_angle.z), _input_tc, euler_accel.z, _attitude_target_euler_rate.z, _dt);
         if (slew_yaw) {
             _attitude_target_euler_rate.z = constrain_float(_attitude_target_euler_rate.z, -get_slew_yaw_rads(), get_slew_yaw_rads());
