@@ -37,6 +37,8 @@ public:
 
     // output - sends commands to the motors
     virtual void        output() override;
+    //Mathaus
+    virtual void        output(float &srv1, float &srv2, float &srv3, float &srv4, float &Pwm1, float &Pwm2, float &Pwm3, float &Pwm4);
 
     // output_min - sends minimum values out to the motors
     void                output_min() override;
@@ -104,6 +106,10 @@ protected:
     // output_to_motors - sends commands to the motors
     virtual void        output_to_motors() = 0;
 
+    // mathaus
+    // output_to_motors - sends commands to the motors
+    virtual void        output_to_motors(float &srv1,float &srv2,float &srv3,float &srv4, float &Pwm1, float &Pwm2, float &Pwm3, float &Pwm4) = 0;
+
     // update the throttle input filter
     virtual void        update_throttle_filter() override;
 
@@ -124,6 +130,9 @@ protected:
 
     // converts desired thrust to linearized actuator output in a range of 0~1
     float               thrust_to_actuator(float thrust_in);
+
+     // convert thrust (0~1) range back to pwm range  Mathaus
+    int16_t             calc_thrust_to_pwm_M(float thrust_in) const;
 
     // adds slew rate limiting to actuator output if MOT_SLEW_TIME > 0 and not shutdown
     void                set_actuator_with_slew(float& actuator_output, float input);

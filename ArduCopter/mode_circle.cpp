@@ -125,6 +125,9 @@ void ModeCircle::run()
         pos_control->set_alt_target_from_climb_rate(target_climb_rate, G_Dt, false);
     }
     pos_control->update_z_controller();
+    //Mathaus
+    copter.FxFy_calc(copter.circle_nav->get_roll(),copter.circle_nav->get_pitch());
+
 }
 
 uint32_t ModeCircle::wp_distance() const

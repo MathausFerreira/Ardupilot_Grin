@@ -60,7 +60,7 @@ void ModeAuto::run()
     switch (_mode) {
 
     case Auto_TakeOff:
-        takeoff_run();
+      //  takeoff_run();
         break;
 
     case Auto_WP:
@@ -69,7 +69,7 @@ void ModeAuto::run()
         break;
 
     case Auto_Land:
-        land_run();
+        //land_run();
         break;
 
     case Auto_RTL:
@@ -206,6 +206,8 @@ void ModeAuto::wp_start(const Location& dest_loc)
         auto_yaw.set_mode_to_default(false);
     }
 }
+
+
 
 // auto_land_start - initialises controller to implement a landing
 void ModeAuto::land_start()
@@ -747,6 +749,10 @@ void ModeAuto::wp_run()
     // call z-axis position controller (wpnav should have already updated it's alt target)
     pos_control->update_z_controller();
 
+
+    //Mathaus
+    copter.FxFy_calc(wp_nav->get_roll(),wp_nav->get_pitch());
+
     // call attitude controller
     if (auto_yaw.mode() == AUTO_YAW_HOLD) {
         // roll & pitch from waypoint controller, yaw rate from pilot
@@ -786,6 +792,9 @@ void ModeAuto::spline_run()
 
     // call z-axis position controller (wpnav should have already updated it's alt target)
     pos_control->update_z_controller();
+
+    //Mathaus
+    copter.FxFy_calc(wp_nav->get_roll(),wp_nav->get_pitch());
 
     // call attitude controller
     if (auto_yaw.mode() == AUTO_YAW_HOLD) {
@@ -845,6 +854,9 @@ void ModeAuto::circle_run()
     // call z-axis position controller
     pos_control->update_z_controller();
 
+    //Mathaus
+    copter.FxFy_calc(copter.circle_nav->get_roll(),copter.circle_nav->get_pitch());
+
     if (auto_yaw.mode() == AUTO_YAW_HOLD) {
         // roll & pitch from waypoint controller, yaw rate from pilot
         attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(copter.circle_nav->get_roll(), copter.circle_nav->get_pitch(), target_yaw_rate);
@@ -888,6 +900,10 @@ void ModeAuto::loiter_run()
     copter.failsafe_terrain_set_status(wp_nav->update_wpnav());
 
     pos_control->update_z_controller();
+
+    //Mathaus
+    copter.FxFy_calc(wp_nav->get_roll(),wp_nav->get_pitch());
+
     attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(wp_nav->get_roll(), wp_nav->get_pitch(), target_yaw_rate);
 }
 

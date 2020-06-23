@@ -69,6 +69,68 @@ void AP_MotorsMatrix::set_frame_class_and_type(motor_frame_class frame_class, mo
     set_update_rate(_speed_hz);
 }
 
+void AP_MotorsMatrix::update_srv_action(float srv1, float srv2, float srv3, float srv4)
+{
+    srv1 = lround(srv1);
+    srv2 = lround(srv2);
+    srv3 = lround(srv3);
+    srv4 = lround(srv4);
+
+    hal.rcout->write(CH_9, uint16_t(srv1));  // Servo 1
+    hal.rcout->write(CH_10, uint16_t(srv2));  // Servo 2
+    hal.rcout->write(CH_11,uint16_t(srv3));  // Servo 3
+    hal.rcout->write(CH_12,uint16_t(srv4));  // Servo 4
+}
+
+
+void AP_MotorsMatrix::output_to_motors(float &srv1, float &srv2, float &srv3, float &srv4, float &Pwm1, float &Pwm2, float &Pwm3, float &Pwm4) //mathaus
+{
+    int8_t i = 0;
+
+    switch (_spool_state) {
+        case SpoolState::SHUT_DOWN: {
+            // no output
+            for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    _actuator[i] = 0.0f;
+                }
+            }
+            break;
+        }
+        case SpoolState::GROUND_IDLE:
+            // sends output to motors when armed but not flying
+            for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+                if (motor_enabled[i]) {
+                    set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
+                }
+            }
+            break;
+        case SpoolState::SPOOLING_UP:
+        case SpoolState::THROTTLE_UNLIMITED:
+        case SpoolState::SPOOLING_DOWN:
+            // set motor output based on thrust requests
+            Pwm1 = constrain_float(Pwm1,0.0f,1.0f);
+            Pwm2 = constrain_float(Pwm2,0.0f,1.0f);
+            Pwm3 = constrain_float(Pwm3,0.0f,1.0f);
+            Pwm4 = constrain_float(Pwm4,0.0f,1.0f);
+
+            motor_enabled[0] ? set_actuator_with_slew(_actuator[i], thrust_to_actuator(Pwm1)): set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
+            motor_enabled[1] ? set_actuator_with_slew(_actuator[i], thrust_to_actuator(Pwm2)): set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
+            motor_enabled[2] ? set_actuator_with_slew(_actuator[i], thrust_to_actuator(Pwm3)): set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
+            motor_enabled[3] ? set_actuator_with_slew(_actuator[i], thrust_to_actuator(Pwm4)): set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
+            break;
+    }
+
+    // convert output to PWM and send to each motor
+    for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            rc_write(i, output_to_pwm(_actuator[i]));
+        }
+    }
+        //Atualiza a saida dos servos
+    update_srv_action(srv1,srv2,srv3,srv4);
+}
+
 void AP_MotorsMatrix::output_to_motors()
 {
     int8_t i;

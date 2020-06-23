@@ -260,6 +260,34 @@ void AP_MotorsMulticopter::output()
     output_rpyt();
 };
 
+// output - sends commands to the motors
+void AP_MotorsMulticopter::output(float &srv1, float &srv2, float &srv3, float &srv4, float &Pwm1, float &Pwm2, float &Pwm3, float &Pwm4) //(mathaus)
+{
+    // update throttle filter
+    update_throttle_filter();
+
+    // calc filtered battery voltage and lift_max
+    update_lift_max_from_batt_voltage();
+
+    // run spool logic
+    output_logic();
+
+    // calculate thrust
+    output_armed_stabilizing();
+
+    // apply any thrust compensation for the frame
+    thrust_compensation();
+
+    // convert rpy_thrust values to pwm
+    output_to_motors(srv1,srv2,srv3,srv4,Pwm1,Pwm2,Pwm3,Pwm4);
+
+    // output any booster throttle
+    output_boost_throttle();
+
+    // output raw roll/pitch/yaw/thrust
+    output_rpyt();
+};
+
 // output booster throttle, if any
 void AP_MotorsMulticopter::output_boost_throttle(void)
 {

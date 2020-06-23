@@ -230,8 +230,74 @@ public:
 
 private:
 
+
     // key aircraft parameters passed to multiple libraries
     AP_Vehicle::MultiCopter aparm;
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+    /// Declaração de Variáveis ( Mathaus )
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    // Propriedade Física do Barco
+    float FT = 0.0f;
+    float FM1 = 10*2.1f;
+    float FM2 = 10*2.1f;
+    float FM3 = 10*2.1f;
+    float FM4 = 10*2.1f;
+
+    float Fmax = FM1 + FM2 + FM3 + FM4;       // Força e torque maximos do barco
+
+    float L    = 0.54f;          // Tamanho do braço do barco
+    float Lx = L*cosf(M_PI/4.0f);
+    float Ly = L*cosf(M_PI/4.0f);
+
+    float Pwmmax = 1001.0f; // Esse valor será a faixa de pwm que eu vou escolher para trabalhar --------------- // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float Pwmmin = 1.0f;    // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float Nmax = L*Fmax;
+
+    float k1 = (FM1)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k2 = (FM2)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k3 = (FM3)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k4 = (FM4)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+
+    // Servo Motores Barco
+    float servo_m1 = 0.0f;
+    float servo_m2 = 0.0f;
+    float servo_m3 = 0.0f;
+    float servo_m4 = 0.0f;
+    //Usado para calcular valores
+    float theta_m1 =  0.0f;
+    float theta_m2 =  0.0f;
+    float theta_m3 =  0.0f;
+    float theta_m4 =  0.0f;
+
+    float Pwm1 = 0.0f;
+    float Pwm2 = 0.0f;
+    float Pwm3 = 0.0f;
+    float Pwm4 = 0.0f;
+
+    //    Forcas enviadas para a alocacao
+    float Fx = 0.0f;
+    float Fy = 0.0f;
+    float tN = 0.0f;
+
+    //    Forcas Alocadas realmente
+    float FX_out = 0.0f;
+    float FY_out = 0.0f;
+    float TN_out = 0.0f;
+
+//    float GanhoF = 1.0f;
+
+    // Variáveis auxiliares para Fx e Fy
+    float X = 0.0f;
+    float Y = 0.0f;
+    float Z = 0.0f;
+    float GanhoF ;
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
+
 
     // Global parameters are all contained within the 'g' class.
     Parameters g;
@@ -245,6 +311,8 @@ private:
     RC_Channel *channel_pitch;
     RC_Channel *channel_throttle;
     RC_Channel *channel_yaw;
+    //Mathaus
+    RC_Channel *channel_gain;
 
     AP_Logger logger;
 
@@ -660,6 +728,31 @@ private:
     void set_accel_throttle_I_from_pilot_throttle();
     void rotate_body_frame_to_NE(float &x, float &y);
     uint16_t get_pilot_speed_dn();
+
+
+    // Mathaus GRIN
+
+    int servo_angle_to_pwm(float angle,float srv_min_pwm,float srv_max_pwm);
+    float servo_pwm_to_angle(int PWM_aux);
+    float PWMtoNorm(float pwm);
+    float NormtoPWM(float pwm);
+    float mapCube(float x, float y, float z);
+    void Alocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
+    void get_pilot_desired_force_to_boat_M();
+    void pwm_servo_angle();
+    void FOSSEN_allocation_matrix(float &FX,float &FY,float &tN,float &theta_motor1,float &theta_motor2,float &theta_motor3,float &theta_motor4,float &PWM1 ,float &PWM2 ,float &PWM3 ,float &PWM4);
+    void FxFy_calc(float roll, float pitch);
+
+    void get_pilot_desired_force_to_boat(float roll, float pitch, float yaw);
+    void get_pilot_desired_force_to_boat();
+    void calcPWM();
+    int servo_angle_to_pwm(float ang);
+
+    void Log_Write_Mathaus();
+    void Log_Write_Grin();
+
+    // Accacio
+    void Log_Write_Accacio();
 
 #if ADSB_ENABLED == ENABLED
     // avoidance_adsb.cpp

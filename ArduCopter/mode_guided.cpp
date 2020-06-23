@@ -418,6 +418,10 @@ void ModeGuided::pos_control_run()
     // call z-axis position controller (wpnav should have already updated it's alt target)
     pos_control->update_z_controller();
 
+    //Mathaus
+    copter.FxFy_calc(wp_nav->get_roll(),wp_nav->get_pitch());
+    
+
     // call attitude controller
     if (auto_yaw.mode() == AUTO_YAW_HOLD) {
         // roll & pitch from waypoint controller, yaw rate from pilot

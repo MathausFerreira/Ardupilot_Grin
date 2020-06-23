@@ -140,6 +140,9 @@ void ModeLoiter::run()
         // run loiter controller
         loiter_nav->update();
 
+        //Mathaus
+        copter.FxFy_calc(loiter_nav->get_roll(), loiter_nav->get_pitch());
+        
         // call attitude controller
         attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
 

@@ -131,8 +131,61 @@ void Copter::auto_disarm_check()
     }
 }
 
+//------------------------------------------------------------------------------------------------
+
+int Copter::servo_angle_to_pwm(float angle,float srv_min_pwm, float srv_max_pwm)
+{
+    /// Nessa função deve-se inserir os valores mínimos e maxímos do pwm  considerando 0 a 180 como angulos mínimos e máximos
+
+    //Entrada de angulo deve ser  de -90 a 90 ELE CHEGARÁ A 180 DEVIDO A ENGRENAGEM
+    angle = constrain_float(angle,-180.0,180.0);
+
+    angle = 180 - angle;
+
+    //valor que o servo entende como 0 graus
+    float srv_min_angle = 0.0;
+
+    //valor que o servo entende como 360
+    float srv_max_angle = 360.0;
+
+    int pwm =  srv_min_pwm + angle * (srv_max_pwm - srv_min_pwm)/(srv_max_angle - srv_min_angle);
+
+    return pwm;
+}
+
+
+void Copter::pwm_servo_angle()
+{
+    /// todos os angulos devem estar em graus nesta função
+    if(!motors->armed())
+    {
+        theta_m1 = 0.0;
+        theta_m2 = 0.0;
+        theta_m3 = 0.0;
+        theta_m4 = 0.0;
+    }
+//Linha utilizada para medir valores de pwm min e max
+   // servo_m4 = (channel_throttle->get_radio_in()-channel_throttle->get_radio_min()) + 1.5*(canalGanho->get_radio_in()-canalGanho->get_radio_min());
+
+    //BARCO GRANDE
+    servo_m1 = servo_angle_to_pwm(theta_m1,444.0,2490.0);//675.0,2329.0);
+    servo_m2 = servo_angle_to_pwm(theta_m2,421.0,2501.0);//664.0,2144.0);
+    servo_m3 = servo_angle_to_pwm(theta_m3,418.0,2461.0);//656.0,2400.0);
+    servo_m4 = servo_angle_to_pwm(theta_m4,421.0,2501.0);//700.0,2345.0);
+
+    //BARCO PEQUENO
+//    servo_m1 = servo_angle_to_pwm(theta_m1,986.0,1897.0);
+//    servo_m2 = servo_angle_to_pwm(theta_m2,550.0,2270.0);
+//    servo_m3 = servo_angle_to_pwm(theta_m3,502.0,2408.0);
+//    servo_m4 = servo_angle_to_pwm(theta_m4,520.0,2390.0);
+
+}
+
+//------------------------------------------------------------------------------------------------
+
+
 // motors_output - send output to motors library which will adjust and send to ESCs and servos
-void Copter::motors_output()
+void Copter::motors_output() // Mathaus
 {
 #if ADVANCED_FAILSAFE == ENABLED
     // this is to allow the failsafe module to deliberately crash
@@ -175,7 +228,11 @@ void Copter::motors_output()
         }
 
         // send output signals to motors
-        motors->output();
+        // Mathaus
+        FOSSEN_allocation_matrix(Fx,Fy,tN,theta_m1,theta_m2,theta_m3,theta_m4,Pwm1,Pwm2,Pwm3,Pwm4);
+        pwm_servo_angle();
+        motors->output(servo_m1,servo_m2,servo_m3,servo_m4, Pwm1, Pwm2, Pwm3, Pwm4);
+        //motors->output();
     }
 
     // push all channels

@@ -50,6 +50,9 @@ void ModeBrake::run()
     pos_control->set_desired_velocity_xy(0.0f, 0.0f);
     pos_control->update_xy_controller();
 
+    //Mathaus
+    copter.FxFy_calc(wp_nav->get_roll(),wp_nav->get_pitch());
+    
     // call attitude controller
     attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(wp_nav->get_roll(), wp_nav->get_pitch(), 0.0f);
 

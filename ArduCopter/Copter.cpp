@@ -539,6 +539,24 @@ void Copter::init_simple_bearing()
     }
 }
 
+//Mathaus
+void Copter::FxFy_calc(float roll, float pitch)
+{
+    // Forças Calculadas pelo controlador de posição são calculadas aqui.
+    X = -((float)pitch)/(float)(aparm.angle_max);
+    Y =  ((float)roll) /(float)(aparm.angle_max);
+
+    // Saturação das Forças
+    X = constrain_float(X,-1.0f,1.0f);
+    Y = constrain_float(Y,-1.0f,1.0f);
+
+    // Mapeamento p/ transformar forças de uma ambiente quadrado para um circular
+    Fx = mapCube(X,Y,Z); // DESATIVADO PARA MAPEAMENTO CUBICO EM ESFERA
+    Fy = mapCube(Y,X,Z);
+    tN = mapCube(Z,X,Y);
+}
+
+
 // update_simple_mode - rotates pilot input if we are in simple mode
 void Copter::update_simple_mode(void)
 {
