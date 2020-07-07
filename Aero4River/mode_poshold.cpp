@@ -121,12 +121,12 @@ void ModePosHold::run()
 
     case AltHold_Takeoff:
         // initiate take-off
-        if (!takeoff.running()) {
-            takeoff.start(constrain_float(g.pilot_takeoff_alt,0.0f,1000.0f));
-        }
+        // if (!takeoff.running()) {
+        //     takeoff.start(constrain_float(g.pilot_takeoff_alt,0.0f,1000.0f));
+        // }
 
-        // get take-off adjusted pilot and takeoff climb rates
-        takeoff.get_climb_rates(target_climb_rate, takeoff_climb_rate);
+        // // get take-off adjusted pilot and takeoff climb rates
+        // takeoff.get_climb_rates(target_climb_rate, takeoff_climb_rate);
 
         // get avoidance adjusted climb rate
         target_climb_rate = get_avoidance_adjusted_climbrate(target_climb_rate);

@@ -571,7 +571,7 @@ void ModeGuided::angle_control_run()
     float climb_rate_cms = constrain_float(guided_angle_state.climb_rate_cms, -fabsf(wp_nav->get_default_speed_down()), wp_nav->get_default_speed_up());
 
     // get avoidance adjusted climb rate
-    climb_rate_cms = get_avoidance_adjusted_climbrate(climb_rate_cms);
+    // climb_rate_cms = get_avoidance_adjusted_climbrate(climb_rate_cms);
 
     // check for timeout - set lean angles and climb rate to zero if no updates received for 3 seconds
     uint32_t tnow = millis();
@@ -642,7 +642,7 @@ void ModeGuided::set_desired_velocity_with_accel_and_fence_limits(const Vector3f
     // limit the velocity to prevent fence violations
     copter.avoid.adjust_velocity(pos_control->get_pos_xy_p().kP(), pos_control->get_max_accel_xy(), curr_vel_des, G_Dt);
     // get avoidance adjusted climb rate
-    curr_vel_des.z = get_avoidance_adjusted_climbrate(curr_vel_des.z);
+    // curr_vel_des.z = get_avoidance_adjusted_climbrate(curr_vel_des.z);
 #endif
 
     // update position controller with new target

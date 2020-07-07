@@ -112,9 +112,9 @@
  # include <AC_PrecLand/AC_PrecLand.h>
  # include <AP_IRLock/AP_IRLock.h>
 #endif
-#if ADSB_ENABLED == ENABLED
- # include <AP_ADSB/AP_ADSB.h>
-#endif
+// #if ADSB_ENABLED == ENABLED
+//  # include <AP_ADSB/AP_ADSB.h>
+// #endif
 #if MODE_FOLLOW_ENABLED == ENABLED
  # include <AP_Follow/AP_Follow.h>
 #endif
@@ -170,9 +170,9 @@
 #include "UserParameters.h"
 #endif
 #include "Parameters.h"
-#if ADSB_ENABLED == ENABLED
-#include "avoidance_adsb.h"
-#endif
+// #if ADSB_ENABLED == ENABLED
+// #include "avoidance_adsb.h"
+// #endif
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
 #include <SITL/SITL.h>
@@ -200,29 +200,29 @@ public:
     friend class AutoTune;
 
     friend class Mode;
-    friend class ModeAcro;
-    friend class ModeAcro_Heli;
+    // friend class ModeAcro;
+    // friend class ModeAcro_Heli;
     friend class ModeAltHold;
     friend class ModeAuto;
     friend class ModeAutoTune;
-    friend class ModeAvoidADSB;
+    // friend class ModeAvoidADSB;
     friend class ModeBrake;
     friend class ModeCircle;
     friend class ModeDrift;
-    friend class ModeFlip;
+    // friend class ModeFlip;
     friend class ModeFlowHold;
     friend class ModeFollow;
     friend class ModeGuided;
-    friend class ModeLand;
+    // friend class ModeLand;
     friend class ModeLoiter;
     friend class ModePosHold;
     friend class ModeRTL;
     friend class ModeSmartRTL;
-    friend class ModeSport;
+    // friend class ModeSport;
     friend class ModeStabilize;
-    friend class ModeStabilize_Heli;
+    // friend class ModeStabilize_Heli;
     friend class ModeSystemId;
-    friend class ModeThrow;
+    // friend class ModeThrow;
     friend class ModeZigZag;
     friend class ModeAutorotate;
 
@@ -528,12 +528,12 @@ private:
     AC_InputManager_Heli input_manager;
 #endif
 
-#if ADSB_ENABLED == ENABLED
-    AP_ADSB adsb;
+// #if ADSB_ENABLED == ENABLED
+//     AP_ADSB adsb;
 
-    // avoidance of adsb enabled vehicles (normally manned vehicles)
-    AP_Avoidance_Copter avoidance_adsb{adsb};
-#endif
+//     // avoidance of adsb enabled vehicles (normally manned vehicles)
+//     AP_Avoidance_Copter avoidance_adsb{adsb};
+// #endif
 
     // last valid RC input time
     uint32_t last_radio_update_ms;
@@ -656,15 +656,15 @@ private:
     void set_throttle_takeoff();
     float get_pilot_desired_climb_rate(float throttle_control);
     float get_non_takeoff_throttle();
-    float get_avoidance_adjusted_climbrate(float target_rate);
+    // float get_avoidance_adjusted_climbrate(float target_rate);
     void set_accel_throttle_I_from_pilot_throttle();
     void rotate_body_frame_to_NE(float &x, float &y);
     uint16_t get_pilot_speed_dn();
 
-#if ADSB_ENABLED == ENABLED
-    // avoidance_adsb.cpp
-    void avoidance_adsb_update(void);
-#endif
+// #if ADSB_ENABLED == ENABLED
+//     // avoidance_adsb.cpp
+//     void avoidance_adsb_update(void);
+// #endif
 
     // baro_ground_effect.cpp
     void update_ground_effect_detector(void);
@@ -888,13 +888,13 @@ private:
 #endif
 
     Mode *flightmode;
-#if MODE_ACRO_ENABLED == ENABLED
-#if FRAME_CONFIG == HELI_FRAME
-    ModeAcro_Heli mode_acro;
-#else
-    ModeAcro mode_acro;
-#endif
-#endif
+// #if MODE_ACRO_ENABLED == ENABLED
+// #if FRAME_CONFIG == HELI_FRAME
+//     ModeAcro_Heli mode_acro;
+// #else
+//     ModeAcro mode_acro;
+// #endif
+// #endif
     ModeAltHold mode_althold;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
@@ -912,16 +912,16 @@ private:
 #if MODE_DRIFT_ENABLED == ENABLED
     ModeDrift mode_drift;
 #endif
-#if MODE_FLIP_ENABLED == ENABLED
-    ModeFlip mode_flip;
-#endif
+// #if MODE_FLIP_ENABLED == ENABLED
+//     ModeFlip mode_flip;
+// #endif
 #if MODE_FOLLOW_ENABLED == ENABLED
     ModeFollow mode_follow;
 #endif
 #if MODE_GUIDED_ENABLED == ENABLED
     ModeGuided mode_guided;
 #endif
-    ModeLand mode_land;
+    //  ModeLand mode_land;
 #if MODE_LOITER_ENABLED == ENABLED
     ModeLoiter mode_loiter;
 #endif
@@ -936,27 +936,27 @@ private:
 #else
     ModeStabilize mode_stabilize;
 #endif
-#if MODE_SPORT_ENABLED == ENABLED
-    ModeSport mode_sport;
-#endif
+// #if MODE_SPORT_ENABLED == ENABLED
+//     ModeSport mode_sport;
+// #endif
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ModeSystemId mode_systemid;
 #endif
-#if ADSB_ENABLED == ENABLED
-    ModeAvoidADSB mode_avoid_adsb;
-#endif
-#if MODE_THROW_ENABLED == ENABLED
-    ModeThrow mode_throw;
-#endif
+// #if ADSB_ENABLED == ENABLED
+//     ModeAvoidADSB mode_avoid_adsb;
+// #endif
+// #if MODE_THROW_ENABLED == ENABLED
+//     ModeThrow mode_throw;
+// #endif
 #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
     ModeGuidedNoGPS mode_guided_nogps;
 #endif
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
 #endif
-#if !HAL_MINIMIZE_FEATURES && OPTFLOW == ENABLED
-    ModeFlowHold mode_flowhold;
-#endif
+// #if !HAL_MINIMIZE_FEATURES && OPTFLOW == ENABLED
+//     ModeFlowHold mode_flowhold;
+// #endif
 #if MODE_ZIGZAG_ENABLED == ENABLED
     ModeZigZag mode_zigzag;
 #endif

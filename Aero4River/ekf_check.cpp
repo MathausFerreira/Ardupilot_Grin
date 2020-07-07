@@ -153,31 +153,31 @@ void Copter::failsafe_ekf_event()
     failsafe.ekf = true;
     AP::logger().Write_Error(LogErrorSubsystem::FAILSAFE_EKFINAV, LogErrorCode::FAILSAFE_OCCURRED);
 
-    // sometimes LAND *does* require GPS so ensure we are in non-GPS land
-    if (control_mode == Mode::Number::LAND && landing_with_GPS()) {
-        mode_land.do_not_use_GPS();
-        return;
-    }
+    // // sometimes LAND *does* require GPS so ensure we are in non-GPS land
+    //  if (control_mode == Mode::Number::LAND && landing_with_GPS()) {
+    //     mode_land.do_not_use_GPS();
+        //  return;
+    //  }
 
-    // does this mode require position?
-    if (!copter.flightmode->requires_GPS() && (g.fs_ekf_action != FS_EKF_ACTION_LAND_EVEN_STABILIZE)) {
-        return;
-    }
+    // // does this mode require position?
+    // if (!copter.flightmode->requires_GPS() && (g.fs_ekf_action != FS_EKF_ACTION_LAND_EVEN_STABILIZE)) {
+    //     return;
+    // }
 
-    // take action based on fs_ekf_action parameter
-    switch (g.fs_ekf_action) {
-        case FS_EKF_ACTION_ALTHOLD:
-            // AltHold
-            if (failsafe.radio || !set_mode(Mode::Number::ALT_HOLD, ModeReason::EKF_FAILSAFE)) {
-                set_mode_land_with_pause(ModeReason::EKF_FAILSAFE);
-            }
-            break;
-        case FS_EKF_ACTION_LAND:
-        case FS_EKF_ACTION_LAND_EVEN_STABILIZE:
-        default:
-            set_mode_land_with_pause(ModeReason::EKF_FAILSAFE);
-            break;
-    }
+    // // take action based on fs_ekf_action parameter
+    // switch (g.fs_ekf_action) {
+    //     case FS_EKF_ACTION_ALTHOLD:
+    //         // AltHold
+    //         if (failsafe.radio || !set_mode(Mode::Number::ALT_HOLD, ModeReason::EKF_FAILSAFE)) {
+    //             set_mode_land_with_pause(ModeReason::EKF_FAILSAFE);
+    //         }
+    //         break;
+    //     case FS_EKF_ACTION_LAND:
+    //     case FS_EKF_ACTION_LAND_EVEN_STABILIZE:
+    //     default:
+    //         set_mode_land_with_pause(ModeReason::EKF_FAILSAFE);
+    //         break;
+    // }
 }
 
 // failsafe_ekf_off_event - actions to take when EKF failsafe is cleared

@@ -28,13 +28,16 @@ void Copter::failsafe_radio_on_event()
             desired_action = Failsafe_Action_SmartRTL;
             break;
         case FS_THR_ENABLED_ALWAYS_SMARTRTL_OR_LAND:
-            desired_action = Failsafe_Action_SmartRTL_Land;
+        desired_action = Failsafe_Action_None;
+            // desired_action = Failsafe_Action_SmartRTL_Land;
             break;
         case FS_THR_ENABLED_ALWAYS_LAND:
-            desired_action = Failsafe_Action_Land;
+            desired_action = Failsafe_Action_None;
+            // desired_action = Failsafe_Action_Land;
             break;
         default:
-            desired_action = Failsafe_Action_Land;
+           desired_action = Failsafe_Action_None;
+            // desired_action = Failsafe_Action_Land;
     }
 
     // Conditions to deviate from FS_THR_ENABLE selection and send specific GCS warning
@@ -49,10 +52,10 @@ void Copter::failsafe_radio_on_event()
         gcs().send_text(MAV_SEVERITY_WARNING, "Radio + Battery Failsafe - Continuing Landing");
         desired_action = Failsafe_Action_Land;
 
-    } else if (flightmode->is_landing() && failsafe_option(FailsafeOption::CONTINUE_IF_LANDING)) {
-        // Allow landing to continue when FS_OPTIONS is set to continue landing
-        gcs().send_text(MAV_SEVERITY_WARNING, "Radio Failsafe - Continuing Landing");
-        desired_action = Failsafe_Action_Land;
+    // } else if (flightmode->is_landing() && failsafe_option(FailsafeOption::CONTINUE_IF_LANDING)) {
+    //     // Allow landing to continue when FS_OPTIONS is set to continue landing
+    //     gcs().send_text(MAV_SEVERITY_WARNING, "Radio Failsafe - Continuing Landing");
+    //     desired_action = Failsafe_Action_Land;
 
     } else if (control_mode == Mode::Number::AUTO && failsafe_option(FailsafeOption::RC_CONTINUE_IF_AUTO)) {
         // Allow mission to continue when FS_OPTIONS is set to continue mission
@@ -294,13 +297,13 @@ void Copter::gpsglitch_check()
 void Copter::set_mode_RTL_or_land_with_pause(ModeReason reason)
 {
     // attempt to switch to RTL, if this fails then switch to Land
-    if (!set_mode(Mode::Number::RTL, reason)) {
-        // set mode to land will trigger mode change notification to pilot
-        set_mode_land_with_pause(reason);
-    } else {
+    // if (!set_mode(Mode::Number::RTL, reason)) {
+    //     // set mode to land will trigger mode change notification to pilot
+    //     set_mode_land_with_pause(reason);
+    // } else {
         // alert pilot to mode change
         AP_Notify::events.failsafe_mode_change = 1;
-    }
+    // }
 }
 
 // set_mode_SmartRTL_or_land_with_pause - sets mode to SMART_RTL if possible or LAND with 4 second delay before descent starts
@@ -308,12 +311,12 @@ void Copter::set_mode_RTL_or_land_with_pause(ModeReason reason)
 void Copter::set_mode_SmartRTL_or_land_with_pause(ModeReason reason)
 {
     // attempt to switch to SMART_RTL, if this failed then switch to Land
-    if (!set_mode(Mode::Number::SMART_RTL, reason)) {
-        gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL Unavailable, Using Land Mode");
-        set_mode_land_with_pause(reason);
-    } else {
+    // if (!set_mode(Mode::Number::SMART_RTL, reason)) {
+    //     gcs().send_text(MAV_SEVERITY_WARNING, "SmartRTL Unavailable, Using Land Mode");
+    //     set_mode_land_with_pause(reason);
+    // } else {
         AP_Notify::events.failsafe_mode_change = 1;
-    }
+    // }
 }
 
 // set_mode_SmartRTL_or_RTL - sets mode to SMART_RTL if possible or RTL if possible or LAND with 4 second delay before descent starts
@@ -358,7 +361,7 @@ void Copter::do_failsafe_action(Failsafe_Action action, ModeReason reason){
         case Failsafe_Action_None:
             return;
         case Failsafe_Action_Land:
-            set_mode_land_with_pause(reason);
+            // set_mode_land_with_pause(reason);
             break;
         case Failsafe_Action_RTL:
             set_mode_RTL_or_land_with_pause(reason);
