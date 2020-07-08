@@ -41,7 +41,7 @@
 #include <AP_InertialSensor/AP_InertialSensor.h>  // ArduPilot Mega Inertial Sensor (accel & gyro) Library
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Mission/AP_Mission.h>     // Mission command library
-#include <AC_AttitudeControl/AC_AttitudeControl_Multi.h> // Attitude control library
+#include <AC_AttitudeControl/AC_AttitudeControl_River.h> // Attitude control library
 // #include <AC_AttitudeControl/AC_AttitudeControl_Heli.h> // Attitude control library for traditional helicopter
 #include <AC_AttitudeControl/AC_PosControl.h>      // Position control library
 #include <AP_Motors/AP_Motors.h>          // AP Motors library
@@ -71,8 +71,8 @@
 #include "config.h"
 
 
-#define AC_AttitudeControl_t AC_AttitudeControl_Multi
-#define MOTOR_CLASS AP_MotorsMulticopter
+#define AC_AttitudeControl_t AC_AttitudeControl_River
+#define MOTOR_CLASS AP_MotorsRiver
 
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
@@ -227,6 +227,8 @@ private:
     RC_Channel *channel_pitch;
     RC_Channel *channel_throttle;
     RC_Channel *channel_yaw;
+    RC_Channel *canalGanho; //Mathaus
+
 
     AP_Logger logger;
 
@@ -794,9 +796,9 @@ private:
     void Log_Write_Data(LogDataID id, float value);
     void Log_Write_Parameter_Tuning(uint8_t param, float tuning_val, float tune_min, float tune_max);
     void Log_Sensor_Health();
-#if FRAME_CONFIG == HELI_FRAME
-    void Log_Write_Heli(void);
-#endif
+// #if FRAME_CONFIG == HELI_FRAME
+//     void Log_Write_Heli(void);
+// #endif
     void Log_Write_Precland();
     void Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target);
     void Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitude, float frequency_start, float frequency_stop, float time_fade_in, float time_const_freq, float time_record, float time_fade_out);
