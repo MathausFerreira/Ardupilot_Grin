@@ -276,7 +276,7 @@ void ModeRTL::descent_start()
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
     // optionally deploy landing gear
-    copter.landinggear.deploy_for_landing();
+    // copter.landinggear.deploy_for_landing();
 }
 
 // rtl_descent_run - implements the final descent to the RTL_ALT
@@ -362,7 +362,7 @@ void ModeRTL::land_start()
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
     // optionally deploy landing gear
-    copter.landinggear.deploy_for_landing();
+    // copter.landinggear.deploy_for_landing();
 }
 
 bool ModeRTL::is_landing() const

@@ -118,9 +118,9 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if MODE_SMARTRTL_ENABLED == ENABLED
     SCHED_TASK_CLASS(ModeSmartRTL, &copter.mode_smartrtl,       save_position,    3, 100),
 #endif
-#if SPRAYER_ENABLED == ENABLED
-    SCHED_TASK_CLASS(AC_Sprayer,           &copter.sprayer,             update,           3,  90),
-#endif
+// #if SPRAYER_ENABLED == ENABLED
+//     SCHED_TASK_CLASS(AC_Sprayer,           &copter.sprayer,             update,           3,  90),
+// #endif
     SCHED_TASK(three_hz_loop,          3,     75),
     SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,     75),
     SCHED_TASK_CLASS(AP_Baro,              &copter.barometer,           accumulate,      50,  90),
@@ -141,7 +141,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(ekf_check,             10,     75),
     SCHED_TASK(check_vibration,       10,     50),
     SCHED_TASK(gpsglitch_check,       10,     50),
-    SCHED_TASK(landinggear_update,    10,     75),
+    // SCHED_TASK(landinggear_update,    10,     75),
     SCHED_TASK(standby_update,        100,    75),
     SCHED_TASK(lost_vehicle_check,    10,     50),
     SCHED_TASK_CLASS(GCS,                  (GCS*)&copter._gcs,          update_receive, 400, 180),
@@ -255,7 +255,7 @@ void Copter::fast_loop()
     update_home_from_EKF();
 
     // check if we've landed or crashed
-    update_land_and_crash_detectors();
+    // update_land_and_crash_detectors();
 
 #if MOUNT == ENABLED
     // camera mount's fast update
@@ -429,10 +429,10 @@ void Copter::twentyfive_hz_logging()
     }
 #endif
 
-#if PRECISION_LANDING == ENABLED
-    // log output
-    Log_Write_Precland();
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     // log output
+//     Log_Write_Precland();
+// #endif
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     if (should_log(MASK_LOG_ATTITUDE_MED) || should_log(MASK_LOG_ATTITUDE_FAST)) {
@@ -460,6 +460,60 @@ void Copter::three_hz_loop()
     // update ch6 in flight tuning
     tuning();
 }
+
+//Mathaus
+
+// Code to detect a crash main ArduCopter code
+#define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing
+#define LAND_CHECK_LARGE_ANGLE_CD   1500.0f     // maximum angle target to be considered landing
+#define LAND_CHECK_ACCEL_MOVING     3.0f        // maximum acceleration after subtracting gravity
+
+void Copter::update_throttle_mix()
+{
+// #if FRAME_CONFIG != HELI_FRAME
+//     // if disarmed or landed prioritise throttle
+//     if (!motors->armed() || ap.land_complete) {
+//         attitude_control->set_throttle_mix_min();
+//         return;
+//     }
+
+//     if (flightmode->has_manual_throttle()) {
+//         // manual throttle
+//         if(channel_throttle->get_control_in() <= 0) {
+//             attitude_control->set_throttle_mix_min();
+//         } else {
+//             attitude_control->set_throttle_mix_man();
+//         }
+//     } else {
+//         // autopilot controlled throttle
+
+//         // check for aggressive flight requests - requested roll or pitch angle below 15 degrees
+//         const Vector3f angle_target = attitude_control->get_att_target_euler_cd();
+//          bool large_angle_request = (norm(angle_target.x, angle_target.y) > LAND_CHECK_LARGE_ANGLE_CD);
+
+//         // check for large external disturbance - angle error over 30 degrees
+//         const float angle_error = attitude_control->get_att_error_angle_deg();
+//          bool large_angle_error = (angle_error > LAND_CHECK_ANGLE_ERROR_DEG);
+
+//         // check for large acceleration - falling or high turbulence
+//          const bool accel_moving = (land_accel_ef_filter.get().length() > LAND_CHECK_ACCEL_MOVING);
+
+//         // check for requested decent
+//         bool descent_not_demanded = pos_control->get_desired_velocity().z >= 0.0f;
+
+//         // check if landing
+//         const bool landing = flightmode->is_landing();
+
+//         // if ((large_angle_request && !landing) || large_angle_error || accel_moving || descent_not_demanded) {
+//         //     attitude_control->set_throttle_mix_max(pos_control->get_vel_z_control_ratio());
+//         // } else {
+//             attitude_control->set_throttle_mix_min();
+//         // }
+//     }
+// #endif
+}
+
+
 
 // one_hz_loop - runs at 1Hz
 void Copter::one_hz_loop()

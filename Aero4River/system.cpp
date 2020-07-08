@@ -131,13 +131,13 @@ void Copter::init_ardupilot()
     camera_mount.init();
 #endif
 
-#if PRECISION_LANDING == ENABLED
-    // initialise precision landing
-    init_precland();
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     // initialise precision landing
+//     init_precland();
+// #endif
 
     // initialise landing gear position
-    landinggear.init();
+    // landinggear.init();
 
 #ifdef USERHOOK_INIT
     USERHOOK_INIT
@@ -196,8 +196,8 @@ void Copter::init_ardupilot()
 #endif // ENABLE_SCRIPTING
 
     // set landed flags
-    set_land_complete(true);
-    set_land_complete_maybe(true);
+    // set_land_complete(true);
+    // set_land_complete_maybe(true);
 
     // we don't want writes to the serial port to cause us to pause
     // mid-flight, so set the serial ports non-blocking once we are

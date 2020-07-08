@@ -42,7 +42,7 @@
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_Mission/AP_Mission.h>     // Mission command library
 #include <AC_AttitudeControl/AC_AttitudeControl_Multi.h> // Attitude control library
-#include <AC_AttitudeControl/AC_AttitudeControl_Heli.h> // Attitude control library for traditional helicopter
+// #include <AC_AttitudeControl/AC_AttitudeControl_Heli.h> // Attitude control library for traditional helicopter
 #include <AC_AttitudeControl/AC_PosControl.h>      // Position control library
 #include <AP_Motors/AP_Motors.h>          // AP Motors library
 #include <AP_Stats/AP_Stats.h>     // statistics library
@@ -56,31 +56,24 @@
 #include <AP_Declination/AP_Declination.h>     // ArduPilot Mega Declination Helper Library
 #include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
 #include <AP_BattMonitor/AP_BattMonitor.h>     // Battery monitor library
-#include <AP_LandingGear/AP_LandingGear.h>     // Landing Gear library
+// #include <AP_LandingGear/AP_LandingGear.h>     // Landing Gear library
 #include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
-#include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
+// #include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
 #include <AP_Arming/AP_Arming.h>
 #include <AP_SmartRTL/AP_SmartRTL.h>
 #include <AP_TempCalibration/AP_TempCalibration.h>
 #include <AC_AutoTune/AC_AutoTune.h>
-#include <AP_Parachute/AP_Parachute.h>
-#include <AC_Sprayer/AC_Sprayer.h>
+// #include <AP_Parachute/AP_Parachute.h>
+// #include <AC_Sprayer/AC_Sprayer.h>
 
 // Configuration
 #include "defines.h"
 #include "config.h"
 
-#if FRAME_CONFIG == HELI_FRAME
-    #define AC_AttitudeControl_t AC_AttitudeControl_Heli
-#else
-    #define AC_AttitudeControl_t AC_AttitudeControl_Multi
-#endif
 
-#if FRAME_CONFIG == HELI_FRAME
- #define MOTOR_CLASS AP_MotorsHeli
-#else
- #define MOTOR_CLASS AP_MotorsMulticopter
-#endif
+#define AC_AttitudeControl_t AC_AttitudeControl_Multi
+#define MOTOR_CLASS AP_MotorsMulticopter
+
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
  #include <AC_Autorotation/AC_Autorotation.h> // Autorotation controllers
@@ -108,12 +101,9 @@
 #if GRIPPER_ENABLED == ENABLED
  # include <AP_Gripper/AP_Gripper.h>
 #endif
-#if PRECISION_LANDING == ENABLED
- # include <AC_PrecLand/AC_PrecLand.h>
- # include <AP_IRLock/AP_IRLock.h>
-#endif
-// #if ADSB_ENABLED == ENABLED
-//  # include <AP_ADSB/AP_ADSB.h>
+// #if PRECISION_LANDING == ENABLED
+//  # include <AC_PrecLand/AC_PrecLand.h>
+//  # include <AP_IRLock/AP_IRLock.h>
 // #endif
 #if MODE_FOLLOW_ENABLED == ENABLED
  # include <AP_Follow/AP_Follow.h>
@@ -200,29 +190,21 @@ public:
     friend class AutoTune;
 
     friend class Mode;
-    // friend class ModeAcro;
-    // friend class ModeAcro_Heli;
     friend class ModeAltHold;
     friend class ModeAuto;
     friend class ModeAutoTune;
-    // friend class ModeAvoidADSB;
     friend class ModeBrake;
     friend class ModeCircle;
     friend class ModeDrift;
-    // friend class ModeFlip;
     friend class ModeFlowHold;
     friend class ModeFollow;
     friend class ModeGuided;
-    // friend class ModeLand;
     friend class ModeLoiter;
     friend class ModePosHold;
     friend class ModeRTL;
     friend class ModeSmartRTL;
-    // friend class ModeSport;
     friend class ModeStabilize;
-    // friend class ModeStabilize_Heli;
     friend class ModeSystemId;
-    // friend class ModeThrow;
     friend class ModeZigZag;
     friend class ModeAutorotate;
 
@@ -499,41 +481,17 @@ private:
     AP_Rally_Copter rally;
 #endif
 
-    // Crop Sprayer
-#if SPRAYER_ENABLED == ENABLED
-    AC_Sprayer sprayer;
-#endif
-
-    // Parachute release
-#if PARACHUTE == ENABLED
-    AP_Parachute parachute{relay};
-#endif
-
-    // Landing Gear Controller
-    AP_LandingGear landinggear;
 
     // terrain handling
 #if AP_TERRAIN_AVAILABLE && AC_TERRAIN && MODE_AUTO_ENABLED == ENABLED
     AP_Terrain terrain{mode_auto.mission};
 #endif
 
-    // Precision Landing
-#if PRECISION_LANDING == ENABLED
-    AC_PrecLand precland;
-#endif
-
-    // Pilot Input Management Library
-    // Only used for Helicopter for now
-#if FRAME_CONFIG == HELI_FRAME
-    AC_InputManager_Heli input_manager;
-#endif
-
-// #if ADSB_ENABLED == ENABLED
-//     AP_ADSB adsb;
-
-//     // avoidance of adsb enabled vehicles (normally manned vehicles)
-//     AP_Avoidance_Copter avoidance_adsb{adsb};
+//     // Precision Landing
+// #if PRECISION_LANDING == ENABLED
+//     AC_PrecLand precland;
 // #endif
+
 
     // last valid RC input time
     uint32_t last_radio_update_ms;
@@ -544,23 +502,6 @@ private:
     // Top-level logic
     // setup the var_info table
     AP_Param param_loader;
-
-#if FRAME_CONFIG == HELI_FRAME
-    // Mode filter to reject RC Input glitches.  Filter size is 5, and it draws the 4th element, so it can reject 3 low glitches,
-    // and 1 high glitch.  This is because any "off" glitches can be highly problematic for a helicopter running an ESC
-    // governor.  Even a single "off" frame can cause the rotor to slow dramatically and take a long time to restart.
-    ModeFilterInt16_Size5 rotor_speed_deglitch_filter {4};
-
-    // Tradheli flags
-    typedef struct {
-        uint8_t dynamic_flight          : 1;    // 0   // true if we are moving at a significant speed (used to turn on/off leaky I terms)
-        uint8_t inverted_flight         : 1;    // 1   // true for inverted flight mode
-        uint8_t in_autorotation         : 1;    // 2   // true when heli is in autorotation
-    } heli_flags_t;
-    heli_flags_t heli_flags;
-
-    int16_t hover_roll_trim_scalar_slew;
-#endif
 
     // ground effect detector
     struct {
@@ -619,7 +560,6 @@ private:
                   "_failsafe_priorities is missing the sentinel");
 
 
-
     // AP_State.cpp
     void set_auto_armed(bool b);
     void set_simple_mode(uint8_t b);
@@ -656,18 +596,102 @@ private:
     void set_throttle_takeoff();
     float get_pilot_desired_climb_rate(float throttle_control);
     float get_non_takeoff_throttle();
-    // float get_avoidance_adjusted_climbrate(float target_rate);
     void set_accel_throttle_I_from_pilot_throttle();
     void rotate_body_frame_to_NE(float &x, float &y);
     uint16_t get_pilot_speed_dn();
 
-// #if ADSB_ENABLED == ENABLED
-//     // avoidance_adsb.cpp
-//     void avoidance_adsb_update(void);
-// #endif
-
-    // baro_ground_effect.cpp
     void update_ground_effect_detector(void);
+
+    //   Aero4River Code Mathaus
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    /// Declaração de Variáveis ( Mathaus )
+    /////////////////////////////////////////////////////////////////////////////////////
+
+    // Propriedade Física do Barco
+    float FT = 0.0f;
+    float FM1 = GRAVITY_MSS*2.1f;
+    float FM2 = GRAVITY_MSS*2.1f;
+    float FM3 = GRAVITY_MSS*2.1f;
+    float FM4 = GRAVITY_MSS*2.1f;
+
+    float Fmax = FM1 + FM2 + FM3 + FM4;       // Força e torque maximos do barco
+
+    float L    = 0.54f;          // Tamanho do braço do barco
+    float Lx = L*cosf(M_PI/4.0f);
+    float Ly = L*cosf(M_PI/4.0f);
+
+    float Pwmmax = 1001.0f; // Esse valor será a faixa de pwm que eu vou escolher para trabalhar --------------- // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float Pwmmin = 1.0f;    // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float Nmax = L*Fmax;
+
+    float k1 = (FM1)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k2 = (FM2)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k3 = (FM3)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k4 = (FM4)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+
+    // Servo Motores Barco
+    float servo_m1 = 0.0f;
+    float servo_m2 = 0.0f;
+    float servo_m3 = 0.0f;
+    float servo_m4 = 0.0f;
+
+    //Usado para calcular valores
+    float theta_m1 =  0.0f;
+    float theta_m2 =  0.0f;
+    float theta_m3 =  0.0f;
+    float theta_m4 =  0.0f;
+
+    float Pwm1 = 0.0f;
+    float Pwm2 = 0.0f;
+    float Pwm3 = 0.0f;
+    float Pwm4 = 0.0f;
+
+    //    Forcas enviadas para a alocacao
+    float Fx = 0.0f;
+    float Fy = 0.0f;
+    float tN = 0.0f;
+
+    //    Forcas Alocadas realmente
+    float FX_out = 0.0f;
+    float FY_out = 0.0f;
+    float TN_out = 0.0f;
+
+    // Variáveis auxiliares para Fx e Fy
+    float X = 0.0f;
+    float Y = 0.0f;
+    float Z = 0.0f;
+    float GanhoF ;
+
+    ////////////////////////////    Funções    ///////////////////////////////////
+
+    int servo_angle_to_pwm(float angle,float srv_min_pwm,float srv_max_pwm);
+    float servo_pwm_to_angle(int PWM_aux);
+    float PWMtoNorm(float pwm);
+    float NormtoPWM(float pwm);
+    float mapCube(float x, float y, float z);
+    void Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
+    void get_pilot_desired_force_to_boat_M();
+    void pwm_servo_angle();
+    void FOSSEN_alocation_matrix(float &FX,float &FY,float &tN,float &theta_motor1,float &theta_motor2,float &theta_motor3,float &theta_motor4,float &PWM1 ,float &PWM2 ,float &PWM3 ,float &PWM4);
+    void FxFy_calc(float roll, float pitch);
+
+    void get_pilot_desired_force_to_boat(float roll, float pitch, float yaw);
+    void get_pilot_desired_force_to_boat();
+    void calcPWM();
+    int servo_angle_to_pwm(float ang);
+
+    void Log_Write_Mathaus();
+    void Log_Write_Grin();
+
+    // Accacio
+    void Log_Write_Accacio();
+
+
+
+    //
+
+
 
     // commands.cpp
     void update_home_from_EKF();

@@ -236,7 +236,7 @@ void ModeAuto::land_start(const Vector3f& destination)
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
     // optionally deploy landing gear
-    copter.landinggear.deploy_for_landing();
+    // copter.landinggear.deploy_for_landing();
 }
 
 // auto_circle_movetoedge_start - initialise waypoint controller to move to edge of a circle with it's center at the specified location
@@ -1492,7 +1492,7 @@ bool ModeAuto::verify_takeoff()
 
     // retract the landing gear
     if (reached_wp_dest) {
-        copter.landinggear.retract_after_takeoff();
+        // copter.landinggear.retract_after_takeoff();
     }
 
     return reached_wp_dest;

@@ -777,10 +777,10 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
             // For safety, anything other than 1 will deploy
             switch ((uint8_t)packet.param2) {
                 case 1:
-                    copter.landinggear.set_position(AP_LandingGear::LandingGear_Retract);
+                    // copter.landinggear.set_position(AP_LandingGear::LandingGear_Retract);
                     return MAV_RESULT_ACCEPTED;
                 default:
-                    copter.landinggear.set_position(AP_LandingGear::LandingGear_Deploy);
+                    // copter.landinggear.set_position(AP_LandingGear::LandingGear_Deploy);
                     return MAV_RESULT_ACCEPTED;
             }
             return MAV_RESULT_FAILED;

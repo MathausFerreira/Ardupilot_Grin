@@ -218,15 +218,15 @@
 
 //////////////////////////////////////////////////////////////////////////////
 //  Crop Sprayer - enabled only on larger firmwares
-#ifndef SPRAYER_ENABLED
- # define SPRAYER_ENABLED  HAL_SPRAYER_ENABLED
-#endif
+// #ifndef SPRAYER_ENABLED
+//  # define SPRAYER_ENABLED  HAL_SPRAYER_ENABLED
+// #endif
 
 //////////////////////////////////////////////////////////////////////////////
 // Precision Landing with companion computer or IRLock sensor
-#ifndef PRECISION_LANDING
- # define PRECISION_LANDING ENABLED
-#endif
+// #ifndef PRECISION_LANDING
+//  # define PRECISION_LANDING ENABLED
+// #endif
 
 //////////////////////////////////////////////////////////////////////////////
 // gripper - enabled only on larger firmwares
@@ -248,9 +248,9 @@
 
 //////////////////////////////////////////////////////////////////////////////
 // Parachute release
-#ifndef PARACHUTE
- # define PARACHUTE HAL_PARACHUTE_ENABLED
-#endif
+// #ifndef PARACHUTE
+//  # define PARACHUTE HAL_PARACHUTE_ENABLED
+// #endif
 
 //////////////////////////////////////////////////////////////////////////////
 // ADSB support

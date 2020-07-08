@@ -858,9 +858,9 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method)
     }
 #endif
 
-    // we are not in the air
-    copter.set_land_complete(true);
-    copter.set_land_complete_maybe(true);
+    // // we are not in the air
+    // copter.set_land_complete(true);
+    // copter.set_land_complete_maybe(true);
 
     // send disarm command to motors
     copter.motors->armed(false);

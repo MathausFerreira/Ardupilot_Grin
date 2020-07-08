@@ -478,21 +478,21 @@ const AP_Param::Info Copter::var_info[] = {
     // @Path: ../libraries/AP_Relay/AP_Relay.cpp
     GOBJECT(relay,                  "RELAY_", AP_Relay),
 
-#if PARACHUTE == ENABLED
-    // @Group: CHUTE_
-    // @Path: ../libraries/AP_Parachute/AP_Parachute.cpp
-    GOBJECT(parachute, "CHUTE_", AP_Parachute),
-#endif
+// #if PARACHUTE == ENABLED
+//     // @Group: CHUTE_
+//     // @Path: ../libraries/AP_Parachute/AP_Parachute.cpp
+//     GOBJECT(parachute, "CHUTE_", AP_Parachute),
+// #endif
 
-    // @Group: LGR_
-    // @Path: ../libraries/AP_LandingGear/AP_LandingGear.cpp
-    GOBJECT(landinggear,    "LGR_", AP_LandingGear),
+//     // @Group: LGR_
+//     // @Path: ../libraries/AP_LandingGear/AP_LandingGear.cpp
+//     GOBJECT(landinggear,    "LGR_", AP_LandingGear),
 
-#if FRAME_CONFIG == HELI_FRAME
-    // @Group: IM_
-    // @Path: ../libraries/AC_InputManager/AC_InputManager_Heli.cpp
-    GOBJECT(input_manager, "IM_", AC_InputManager_Heli),
-#endif
+// #if FRAME_CONFIG == HELI_FRAME
+//     // @Group: IM_
+//     // @Path: ../libraries/AC_InputManager/AC_InputManager_Heli.cpp
+//     GOBJECT(input_manager, "IM_", AC_InputManager_Heli),
+// #endif
 
     // @Group: COMPASS_
     // @Path: ../libraries/AP_Compass/AP_Compass.cpp
@@ -667,11 +667,11 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(optflow,   "FLOW", OpticalFlow),
 #endif
 
-#if PRECISION_LANDING == ENABLED
-    // @Group: PLND_
-    // @Path: ../libraries/AC_PrecLand/AC_PrecLand.cpp
-    GOBJECT(precland, "PLND_", AC_PrecLand),
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     // @Group: PLND_
+//     // @Path: ../libraries/AC_PrecLand/AC_PrecLand.cpp
+//     GOBJECT(precland, "PLND_", AC_PrecLand),
+// #endif
 
 #if RPM_ENABLED == ENABLED
     // @Group: RPM

@@ -440,9 +440,9 @@ private:
     void do_set_home(const AP_Mission::Mission_Command& cmd);
     void do_roi(const AP_Mission::Mission_Command& cmd);
     void do_mount_control(const AP_Mission::Mission_Command& cmd);
-#if PARACHUTE == ENABLED
-    void do_parachute(const AP_Mission::Mission_Command& cmd);
-#endif
+// #if PARACHUTE == ENABLED
+//     void do_parachute(const AP_Mission::Mission_Command& cmd);
+// #endif
 #if WINCH_ENABLED == ENABLED
     void do_winch(const AP_Mission::Mission_Command& cmd);
 #endif
@@ -899,9 +899,9 @@ public:
     bool is_autopilot() const override { return false; }
     bool has_user_takeoff(bool must_navigate) const override { return true; }
 
-#if PRECISION_LANDING == ENABLED
-    void set_precision_loiter_enabled(bool value) { _precision_loiter_enabled = value; }
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     void set_precision_loiter_enabled(bool value) { _precision_loiter_enabled = value; }
+// #endif
 
 protected:
 
@@ -911,16 +911,16 @@ protected:
     uint32_t wp_distance() const override;
     int32_t wp_bearing() const override;
 
-#if PRECISION_LANDING == ENABLED
-    bool do_precision_loiter();
-    void precision_loiter_xy();
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     bool do_precision_loiter();
+//     void precision_loiter_xy();
+// #endif
 
 private:
 
-#if PRECISION_LANDING == ENABLED
-    bool _precision_loiter_enabled;
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     bool _precision_loiter_enabled;
+// #endif
 
 };
 
@@ -1444,9 +1444,9 @@ private:
 
     // parameters
     AP_Int8  _auto_enabled;    // top level enable/disable control
-#if SPRAYER_ENABLED == ENABLED
-    AP_Int8  _spray_enabled;   // auto spray enable/disable
-#endif
+// #if SPRAYER_ENABLED == ENABLED
+//     AP_Int8  _spray_enabled;   // auto spray enable/disable
+// #endif
     AP_Int8  _wp_delay;        // delay for zigzag waypoint
     AP_Float _side_dist;       // sideways distance
     AP_Int8  _direction;       // sideways direction

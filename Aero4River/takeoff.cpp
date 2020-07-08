@@ -52,7 +52,7 @@ bool Mode::do_user_takeoff(float takeoff_alt_cm, bool must_navigate)
 void Mode::_TakeOff::start(float alt_cm)
 {
     // indicate we are taking off
-    copter.set_land_complete(false);
+    // copter.set_land_complete(false);
     // tell position controller to reset alt target and reset I terms
     copter.set_throttle_takeoff();
 
@@ -162,7 +162,7 @@ void Mode::auto_takeoff_run()
 
     // aircraft stays in landed state until rotor speed runup has finished
     if (motors->get_spool_state() == AP_Motors::SpoolState::THROTTLE_UNLIMITED) {
-        set_land_complete(false);
+        // set_land_complete(false);
     } else {
         wp_nav->shift_wp_origin_to_current_pos();
     }

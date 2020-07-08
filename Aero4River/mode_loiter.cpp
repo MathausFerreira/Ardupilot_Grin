@@ -34,41 +34,41 @@ bool ModeLoiter::init(bool ignore_checks)
     return true;
 }
 
-#if PRECISION_LANDING == ENABLED
-bool ModeLoiter::do_precision_loiter()
-{
-    if (!_precision_loiter_enabled) {
-        return false;
-    }
-    if (copter.ap.land_complete_maybe) {
-        return false;        // don't move on the ground
-    }
-    // if the pilot *really* wants to move the vehicle, let them....
-    if (loiter_nav->get_pilot_desired_acceleration().length() > 50.0f) {
-        return false;
-    }
-    if (!copter.precland.target_acquired()) {
-        return false; // we don't have a good vector
-    }
-    return true;
-}
+// #if PRECISION_LANDING == ENABLED
+// bool ModeLoiter::do_precision_loiter()
+// {
+//     if (!_precision_loiter_enabled) {
+//         return false;
+//     }
+//     if (copter.ap.land_complete_maybe) {
+//         return false;        // don't move on the ground
+//     }
+//     // if the pilot *really* wants to move the vehicle, let them....
+//     if (loiter_nav->get_pilot_desired_acceleration().length() > 50.0f) {
+//         return false;
+//     }
+//     if (!copter.precland.target_acquired()) {
+//         return false; // we don't have a good vector
+//     }
+//     return true;
+// }
 
-void ModeLoiter::precision_loiter_xy()
-{
-    loiter_nav->clear_pilot_desired_acceleration();
-    Vector2f target_pos, target_vel_rel;
-    if (!copter.precland.get_target_position_cm(target_pos)) {
-        target_pos.x = inertial_nav.get_position().x;
-        target_pos.y = inertial_nav.get_position().y;
-    }
-    if (!copter.precland.get_target_velocity_relative_cms(target_vel_rel)) {
-        target_vel_rel.x = -inertial_nav.get_velocity().x;
-        target_vel_rel.y = -inertial_nav.get_velocity().y;
-    }
-    pos_control->set_xy_target(target_pos.x, target_pos.y);
-    pos_control->override_vehicle_velocity_xy(-target_vel_rel);
-}
-#endif
+// void ModeLoiter::precision_loiter_xy()
+// {
+//     loiter_nav->clear_pilot_desired_acceleration();
+//     Vector2f target_pos, target_vel_rel;
+//     if (!copter.precland.get_target_position_cm(target_pos)) {
+//         target_pos.x = inertial_nav.get_position().x;
+//         target_pos.y = inertial_nav.get_position().y;
+//     }
+//     if (!copter.precland.get_target_velocity_relative_cms(target_vel_rel)) {
+//         target_vel_rel.x = -inertial_nav.get_velocity().x;
+//         target_vel_rel.y = -inertial_nav.get_velocity().y;
+//     }
+//     pos_control->set_xy_target(target_pos.x, target_pos.y);
+//     pos_control->override_vehicle_velocity_xy(-target_vel_rel);
+// }
+// #endif
 
 // loiter_run - runs the loiter controller
 // should be called at 100hz or more
@@ -165,11 +165,11 @@ void ModeLoiter::run()
         // set motors to full range
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-#if PRECISION_LANDING == ENABLED
-        if (do_precision_loiter()) {
-            precision_loiter_xy();
-        }
-#endif
+// #if PRECISION_LANDING == ENABLED
+//         if (do_precision_loiter()) {
+//             precision_loiter_xy();
+//         }
+// #endif
 
         // run loiter controller
         loiter_nav->update();

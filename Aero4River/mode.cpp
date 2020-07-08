@@ -556,21 +556,21 @@ void Mode::land_run_vertical_control(bool pause_descent)
         // Constrain the demanded vertical velocity so that it is between the configured maximum descent speed and the configured minimum descent speed.
         cmb_rate = constrain_float(cmb_rate, max_land_descent_velocity, -abs(g.land_speed));
 
-#if PRECISION_LANDING == ENABLED
-        const bool navigating = pos_control->is_active_xy();
-        bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired() && navigating;
+// #if PRECISION_LANDING == ENABLED
+//         const bool navigating = pos_control->is_active_xy();
+//         bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired() && navigating;
 
-        if (doing_precision_landing && copter.rangefinder_alt_ok() && copter.rangefinder_state.alt_cm > 35.0f && copter.rangefinder_state.alt_cm < 200.0f)
-        {
-            // compute desired velocity
-            const float precland_acceptable_error = 15.0f;
-            const float precland_min_descent_speed = 10.0f;
+//         if (doing_precision_landing && copter.rangefinder_alt_ok() && copter.rangefinder_state.alt_cm > 35.0f && copter.rangefinder_state.alt_cm < 200.0f)
+//         {
+//             // compute desired velocity
+//             const float precland_acceptable_error = 15.0f;
+//             const float precland_min_descent_speed = 10.0f;
 
-            float max_descent_speed = abs(g.land_speed) * 0.5f;
-            float land_slowdown = MAX(0.0f, pos_control->get_horizontal_error() * (max_descent_speed / precland_acceptable_error));
-            cmb_rate = MIN(-precland_min_descent_speed, -max_descent_speed + land_slowdown);
-        }
-#endif
+//             float max_descent_speed = abs(g.land_speed) * 0.5f;
+//             float land_slowdown = MAX(0.0f, pos_control->get_horizontal_error() * (max_descent_speed / precland_acceptable_error));
+//             cmb_rate = MIN(-precland_min_descent_speed, -max_descent_speed + land_slowdown);
+//         }
+// #endif
     }
 
     // update altitude target and call position controller
@@ -630,26 +630,26 @@ void Mode::land_run_horizontal_control()
         }
     }
 
-#if PRECISION_LANDING == ENABLED
-    bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired();
-    // run precision landing
-    if (doing_precision_landing)
-    {
-        Vector2f target_pos, target_vel_rel;
-        if (!copter.precland.get_target_position_cm(target_pos))
-        {
-            target_pos.x = inertial_nav.get_position().x;
-            target_pos.y = inertial_nav.get_position().y;
-        }
-        if (!copter.precland.get_target_velocity_relative_cms(target_vel_rel))
-        {
-            target_vel_rel.x = -inertial_nav.get_velocity().x;
-            target_vel_rel.y = -inertial_nav.get_velocity().y;
-        }
-        pos_control->set_xy_target(target_pos.x, target_pos.y);
-        pos_control->override_vehicle_velocity_xy(-target_vel_rel);
-    }
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired();
+//     // run precision landing
+//     if (doing_precision_landing)
+//     {
+//         Vector2f target_pos, target_vel_rel;
+//         if (!copter.precland.get_target_position_cm(target_pos))
+//         {
+//             target_pos.x = inertial_nav.get_position().x;
+//             target_pos.y = inertial_nav.get_position().y;
+//         }
+//         if (!copter.precland.get_target_velocity_relative_cms(target_vel_rel))
+//         {
+//             target_vel_rel.x = -inertial_nav.get_velocity().x;
+//             target_vel_rel.y = -inertial_nav.get_velocity().y;
+//         }
+//         pos_control->set_xy_target(target_pos.x, target_pos.y);
+//         pos_control->override_vehicle_velocity_xy(-target_vel_rel);
+//     }
+// #endif
 
     // process roll, pitch inputs
     loiter_nav->set_pilot_desired_acceleration(target_roll, target_pitch, G_Dt);
@@ -827,7 +827,7 @@ bool Mode::set_mode(Mode::Number mode, ModeReason reason)
 
 void Mode::set_land_complete(bool b)
 {
-    return copter.set_land_complete(b);
+    // return 0;//copter.set_land_complete(b);
 }
 
 GCS_Copter &Mode::gcs()
