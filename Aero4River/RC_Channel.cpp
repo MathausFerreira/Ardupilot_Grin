@@ -307,40 +307,40 @@ void RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             do_aux_function_change_mode(Mode::Number::FOLLOW, ch_flag);
             break;
 
-        case AUX_FUNC::PARACHUTE_ENABLE:
-#if PARACHUTE == ENABLED
-            // Parachute enable/disable
-            copter.parachute.enabled(ch_flag == AuxSwitchPos::HIGH);
-#endif
-            break;
+//         case AUX_FUNC::PARACHUTE_ENABLE:
+// #if PARACHUTE == ENABLED
+//             // Parachute enable/disable
+//             copter.parachute.enabled(ch_flag == AuxSwitchPos::HIGH);
+// #endif
+//             break;
 
-        case AUX_FUNC::PARACHUTE_RELEASE:
-#if PARACHUTE == ENABLED
-            if (ch_flag == AuxSwitchPos::HIGH) {
-                copter.parachute_manual_release();
-            }
-#endif
-            break;
+//         case AUX_FUNC::PARACHUTE_RELEASE:
+// #if PARACHUTE == ENABLED
+//             if (ch_flag == AuxSwitchPos::HIGH) {
+//                 copter.parachute_manual_release();
+//             }
+// #endif
+//             break;
 
-        case AUX_FUNC::PARACHUTE_3POS:
-#if PARACHUTE == ENABLED
-            // Parachute disable, enable, release with 3 position switch
-            switch (ch_flag) {
-                case AuxSwitchPos::LOW:
-                    copter.parachute.enabled(false);
-                    AP::logger().Write_Event(LogEvent::PARACHUTE_DISABLED);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    copter.parachute.enabled(true);
-                    AP::logger().Write_Event(LogEvent::PARACHUTE_ENABLED);
-                    break;
-                case AuxSwitchPos::HIGH:
-                    copter.parachute.enabled(true);
-                    copter.parachute_manual_release();
-                    break;
-            }
-#endif
-            break;
+//         case AUX_FUNC::PARACHUTE_3POS:
+// #if PARACHUTE == ENABLED
+//             // Parachute disable, enable, release with 3 position switch
+//             switch (ch_flag) {
+//                 case AuxSwitchPos::LOW:
+//                     copter.parachute.enabled(false);
+//                     AP::logger().Write_Event(LogEvent::PARACHUTE_DISABLED);
+//                     break;
+//                 case AuxSwitchPos::MIDDLE:
+//                     copter.parachute.enabled(true);
+//                     AP::logger().Write_Event(LogEvent::PARACHUTE_ENABLED);
+//                     break;
+//                 case AuxSwitchPos::HIGH:
+//                     copter.parachute.enabled(true);
+//                     copter.parachute_manual_release();
+//                     break;
+//             }
+// #endif
+//             break;
 
         case AUX_FUNC::ATTCON_FEEDFWD:
             // enable or disable feed forward
@@ -392,20 +392,20 @@ void RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
 #endif
             break;
 
-        case AUX_FUNC::PRECISION_LOITER:
-#if PRECISION_LANDING == ENABLED && MODE_LOITER_ENABLED == ENABLED
-            switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    copter.mode_loiter.set_precision_loiter_enabled(true);
-                    break;
-                case AuxSwitchPos::MIDDLE:
-                    // nothing
-                    break;
-                case AuxSwitchPos::LOW:
-                    copter.mode_loiter.set_precision_loiter_enabled(false);
-                    break;
-            }
-#endif
+        // case AUX_FUNC::PRECISION_LOITER:
+// #if PRECISION_LANDING == ENABLED && MODE_LOITER_ENABLED == ENABLED
+//             switch (ch_flag) {
+//                 case AuxSwitchPos::HIGH:
+//                     copter.mode_loiter.set_precision_loiter_enabled(true);
+//                     break;
+//                 case AuxSwitchPos::MIDDLE:
+//                     // nothing
+//                     break;
+//                 case AuxSwitchPos::LOW:
+//                     copter.mode_loiter.set_precision_loiter_enabled(false);
+//                     break;
+//             }
+// #endif
             break;
 
         case AUX_FUNC::SMART_RTL:

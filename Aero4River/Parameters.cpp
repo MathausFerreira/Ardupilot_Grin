@@ -521,7 +521,7 @@ const AP_Param::Info Copter::var_info[] = {
 #if FRAME_CONFIG == HELI_FRAME
     GOBJECTPTR(attitude_control, "ATC_", AC_AttitudeControl_Heli),
 #else
-    GOBJECTPTR(attitude_control, "ATC_", AC_AttitudeControl_Multi),
+    GOBJECTPTR(attitude_control, "ATC_", AC_AttitudeControl_River),
 #endif
 
     // @Group: PSC
@@ -572,11 +572,11 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(BoardConfig_CAN,        "CAN_",       AP_BoardConfig_CAN),
 #endif
 
-#if SPRAYER_ENABLED == ENABLED
-    // @Group: SPRAY_
-    // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
-    GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
-#endif
+// #if SPRAYER_ENABLED == ENABLED
+//     // @Group: SPRAY_
+//     // @Path: ../libraries/AC_Sprayer/AC_Sprayer.cpp
+//     GOBJECT(sprayer,                "SPRAY_",       AC_Sprayer),
+// #endif
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     GOBJECT(sitl, "SIM_", SITL::SITL),
@@ -906,11 +906,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(user_parameters, "USR", 28, ParametersG2, UserParameters),
 #endif
 
-#if AUTOTUNE_ENABLED == ENABLED
-    // @Group: AUTOTUNE_
-    // @Path: ../libraries/AC_AutoTune/AC_AutoTune.cpp
-    AP_SUBGROUPPTR(autotune_ptr, "AUTOTUNE_",  29, ParametersG2, AutoTune),
-#endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     // @Group: AUTOTUNE_
+//     // @Path: ../libraries/AC_AutoTune/AC_AutoTune.cpp
+//     AP_SUBGROUPPTR(autotune_ptr, "AUTOTUNE_",  29, ParametersG2, AutoTune),
+// #endif
 
 #ifdef ENABLE_SCRIPTING
     // @Group: SCR_
@@ -998,9 +998,9 @@ ParametersG2::ParametersG2(void)
 #ifdef USER_PARAMS_ENABLED
     ,user_parameters()
 #endif
-#if AUTOTUNE_ENABLED == ENABLED
-    ,autotune_ptr(&copter.autotune)
-#endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     ,autotune_ptr(&copter.autotune)
+// #endif
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ,mode_systemid_ptr(&copter.mode_systemid)
 #endif

@@ -96,11 +96,11 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         //             break;
         // #endif
 
-#if AUTOTUNE_ENABLED == ENABLED
-    case Mode::Number::AUTOTUNE:
-        ret = &mode_autotune;
-        break;
-#endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     case Mode::Number::AUTOTUNE:
+//         ret = &mode_autotune;
+//         break;
+// #endif
 
 #if MODE_POSHOLD_ENABLED == ENABLED
     case Mode::Number::POSHOLD:
@@ -300,12 +300,12 @@ void Copter::update_flight_mode()
 void Copter::exit_mode(Mode *&old_flightmode,
                        Mode *&new_flightmode)
 {
-#if AUTOTUNE_ENABLED == ENABLED
-    if (old_flightmode == &mode_autotune)
-    {
-        mode_autotune.stop();
-    }
-#endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     if (old_flightmode == &mode_autotune)
+//     {
+//         mode_autotune.stop();
+//     }
+// #endif
 
     // stop mission when we leave auto mode
 #if MODE_AUTO_ENABLED == ENABLED

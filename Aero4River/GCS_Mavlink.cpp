@@ -707,25 +707,25 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
         return MAV_RESULT_FAILED;
 #endif
 
-#if PARACHUTE == ENABLED
-    case MAV_CMD_DO_PARACHUTE:
-        // configure or release parachute
-        switch ((uint16_t)packet.param1) {
-        case PARACHUTE_DISABLE:
-            copter.parachute.enabled(false);
-            AP::logger().Write_Event(LogEvent::PARACHUTE_DISABLED);
-            return MAV_RESULT_ACCEPTED;
-        case PARACHUTE_ENABLE:
-            copter.parachute.enabled(true);
-            AP::logger().Write_Event(LogEvent::PARACHUTE_ENABLED);
-            return MAV_RESULT_ACCEPTED;
-        case PARACHUTE_RELEASE:
-            // treat as a manual release which performs some additional check of altitude
-            copter.parachute_manual_release();
-            return MAV_RESULT_ACCEPTED;
-        }
-        return MAV_RESULT_FAILED;
-#endif
+// #if PARACHUTE == ENABLED
+//     case MAV_CMD_DO_PARACHUTE:
+//         // configure or release parachute
+//         switch ((uint16_t)packet.param1) {
+//         case PARACHUTE_DISABLE:
+//             copter.parachute.enabled(false);
+//             AP::logger().Write_Event(LogEvent::PARACHUTE_DISABLED);
+//             return MAV_RESULT_ACCEPTED;
+//         case PARACHUTE_ENABLE:
+//             copter.parachute.enabled(true);
+//             AP::logger().Write_Event(LogEvent::PARACHUTE_ENABLED);
+//             return MAV_RESULT_ACCEPTED;
+//         case PARACHUTE_RELEASE:
+//             // treat as a manual release which performs some additional check of altitude
+//             copter.parachute_manual_release();
+//             return MAV_RESULT_ACCEPTED;
+//         }
+//         return MAV_RESULT_FAILED;
+// #endif
 
     case MAV_CMD_DO_MOTOR_TEST:
         // param1 : motor sequence number (a number from 1 to max number of motors on the vehicle)
@@ -1180,11 +1180,11 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
         break;
     }
 
-#if PRECISION_LANDING == ENABLED
-    case MAVLINK_MSG_ID_LANDING_TARGET:
-        copter.precland.handle_msg(msg);
-        break;
-#endif
+// #if PRECISION_LANDING == ENABLED
+//     case MAVLINK_MSG_ID_LANDING_TARGET:
+//         copter.precland.handle_msg(msg);
+//         break;
+// #endif
 
     case MAVLINK_MSG_ID_TERRAIN_DATA:
     case MAVLINK_MSG_ID_TERRAIN_CHECK:

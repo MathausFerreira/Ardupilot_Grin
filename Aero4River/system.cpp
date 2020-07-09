@@ -479,26 +479,26 @@ void Copter::allocate_motors(void)
         case AP_Motors::MOTOR_FRAME_OCTAQUAD:
         case AP_Motors::MOTOR_FRAME_DODECAHEXA:
         default:
-            motors = new AP_MotorsMatrix(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsMatrix::var_info;
+            motors = new AP_MotorsRiver(copter.scheduler.get_loop_rate_hz());
+            motors_var_info = AP_MotorsRiver::var_info;
             break;
-        case AP_Motors::MOTOR_FRAME_TRI:
-            motors = new AP_MotorsTri(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsTri::var_info;
-            AP_Param::set_frame_type_flags(AP_PARAM_FRAME_TRICOPTER);
-            break;
-        case AP_Motors::MOTOR_FRAME_SINGLE:
-            motors = new AP_MotorsSingle(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsSingle::var_info;
-            break;
-        case AP_Motors::MOTOR_FRAME_COAX:
-            motors = new AP_MotorsCoax(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsCoax::var_info;
-            break;
-        case AP_Motors::MOTOR_FRAME_TAILSITTER:
-            motors = new AP_MotorsTailsitter(copter.scheduler.get_loop_rate_hz());
-            motors_var_info = AP_MotorsTailsitter::var_info;
-            break;
+        // case AP_Motors::MOTOR_FRAME_TRI:
+        //     motors = new AP_MotorsTri(copter.scheduler.get_loop_rate_hz());
+        //     motors_var_info = AP_MotorsTri::var_info;
+        //     AP_Param::set_frame_type_flags(AP_PARAM_FRAME_TRICOPTER);
+        //     break;
+        // case AP_Motors::MOTOR_FRAME_SINGLE:
+        //     motors = new AP_MotorsSingle(copter.scheduler.get_loop_rate_hz());
+        //     motors_var_info = AP_MotorsSingle::var_info;
+        //     break;
+        // case AP_Motors::MOTOR_FRAME_COAX:
+        //     motors = new AP_MotorsCoax(copter.scheduler.get_loop_rate_hz());
+        //     motors_var_info = AP_MotorsCoax::var_info;
+        //     break;
+        // case AP_Motors::MOTOR_FRAME_TAILSITTER:
+        //     motors = new AP_MotorsTailsitter(copter.scheduler.get_loop_rate_hz());
+        //     motors_var_info = AP_MotorsTailsitter::var_info;
+        //     break;
     }
 
     if (motors == nullptr) {

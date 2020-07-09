@@ -849,14 +849,14 @@ bool AP_Arming_Copter::disarm(const AP_Arming::Method method)
         }
     }
 
-#if AUTOTUNE_ENABLED == ENABLED
-    // save auto tuned parameters
-    if (copter.flightmode == &copter.mode_autotune) {
-        copter.mode_autotune.save_tuning_gains();
-    } else {
-        copter.mode_autotune.reset();
-    }
-#endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     // save auto tuned parameters
+//     if (copter.flightmode == &copter.mode_autotune) {
+//         copter.mode_autotune.save_tuning_gains();
+//     } else {
+//         copter.mode_autotune.reset();
+//     }
+// #endif
 
     // // we are not in the air
     // copter.set_land_complete(true);

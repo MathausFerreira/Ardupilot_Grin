@@ -62,7 +62,7 @@
 #include <AP_Arming/AP_Arming.h>
 #include <AP_SmartRTL/AP_SmartRTL.h>
 #include <AP_TempCalibration/AP_TempCalibration.h>
-#include <AC_AutoTune/AC_AutoTune.h>
+// #include <AC_AutoTune/AC_AutoTune.h>
 // #include <AP_Parachute/AP_Parachute.h>
 // #include <AC_Sprayer/AC_Sprayer.h>
 
@@ -187,12 +187,12 @@ public:
     friend class RC_Channel_Copter;
     friend class RC_Channels_Copter;
 
-    friend class AutoTune;
+    // friend class AutoTune;
 
     friend class Mode;
     friend class ModeAltHold;
     friend class ModeAuto;
-    friend class ModeAutoTune;
+    // friend class ModeAutoTune;
     friend class ModeBrake;
     friend class ModeCircle;
     friend class ModeDrift;
@@ -925,10 +925,10 @@ private:
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
 #endif
-#if AUTOTUNE_ENABLED == ENABLED
-    AutoTune autotune;
-    ModeAutoTune mode_autotune;
-#endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     AutoTune autotune;
+//     ModeAutoTune mode_autotune;
+// #endif
 #if MODE_BRAKE_ENABLED == ENABLED
     ModeBrake mode_brake;
 #endif

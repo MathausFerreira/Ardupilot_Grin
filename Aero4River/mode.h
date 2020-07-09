@@ -505,49 +505,49 @@ private:
     } nav_payload_place;
 };
 
-#if AUTOTUNE_ENABLED == ENABLED
-/*
-  wrapper class for AC_AutoTune
- */
-class AutoTune : public AC_AutoTune
-{
-public:
-    bool init() override;
-    void run() override;
+// #if AUTOTUNE_ENABLED == ENABLED
+// /*
+//   wrapper class for AC_AutoTune
+//  */
+// class AutoTune : public AC_AutoTune
+// {
+// public:
+//     bool init() override;
+//     void run() override;
 
-protected:
-    bool start(void) override;
-    bool position_ok() override;
-    float get_pilot_desired_climb_rate_cms(void) const override;
-    void get_pilot_desired_rp_yrate_cd(float &roll_cd, float &pitch_cd, float &yaw_rate_cds) override;
-    void init_z_limits() override;
-    void log_pids() override;
-};
+// protected:
+//     bool start(void) override;
+//     bool position_ok() override;
+//     float get_pilot_desired_climb_rate_cms(void) const override;
+//     void get_pilot_desired_rp_yrate_cd(float &roll_cd, float &pitch_cd, float &yaw_rate_cds) override;
+//     void init_z_limits() override;
+//     void log_pids() override;
+// };
 
-class ModeAutoTune : public Mode {
+// class ModeAutoTune : public Mode {
 
-public:
-    // inherit constructor
-    using Mode::Mode;
+// public:
+//     // inherit constructor
+//     using Mode::Mode;
 
-    bool init(bool ignore_checks) override;
-    void run() override;
+//     bool init(bool ignore_checks) override;
+//     void run() override;
 
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(bool from_gcs) const override { return false; }
-    bool is_autopilot() const override { return false; }
+//     bool requires_GPS() const override { return false; }
+//     bool has_manual_throttle() const override { return false; }
+//     bool allows_arming(bool from_gcs) const override { return false; }
+//     bool is_autopilot() const override { return false; }
 
-    void save_tuning_gains();
-    void stop();
-    void reset();
+//     void save_tuning_gains();
+//     void stop();
+//     void reset();
 
-protected:
+// protected:
 
-    const char *name() const override { return "AUTOTUNE"; }
-    const char *name4() const override { return "ATUN"; }
-};
-#endif
+//     const char *name() const override { return "AUTOTUNE"; }
+//     const char *name4() const override { return "ATUN"; }
+// };
+// #endif
 
 
 class ModeBrake : public Mode {
