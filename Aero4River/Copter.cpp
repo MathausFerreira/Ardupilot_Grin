@@ -118,21 +118,13 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if MODE_SMARTRTL_ENABLED == ENABLED
     SCHED_TASK_CLASS(ModeSmartRTL, &copter.mode_smartrtl,       save_position,    3, 100),
 #endif
-// #if SPRAYER_ENABLED == ENABLED
-//     SCHED_TASK_CLASS(AC_Sprayer,           &copter.sprayer,             update,           3,  90),
-// #endif
+
     SCHED_TASK(three_hz_loop,          3,     75),
     SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,     75),
     SCHED_TASK_CLASS(AP_Baro,              &copter.barometer,           accumulate,      50,  90),
 #if AC_FENCE == ENABLED
     SCHED_TASK_CLASS(AC_Fence,             &copter.fence,               update,          10, 100),
 #endif
-// #if PRECISION_LANDING == ENABLED
-//     SCHED_TASK(update_precland,      400,     50),
-// #endif
-// #if FRAME_CONFIG == HELI_FRAME
-//     SCHED_TASK(check_dynamic_flight,  50,     75),
-// #endif
 #if LOGGING_ENABLED == ENABLED
     SCHED_TASK(fourhundred_hz_logging,400,    50),
 #endif
@@ -166,9 +158,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(compass_cal_update,   100,    100),
     SCHED_TASK(accel_cal_update,      10,    100),
     SCHED_TASK_CLASS(AP_TempCalibration,   &copter.g2.temp_calibration, update,          10, 100),
-// #if ADSB_ENABLED == ENABLED
-//     SCHED_TASK(avoidance_adsb_update, 10,    100),
-// #endif
+
 #if ADVANCED_FAILSAFE == ENABLED
     SCHED_TASK(afs_fs_check,          10,    100),
 #endif
@@ -233,13 +223,6 @@ void Copter::fast_loop()
     // run EKF state estimator (expensive)
     // --------------------
     read_AHRS();
-
-// #if FRAME_CONFIG == HELI_FRAME
-//     update_heli_control_dynamics();
-//     #if MODE_AUTOROTATE_ENABLED == ENABLED
-//         heli_update_autorotation();
-//     #endif
-// #endif //HELI_FRAME
 
     // Inertial Nav
     // --------------------
@@ -329,14 +312,6 @@ void Copter::throttle_loop()
     // check auto_armed status
     update_auto_armed();
 
-// #if FRAME_CONFIG == HELI_FRAME
-//     // update rotor speed
-//     heli_update_rotor_speed_targets();
-
-//     // update trad heli swash plate movement
-//     heli_update_landing_swash();
-// #endif
-
     // compensate for ground effect (if enabled)
     update_ground_effect_detector();
 
@@ -406,9 +381,7 @@ void Copter::ten_hz_logging_loop()
         logger.Write_Beacon(g2.beacon);
 #endif
     }
-// #if FRAME_CONFIG == HELI_FRAME
-//     Log_Write_Heli();
-// #endif
+
 }
 
 // twentyfive_hz_logging - should be run at 25hz
@@ -428,11 +401,6 @@ void Copter::twentyfive_hz_logging()
         logger.Write_IMU();
     }
 #endif
-
-// #if PRECISION_LANDING == ENABLED
-//     // log output
-//     Log_Write_Precland();
-// #endif
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     if (should_log(MASK_LOG_ATTITUDE_MED) || should_log(MASK_LOG_ATTITUDE_FAST)) {
@@ -544,10 +512,6 @@ void Copter::one_hz_loop()
 
     // log terrain data
     terrain_logging();
-
-// #if ADSB_ENABLED == ENABLED
-//     adsb.set_is_flying(!ap.land_complete);
-// #endif
 
     AP_Notify::flags.flying = !ap.land_complete;
 }
