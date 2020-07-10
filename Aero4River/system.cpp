@@ -528,29 +528,29 @@ void Copter::allocate_motors(void)
     }
     AP_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
 
-#if AC_OAPATHPLANNER_ENABLED == ENABLED
-    wp_nav = new AC_WPNav_OA(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
-#else
-    wp_nav = new AC_WPNav(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
-#endif
-    if (wp_nav == nullptr) {
-        AP_HAL::panic("Unable to allocate WPNav");
-    }
-    AP_Param::load_object_from_eeprom(wp_nav, wp_nav->var_info);
+// #if AC_OAPATHPLANNER_ENABLED == ENABLED
+//     wp_nav = new AC_WPNav_OA(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+// #else
+//     wp_nav = new AC_WPNav(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+// #endif
+//     if (wp_nav == nullptr) {
+//         AP_HAL::panic("Unable to allocate WPNav");
+//     }
+//     AP_Param::load_object_from_eeprom(wp_nav, wp_nav->var_info);
 
-    loiter_nav = new AC_Loiter(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
-    if (loiter_nav == nullptr) {
-        AP_HAL::panic("Unable to allocate LoiterNav");
-    }
-    AP_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
+//     loiter_nav = new AC_Loiter(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+//     if (loiter_nav == nullptr) {
+//         AP_HAL::panic("Unable to allocate LoiterNav");
+//     }
+//     AP_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
 
-#if MODE_CIRCLE_ENABLED == ENABLED
-    circle_nav = new AC_Circle(inertial_nav, *ahrs_view, *pos_control);
-    if (circle_nav == nullptr) {
-        AP_HAL::panic("Unable to allocate CircleNav");
-    }
-    AP_Param::load_object_from_eeprom(circle_nav, circle_nav->var_info);
-#endif
+// #if MODE_CIRCLE_ENABLED == ENABLED
+//     circle_nav = new AC_Circle(inertial_nav, *ahrs_view, *pos_control);
+//     if (circle_nav == nullptr) {
+//         AP_HAL::panic("Unable to allocate CircleNav");
+//     }
+//     AP_Param::load_object_from_eeprom(circle_nav, circle_nav->var_info);
+// #endif
 
     // reload lines from the defaults file that may now be accessible
     AP_Param::reload_defaults_file(true);

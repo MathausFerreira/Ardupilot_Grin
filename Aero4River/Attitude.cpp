@@ -151,46 +151,13 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
         yaw_request = ROLL_PITCH_YAW_INPUT_MAX * y_out * g.acro_yaw_p;
     }
     // convert pilot input to the desired yaw rate
-    return yaw_request;
+    return yaw_request; //talvez colocar o torque aqui
 }
 
 /*************************************************************
  *  throttle control
  ****************************************************************/
 
-// update estimated throttle required to hover (if necessary)
-//  called at 100hz
-void Copter::update_throttle_hover(){
-#if FRAME_CONFIG != HELI_FRAME
-    // if not armed or landed exit
-    if (!motors->armed() || ap.land_complete) {
-        return;
-    }
-
-    // do not update in manual throttle modes or Drift
-    if (flightmode->has_manual_throttle() || (control_mode == Mode::Number::DRIFT)) {
-        return;
-    }
-
-    // do not update while climbing or descending
-    if (!is_zero(pos_control->get_desired_velocity().z)) {
-        return;
-    }
-
-    // get throttle output
-    float throttle = motors->get_throttle();
-
-    // calc average throttle if we are in a level hover
-    if (throttle > 0.0f && fabsf(inertial_nav.get_velocity_z()) < 60 &&
-        labs(ahrs.roll_sensor) < 500 && labs(ahrs.pitch_sensor) < 500) {
-        // Can we set the time constant automatically
-        motors->update_throttle_hover(0.01f);
-#if HAL_GYROFFT_ENABLED
-        gyro_fft.update_freq_hover(0.01f, motors->get_throttle_out());
-#endif
-    }
-#endif
-}
 
 // set_throttle_takeoff - allows parents to tell throttle controller we are taking off so I terms can be cleared
 void Copter::set_throttle_takeoff()

@@ -398,7 +398,7 @@ private:
     } sensor_health;
 
     // Motor Output
-    MOTOR_CLASS *motors;
+    AP_MotorsRiver  *motors;
     const struct AP_Param::GroupInfo *motors_var_info;
 
     int32_t _home_bearing;
