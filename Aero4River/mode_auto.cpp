@@ -60,7 +60,8 @@ void ModeAuto::run()
     switch (_mode) {
 
     case Auto_TakeOff:
-        takeoff_run();
+        // takeoff_run();
+        wp_run();
         break;
 
     case Auto_WP:
@@ -137,56 +138,56 @@ void ModeAuto::rtl_start()
 }
 
 // auto_takeoff_start - initialises waypoint controller to implement take-off
-void ModeAuto::takeoff_start(const Location& dest_loc)
-{
-    _mode = Auto_TakeOff;
+// void ModeAuto::takeoff_start(const Location& dest_loc)
+// {
+//     _mode = Auto_TakeOff;
 
-    Location dest(dest_loc);
+//     Location dest(dest_loc);
 
-    if (!copter.current_loc.initialised()) {
-        // vehicle doesn't know where it is ATM.  We should not
-        // initialise our takeoff destination without knowing this!
-        return;
-    }
+//     if (!copter.current_loc.initialised()) {
+//         // vehicle doesn't know where it is ATM.  We should not
+//         // initialise our takeoff destination without knowing this!
+//         return;
+//     }
 
-    // set horizontal target
-    dest.lat = copter.current_loc.lat;
-    dest.lng = copter.current_loc.lng;
+//     // set horizontal target
+//     dest.lat = copter.current_loc.lat;
+//     dest.lng = copter.current_loc.lng;
 
-    // get altitude target
-    int32_t alt_target;
-    if (!dest.get_alt_cm(Location::AltFrame::ABOVE_HOME, alt_target)) {
-        // this failure could only happen if take-off alt was specified as an alt-above terrain and we have no terrain data
-        AP::logger().Write_Error(LogErrorSubsystem::TERRAIN, LogErrorCode::MISSING_TERRAIN_DATA);
-        // fall back to altitude above current altitude
-        alt_target = copter.current_loc.alt + dest.alt;
-    }
+//     // get altitude target
+//     int32_t alt_target;
+//     if (!dest.get_alt_cm(Location::AltFrame::ABOVE_HOME, alt_target)) {
+//         // this failure could only happen if take-off alt was specified as an alt-above terrain and we have no terrain data
+//         AP::logger().Write_Error(LogErrorSubsystem::TERRAIN, LogErrorCode::MISSING_TERRAIN_DATA);
+//         // fall back to altitude above current altitude
+//         alt_target = copter.current_loc.alt + dest.alt;
+//     }
 
-    // sanity check target
-    if (alt_target < copter.current_loc.alt) {
-        dest.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
-    }
-    // Note: if taking off from below home this could cause a climb to an unexpectedly high altitude
-    if (alt_target < 100) {
-        dest.set_alt_cm(100, Location::AltFrame::ABOVE_HOME);
-    }
+//     // sanity check target
+//     if (alt_target < copter.current_loc.alt) {
+//         dest.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
+//     }
+//     // Note: if taking off from below home this could cause a climb to an unexpectedly high altitude
+//     if (alt_target < 100) {
+//         dest.set_alt_cm(100, Location::AltFrame::ABOVE_HOME);
+//     }
 
-    // set waypoint controller target
-    if (!wp_nav->set_wp_destination(dest)) {
-        // failure to set destination can only be because of missing terrain data
-        copter.failsafe_terrain_on_event();
-        return;
-    }
+//     // set waypoint controller target
+//     if (!wp_nav->set_wp_destination(dest)) {
+//         // failure to set destination can only be because of missing terrain data
+//         copter.failsafe_terrain_on_event();
+//         return;
+//     }
 
-    // initialise yaw
-    auto_yaw.set_mode(AUTO_YAW_HOLD);
+//     // initialise yaw
+//     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
-    // clear i term when we're taking off
-    set_throttle_takeoff();
+//     // clear i term when we're taking off
+//     set_throttle_takeoff();
 
-    // get initial alt for WP_NAVALT_MIN
-    auto_takeoff_set_start_alt();
-}
+//     // get initial alt for WP_NAVALT_MIN
+//     auto_takeoff_set_start_alt();
+// }
 
 // auto_wp_start - initialises waypoint controller to implement flying to a particular destination
 void ModeAuto::wp_start(const Location& dest_loc)
@@ -355,10 +356,10 @@ bool ModeAuto::is_landing() const
     return false;
 }
 
-bool ModeAuto::is_taking_off() const
-{
-    return ((_mode == Auto_TakeOff) && !wp_nav->reached_wp_destination());
-}
+//  bool ModeAuto::is_taking_off() const
+//  {
+// //     return ((_mode == Auto_TakeOff) && !wp_nav->reached_wp_destination());
+//  }
 
 // auto_payload_place_start - initialises controller to implement a placing
 void ModeAuto::payload_place_start()
@@ -712,10 +713,10 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
 
 // auto_takeoff_run - takeoff in auto mode
 //      called by auto_run at 100hz or more
-void ModeAuto::takeoff_run()
-{
-    auto_takeoff_run();
-}
+// void ModeAuto::takeoff_run()
+// {
+//     auto_takeoff_run();
+// }
 
 // auto_wp_run - runs the auto waypoint controller
 //      called by auto_run at 100hz or more
@@ -1067,10 +1068,10 @@ Location ModeAuto::terrain_adjusted_location(const AP_Mission::Mission_Command& 
 /********************************************************************************/
 
 // do_takeoff - initiate takeoff navigation command
-void ModeAuto::do_takeoff(const AP_Mission::Mission_Command& cmd)
+ void ModeAuto::do_takeoff(const AP_Mission::Mission_Command& cmd)
 {
-    // Set wp navigation target to safe altitude above current position
-    takeoff_start(cmd.content.location);
+//     // Set wp navigation target to safe altitude above current position
+    //  takeoff_start(cmd.content.location);
 }
 
 Location ModeAuto::loc_from_cmd(const AP_Mission::Mission_Command& cmd) const

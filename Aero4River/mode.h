@@ -62,9 +62,9 @@ public:
     virtual const char *name() const = 0;
     virtual const char *name4() const = 0;
 
-    bool do_user_takeoff(float takeoff_alt_cm, bool must_navigate);
-    virtual bool is_taking_off() const;
-    static void takeoff_stop() { takeoff.stop(); }
+    // bool do_user_takeoff(float takeoff_alt_cm, bool must_navigate);
+    // virtual bool is_taking_off() const;
+    // static void takeoff_stop() { takeoff.stop(); }
 
     virtual bool is_landing() const { return false; }
 
@@ -147,25 +147,25 @@ protected:
     // basically waypoint navigation with pilot yaw permitted.
 
     // user-takeoff support; takeoff state is shared across all mode instances
-    class _TakeOff {
-    public:
-        void start(float alt_cm);
-        void stop();
-        void get_climb_rates(float& pilot_climb_rate,
-                             float& takeoff_climb_rate);
-        bool triggered(float target_climb_rate) const;
+    // class _TakeOff {
+    // public:
+    //     void start(float alt_cm);
+    //     void stop();
+    //     void get_climb_rates(float& pilot_climb_rate,
+    //                          float& takeoff_climb_rate);
+    //     bool triggered(float target_climb_rate) const;
 
-        bool running() const { return _running; }
-    private:
-        bool _running;
-        float max_speed;
-        float alt_delta;
-        uint32_t start_ms;
-    };
+    //     bool running() const { return _running; }
+    // private:
+    //     bool _running;
+    //     float max_speed;
+    //     float alt_delta;
+    //     uint32_t start_ms;
+    // };
 
-    static _TakeOff takeoff;
+    // static _TakeOff takeoff;
 
-    virtual bool do_user_takeoff_start(float takeoff_alt_cm);
+    // virtual bool do_user_takeoff_start(float takeoff_alt_cm);
 
     // method shared by both Guided and Auto for takeoff.  This is
     // waypoint navigation but the user can control the yaw.
@@ -240,6 +240,7 @@ public:
     // class.
     float get_pilot_desired_climb_rate(float throttle_control);
     float get_non_takeoff_throttle(void);
+    void get_pilot_desired_force_to_boat_M(); // Mathaus
     void update_simple_mode(void);
     bool set_mode(Mode::Number mode, ModeReason reason);
     void set_land_complete(bool b);
@@ -303,31 +304,31 @@ private:
 #endif
 
 
-class ModeAltHold : public Mode {
+// class ModeAltHold : public Mode {
 
-public:
-    // inherit constructor
-    using Mode::Mode;
+// public:
+//     // inherit constructor
+//     using Mode::Mode;
 
-    bool init(bool ignore_checks) override;
-    void run() override;
+//     bool init(bool ignore_checks) override;
+//     void run() override;
 
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(bool from_gcs) const override { return true; };
-    bool is_autopilot() const override { return false; }
-    bool has_user_takeoff(bool must_navigate) const override {
-        return !must_navigate;
-    }
+//     bool requires_GPS() const override { return false; }
+//     bool has_manual_throttle() const override { return false; }
+//     bool allows_arming(bool from_gcs) const override { return true; };
+//     bool is_autopilot() const override { return false; }
+//     bool has_user_takeoff(bool must_navigate) const override {
+//         return !must_navigate;
+//     }
 
-protected:
+// protected:
 
-    const char *name() const override { return "ALT_HOLD"; }
-    const char *name4() const override { return "ALTH"; }
+//     const char *name() const override { return "ALT_HOLD"; }
+//     const char *name4() const override { return "ALTH"; }
 
-private:
+// private:
 
-};
+// };
 
 
 class ModeAuto : public Mode {
@@ -362,7 +363,7 @@ public:
 
     bool is_landing() const override;
 
-    bool is_taking_off() const override;
+    // bool is_taking_off() const override;
 
     bool requires_terrain_failsafe() const override { return true; }
 
@@ -794,9 +795,9 @@ public:
     void limit_set(uint32_t timeout_ms, float alt_min_cm, float alt_max_cm, float horiz_max_cm);
     bool limit_check();
 
-    bool is_taking_off() const override;
+    // bool is_taking_off() const override;
 
-    bool do_user_takeoff_start(float takeoff_alt_cm) override;
+    // bool do_user_takeoff_start(float takeoff_alt_cm) override;
 
     GuidedMode mode() const { return guided_mode; }
 
@@ -825,7 +826,7 @@ private:
     void set_yaw_state(bool use_yaw, float yaw_cd, bool use_yaw_rate, float yaw_rate_cds, bool relative_angle);
 
     // controls which controller is run (pos or vel):
-    GuidedMode guided_mode = Guided_TakeOff;
+     GuidedMode guided_mode = Guided_PosVel;
 
 };
 
@@ -1472,75 +1473,75 @@ private:
     bool is_suspended;              // true if zigzag auto is suspended
 };
 
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-class ModeAutorotate : public Mode {
+// #if MODE_AUTOROTATE_ENABLED == ENABLED
+// class ModeAutorotate : public Mode {
 
-public:
+// public:
 
-    // inherit constructor
-    using Mode::Mode;
+//     // inherit constructor
+//     using Mode::Mode;
 
-    bool init(bool ignore_checks) override;
-    void run() override;
+//     bool init(bool ignore_checks) override;
+//     void run() override;
 
-    bool is_autopilot() const override { return true; }
-    bool requires_GPS() const override { return false; }
-    bool has_manual_throttle() const override { return false; }
-    bool allows_arming(bool from_gcs) const override { return false; };
+//     bool is_autopilot() const override { return true; }
+//     bool requires_GPS() const override { return false; }
+//     bool has_manual_throttle() const override { return false; }
+//     bool allows_arming(bool from_gcs) const override { return false; };
 
-    static const struct AP_Param::GroupInfo  var_info[];
+//     static const struct AP_Param::GroupInfo  var_info[];
 
-protected:
+// protected:
 
-    const char *name() const override { return "AUTOROTATE"; }
-    const char *name4() const override { return "AROT"; }
+//     const char *name() const override { return "AUTOROTATE"; }
+//     const char *name4() const override { return "AROT"; }
 
-private:
+// private:
 
-    // --- Internal variables ---
-    float _initial_rpm;             // Head speed recorded at initiation of flight mode (RPM)
-    float _target_head_speed;       // The terget head main rotor head speed.  Normalised by main rotor set point
-    float _desired_v_z;             // Desired vertical
-    int32_t _pitch_target;          // Target pitch attitude to pass to attitude controller
-    uint32_t _entry_time_start_ms;  // Time remaining until entry phase moves on to glide phase
-    float _hs_decay;                // The head accerleration during the entry phase
-    float _bail_time;               // Timer for exiting the bail out phase (s)
-    uint32_t _bail_time_start_ms;   // Time at start of bail out
-    float _target_climb_rate_adjust;// Target vertical acceleration used during bail out phase
-    float _target_pitch_adjust;     // Target pitch rate used during bail out phase
+//     // --- Internal variables ---
+//     float _initial_rpm;             // Head speed recorded at initiation of flight mode (RPM)
+//     float _target_head_speed;       // The terget head main rotor head speed.  Normalised by main rotor set point
+//     float _desired_v_z;             // Desired vertical
+//     int32_t _pitch_target;          // Target pitch attitude to pass to attitude controller
+//     uint32_t _entry_time_start_ms;  // Time remaining until entry phase moves on to glide phase
+//     float _hs_decay;                // The head accerleration during the entry phase
+//     float _bail_time;               // Timer for exiting the bail out phase (s)
+//     uint32_t _bail_time_start_ms;   // Time at start of bail out
+//     float _target_climb_rate_adjust;// Target vertical acceleration used during bail out phase
+//     float _target_pitch_adjust;     // Target pitch rate used during bail out phase
 
-    enum class Autorotation_Phase {
-        ENTRY,
-        SS_GLIDE,
-        FLARE,
-        TOUCH_DOWN,
-        BAIL_OUT } phase_switch;
+//     enum class Autorotation_Phase {
+//         ENTRY,
+//         SS_GLIDE,
+//         FLARE,
+//         TOUCH_DOWN,
+//         BAIL_OUT } phase_switch;
         
-    enum class Navigation_Decision {
-        USER_CONTROL_STABILISED,
-        STRAIGHT_AHEAD,
-        INTO_WIND,
-        NEAREST_RALLY} nav_pos_switch;
+//     enum class Navigation_Decision {
+//         USER_CONTROL_STABILISED,
+//         STRAIGHT_AHEAD,
+//         INTO_WIND,
+//         NEAREST_RALLY} nav_pos_switch;
 
-    // --- Internal flags ---
-    struct controller_flags {
-            bool entry_initial             : 1;
-            bool ss_glide_initial          : 1;
-            bool flare_initial             : 1;
-            bool touch_down_initial        : 1;
-            bool straight_ahead_initial    : 1;
-            bool level_initial             : 1;
-            bool break_initial             : 1;
-            bool bail_out_initial          : 1;
-            bool bad_rpm                   : 1;
-    } _flags;
+//     // --- Internal flags ---
+//     struct controller_flags {
+//             bool entry_initial             : 1;
+//             bool ss_glide_initial          : 1;
+//             bool flare_initial             : 1;
+//             bool touch_down_initial        : 1;
+//             bool straight_ahead_initial    : 1;
+//             bool level_initial             : 1;
+//             bool break_initial             : 1;
+//             bool bail_out_initial          : 1;
+//             bool bad_rpm                   : 1;
+//     } _flags;
 
-    struct message_flags {
-            bool bad_rpm                   : 1;
-    } _msg_flags;
+//     struct message_flags {
+//             bool bad_rpm                   : 1;
+//     } _msg_flags;
 
-    //--- Internal functions ---
-    void warning_message(uint8_t message_n);    //Handles output messages to the terminal
+//     //--- Internal functions ---
+//     void warning_message(uint8_t message_n);    //Handles output messages to the terminal
 
-};
-#endif
+// };
+// #endif

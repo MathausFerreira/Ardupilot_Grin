@@ -30,18 +30,8 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
     switch (mode)
     {
-        // #if MODE_ACRO_ENABLED == ENABLED
-        //         case Mode::Number::ACRO:
-        //             ret = &mode_acro;
-        //             break;
-        // #endif
-
     case Mode::Number::STABILIZE:
         ret = &mode_stabilize;
-        break;
-
-    case Mode::Number::ALT_HOLD:
-        ret = &mode_althold;
         break;
 
 #if MODE_AUTO_ENABLED == ENABLED
@@ -68,10 +58,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-        // case Mode::Number::LAND:
-        //     ret = &mode_land;
-        //     break;
-
 #if MODE_RTL_ENABLED == ENABLED
     case Mode::Number::RTL:
         ret = &mode_rtl;
@@ -84,24 +70,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-        // #if MODE_SPORT_ENABLED == ENABLED
-        //         case Mode::Number::SPORT:
-        //             ret = &mode_sport;
-        //             break;
-        // #endif
-
-        // #if MODE_FLIP_ENABLED == ENABLED
-        //         case Mode::Number::FLIP:
-        //             ret = &mode_flip;
-        //             break;
-        // #endif
-
-// #if AUTOTUNE_ENABLED == ENABLED
-//     case Mode::Number::AUTOTUNE:
-//         ret = &mode_autotune;
-//         break;
-// #endif
-
 #if MODE_POSHOLD_ENABLED == ENABLED
     case Mode::Number::POSHOLD:
         ret = &mode_poshold;
@@ -113,18 +81,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         ret = &mode_brake;
         break;
 #endif
-
-        // #if MODE_THROW_ENABLED == ENABLED
-        //         case Mode::Number::THROW:
-        //             ret = &mode_throw;
-        //             break;
-        // #endif
-
-// #if ADSB_ENABLED == ENABLED
-//     case Mode::Number::AVOID_ADSB:
-//         ret = &mode_avoid_adsb;
-//         break;
-// #endif
 
 #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
     case Mode::Number::GUIDED_NOGPS:
@@ -162,11 +118,11 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-    case Mode::Number::AUTOROTATE:
-        ret = &mode_autorotate;
-        break;
-#endif
+// #if MODE_AUTOROTATE_ENABLED == ENABLED
+//     case Mode::Number::AUTOROTATE:
+//         ret = &mode_autorotate;
+//         break;
+// #endif
 
     default:
         break;
@@ -223,9 +179,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     }
 #endif
 
-    if (!ignore_checks &&
-        new_flightmode->requires_GPS() &&
-        !copter.position_ok())
+    if (!ignore_checks && new_flightmode->requires_GPS() && !copter.position_ok())
     {
         gcs().send_text(MAV_SEVERITY_WARNING, "Mode change failed: %s requires position", new_flightmode->name());
         AP::logger().Write_Error(LogErrorSubsystem::FLIGHT_MODE, LogErrorCode(mode));
@@ -241,7 +195,7 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 
     // perform any cleanup required by previous flight mode
     exit_mode(flightmode, new_flightmode);
-
+ 
     // store previous flight mode (only used by tradeheli's autorotation)
     prev_control_mode = control_mode;
 
@@ -297,8 +251,7 @@ void Copter::update_flight_mode()
 }
 
 // exit_mode - high level call to organise cleanup as a flight mode is exited
-void Copter::exit_mode(Mode *&old_flightmode,
-                       Mode *&new_flightmode)
+void Copter::exit_mode(Mode *&old_flightmode,  Mode *&new_flightmode)
 {
 // #if AUTOTUNE_ENABLED == ENABLED
 //     if (old_flightmode == &mode_autotune)
@@ -329,7 +282,7 @@ void Copter::exit_mode(Mode *&old_flightmode,
     }
 
     // cancel any takeoffs in progress
-    old_flightmode->takeoff_stop();
+    // old_flightmode->takeoff_stop();
 
 #if MODE_SMARTRTL_ENABLED == ENABLED
     // call smart_rtl cleanup
@@ -353,29 +306,6 @@ void Copter::exit_mode(Mode *&old_flightmode,
     }
 #endif
 
-#if FRAME_CONFIG == HELI_FRAME
-    // firmly reset the flybar passthrough to false when exiting acro mode.
-    if (old_flightmode == &mode_acro)
-    {
-        attitude_control->use_flybar_passthrough(false, false);
-        motors->set_acro_tail(false);
-    }
-
-    // if we are changing from a mode that did not use manual throttle,
-    // stab col ramp value should be pre-loaded to the correct value to avoid a twitch
-    // heli_stab_col_ramp should really only be active switching between Stabilize and Acro modes
-    if (!old_flightmode->has_manual_throttle())
-    {
-        if (new_flightmode == &mode_stabilize)
-        {
-            input_manager.set_stab_col_ramp(1.0);
-        }
-        else if (new_flightmode == &mode_acro)
-        {
-            input_manager.set_stab_col_ramp(0.0);
-        }
-    }
-#endif //HELI_FRAME
 }
 
 // notify_flight_mode - sets notify object based on current flight mode.  Only used for OreoLED notify device
@@ -396,6 +326,7 @@ void Mode::update_navigation()
 // returns desired angle in centi-degrees
 void Mode::get_pilot_desired_lean_angles(float &roll_out, float &pitch_out, float angle_max, float angle_limit) const
 {
+    
     // throttle failsafe check
     if (copter.failsafe.radio || !copter.ap.rc_receiver_present)
     {
@@ -430,27 +361,25 @@ void Mode::get_pilot_desired_lean_angles(float &roll_out, float &pitch_out, floa
     // roll_out and pitch_out are returned
 }
 
-bool Mode::_TakeOff::triggered(const float target_climb_rate) const
-{
-    if (!copter.ap.land_complete)
-    {
-        // can't take off if we're already flying
-        return false;
-    }
-    if (target_climb_rate <= 0.0f)
-    {
-        // can't takeoff unless we want to go up...
-        return false;
-    }
-
-    if (copter.motors->get_spool_state() != AP_Motors::SpoolState::THROTTLE_UNLIMITED)
-    {
-        // hold aircraft on the ground until rotor speed runup has finished
-        return false;
-    }
-
-    return true;
-}
+// bool Mode::_TakeOff::triggered(const float target_climb_rate) const
+// {
+//     if (!copter.ap.land_complete)
+//     {
+//         // can't take off if we're already flying
+//         return false;
+//     }
+//     if (target_climb_rate <= 0.0f)
+//     {
+//         // can't takeoff unless we want to go up...
+//         return false;
+//     }
+//     if (copter.motors->get_spool_state() != AP_Motors::SpoolState::THROTTLE_UNLIMITED)
+//     {
+//         // hold aircraft on the ground until rotor speed runup has finished
+//         return false;
+//     }
+//     return true;
+// }
 
 bool Mode::is_disarmed_or_landed() const
 {
@@ -758,12 +687,12 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
             return AltHold_Landed_Pre_Takeoff;
         }
     }
-    else if (takeoff.running() || takeoff.triggered(target_climb_rate_cms))
-    {
-        // the aircraft is currently landed or taking off, asking for a positive climb rate and in THROTTLE_UNLIMITED
-        // the aircraft should progress through the take off procedure
-        return AltHold_Takeoff;
-    }
+    // else if (takeoff.running() || takeoff.triggered(target_climb_rate_cms))
+    // {
+    //     // the aircraft is currently landed or taking off, asking for a positive climb rate and in THROTTLE_UNLIMITED
+    //     // the aircraft should progress through the take off procedure
+    //     return AltHold_Takeoff;
+    // }
     else if (!copter.ap.auto_armed || copter.ap.land_complete)
     {
         // the aircraft is armed and landed
@@ -809,6 +738,14 @@ float Mode::get_pilot_desired_climb_rate(float throttle_control)
 {
     return copter.get_pilot_desired_climb_rate(throttle_control);
 }
+
+// Mathaus
+void Mode::get_pilot_desired_force_to_boat_M()
+{
+     copter.get_pilot_desired_force_to_boat_M();
+}
+//
+
 
 float Mode::get_non_takeoff_throttle()
 {

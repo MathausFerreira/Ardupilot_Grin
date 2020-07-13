@@ -1,5 +1,4 @@
 #include "Copter.h"
-#include <AP_BLHeli/AP_BLHeli.h>
 
 /*****************************************************************************
 *   The init_ardupilot function processes everything we need for an in - air restart
@@ -63,7 +62,6 @@ void Copter::init_ardupilot()
 
     // update motor interlock state
     update_using_interlock();
-
 
     init_rc_in();               // sets up rc channels from radio
 
@@ -210,7 +208,7 @@ void Copter::init_ardupilot()
     // disable safety if requested
     BoardConfig.init_safety();
 
-    hal.console->printf("\nReady to FLY ");
+    hal.console->printf("\nReady to RIVER ");
 
     // flag that initialisation has completed
     ap.initialised = true;
@@ -515,22 +513,22 @@ void Copter::allocate_motors(void)
     // reload lines from the defaults file that may now be accessible
     AP_Param::reload_defaults_file(true);
     
-    // now setup some frame-class specific defaults
-    switch ((AP_Motors::motor_frame_class)g2.frame_class.get()) {
-    case AP_Motors::MOTOR_FRAME_Y6:
-        attitude_control->get_rate_roll_pid().kP().set_default(0.1);
-        attitude_control->get_rate_roll_pid().kD().set_default(0.006);
-        attitude_control->get_rate_pitch_pid().kP().set_default(0.1);
-        attitude_control->get_rate_pitch_pid().kD().set_default(0.006);
-        attitude_control->get_rate_yaw_pid().kP().set_default(0.15);
-        attitude_control->get_rate_yaw_pid().kI().set_default(0.015);
-        break;
-    case AP_Motors::MOTOR_FRAME_TRI:
-        attitude_control->get_rate_yaw_pid().filt_D_hz().set_default(100);
-        break;
-    default:
-        break;
-    }
+    // // now setup some frame-class specific defaults
+    // switch ((AP_Motors::motor_frame_class)g2.frame_class.get()) {
+    // case AP_Motors::MOTOR_FRAME_Y6:
+    //     attitude_control->get_rate_roll_pid().kP().set_default(0.1);
+    //     attitude_control->get_rate_roll_pid().kD().set_default(0.006);
+    //     attitude_control->get_rate_pitch_pid().kP().set_default(0.1);
+    //     attitude_control->get_rate_pitch_pid().kD().set_default(0.006);
+    //     attitude_control->get_rate_yaw_pid().kP().set_default(0.15);
+    //     attitude_control->get_rate_yaw_pid().kI().set_default(0.015);
+    //     break;
+    // case AP_Motors::MOTOR_FRAME_TRI:
+    //     attitude_control->get_rate_yaw_pid().filt_D_hz().set_default(100);
+    //     break;
+    // default:
+    //     break;
+    // }
 
     // brushed 16kHz defaults to 16kHz pulses
     if (motors->get_pwm_type() == AP_Motors::PWM_TYPE_BRUSHED) {
@@ -539,9 +537,6 @@ void Copter::allocate_motors(void)
     
     // upgrade parameters. This must be done after allocating the objects
     convert_pid_parameters();
-#if FRAME_CONFIG == HELI_FRAME
-    convert_tradheli_parameters();
-#endif
 
     // param count could have changed
     AP_Param::invalidate_count();
@@ -549,9 +544,5 @@ void Copter::allocate_motors(void)
 
 bool Copter::is_tradheli() const
 {
-#if FRAME_CONFIG == HELI_FRAME
-    return true;
-#else
     return false;
-#endif
 }

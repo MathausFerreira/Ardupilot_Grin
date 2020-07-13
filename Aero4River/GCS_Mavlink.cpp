@@ -624,11 +624,11 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
         // param6 : longitude   (not supported)
         // param7 : altitude [metres]
 
-        float takeoff_alt = packet.param7 * 100;      // Convert m to cm
+        // float takeoff_alt = packet.param7 * 100;      // Convert m to cm
 
-        if (!copter.flightmode->do_user_takeoff(takeoff_alt, is_zero(packet.param3))) {
-            return MAV_RESULT_FAILED;
-        }
+        // if (!copter.flightmode->do_user_takeoff(takeoff_alt, is_zero(packet.param3))) {
+        //     return MAV_RESULT_FAILED;
+        // }
         return MAV_RESULT_ACCEPTED;
     }
 
@@ -811,7 +811,7 @@ MAV_RESULT GCS_MAVLINK_Copter::handle_command_long_packet(const mavlink_command_
         } else if (copter.ap.land_complete) {
             // if armed and landed, takeoff
             if (copter.set_mode(Mode::Number::LOITER, ModeReason::GCS_COMMAND)) {
-                copter.flightmode->do_user_takeoff(packet.param1*100, true);
+                // copter.flightmode->do_user_takeoff(packet.param1*100, true);
             }
         } else {
             // if flying, land
@@ -1287,8 +1287,8 @@ MAV_LANDED_STATE GCS_MAVLINK_Copter::landed_state() const
     if (copter.flightmode->is_landing()) {
         return MAV_LANDED_STATE_LANDING;
     }
-    if (copter.flightmode->is_taking_off()) {
-        return MAV_LANDED_STATE_TAKEOFF;
-    }
+    // if (copter.flightmode->is_taking_off()) {
+    //     return MAV_LANDED_STATE_TAKEOFF;
+    // }
     return MAV_LANDED_STATE_IN_AIR;
 }

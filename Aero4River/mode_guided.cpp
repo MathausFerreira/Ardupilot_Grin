@@ -47,42 +47,42 @@ bool ModeGuided::init(bool ignore_checks)
 
 
 // do_user_takeoff_start - initialises waypoint controller to implement take-off
-bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
-{
-    guided_mode = Guided_TakeOff;
+// bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
+// {
+//     guided_mode = Guided_TakeOff;
 
-    // initialise wpnav destination
-    Location target_loc = copter.current_loc;
-    Location::AltFrame frame = Location::AltFrame::ABOVE_HOME;
-    if (wp_nav->rangefinder_used_and_healthy() &&
-            wp_nav->get_terrain_source() == AC_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER &&
-            takeoff_alt_cm < copter.rangefinder.max_distance_cm_orient(ROTATION_PITCH_270)) {
-        // can't takeoff downwards
-        if (takeoff_alt_cm <= copter.rangefinder_state.alt_cm) {
-            return false;
-        }
-        frame = Location::AltFrame::ABOVE_TERRAIN;
-    }
-    target_loc.set_alt_cm(takeoff_alt_cm, frame);
+//     // initialise wpnav destination
+//     Location target_loc = copter.current_loc;
+//     Location::AltFrame frame = Location::AltFrame::ABOVE_HOME;
+//     if (wp_nav->rangefinder_used_and_healthy() &&
+//             wp_nav->get_terrain_source() == AC_WPNav::TerrainSource::TERRAIN_FROM_RANGEFINDER &&
+//             takeoff_alt_cm < copter.rangefinder.max_distance_cm_orient(ROTATION_PITCH_270)) {
+//         // can't takeoff downwards
+//         if (takeoff_alt_cm <= copter.rangefinder_state.alt_cm) {
+//             return false;
+//         }
+//         frame = Location::AltFrame::ABOVE_TERRAIN;
+//     }
+//     target_loc.set_alt_cm(takeoff_alt_cm, frame);
 
-    if (!wp_nav->set_wp_destination(target_loc)) {
-        // failure to set destination can only be because of missing terrain data
-        AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILED_TO_SET_DESTINATION);
-        // failure is propagated to GCS with NAK
-        return false;
-    }
+//     if (!wp_nav->set_wp_destination(target_loc)) {
+//         // failure to set destination can only be because of missing terrain data
+//         AP::logger().Write_Error(LogErrorSubsystem::NAVIGATION, LogErrorCode::FAILED_TO_SET_DESTINATION);
+//         // failure is propagated to GCS with NAK
+//         return false;
+//     }
 
-    // initialise yaw
-    auto_yaw.set_mode(AUTO_YAW_HOLD);
+//     // initialise yaw
+//     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
-    // clear i term when we're taking off
-    set_throttle_takeoff();
+//     // clear i term when we're taking off
+//     set_throttle_takeoff();
 
-    // get initial alt for WP_NAVALT_MIN
-    auto_takeoff_set_start_alt();
+//     // get initial alt for WP_NAVALT_MIN
+//     auto_takeoff_set_start_alt();
 
-    return true;
-}
+//     return true;
+// }
 
 // initialise guided mode's position controller
 void ModeGuided::pos_control_start()
@@ -149,10 +149,10 @@ void ModeGuided::posvel_control_start()
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 }
 
-bool ModeGuided::is_taking_off() const
-{
-    return guided_mode == Guided_TakeOff;
-}
+// bool ModeGuided::is_taking_off() const
+// {
+//     return guided_mode == Guided_TakeOff;
+// }
 
 // initialise guided mode's angle controller
 void ModeGuided::angle_control_start()
@@ -347,12 +347,8 @@ void ModeGuided::run()
     // call the correct auto controller
     switch (guided_mode) {
 
-    case Guided_TakeOff:
-        // run takeoff controller
-        takeoff_run();
-        break;
-
-    case Guided_WP:
+     case Guided_TakeOff:
+     case Guided_WP:
         // run position controller
         pos_control_run();
         break;
@@ -376,18 +372,18 @@ void ModeGuided::run()
 
 // guided_takeoff_run - takeoff in guided mode
 //      called by guided_run at 100hz or more
-void ModeGuided::takeoff_run()
-{
-    auto_takeoff_run();
-    if (wp_nav->reached_wp_destination()) {
-        // optionally retract landing gear
-        // copter.landinggear.retract_after_takeoff();
+// void ModeGuided::takeoff_run()
+// {
+//     auto_takeoff_run();
+//     if (wp_nav->reached_wp_destination()) {
+//         // optionally retract landing gear
+//         // copter.landinggear.retract_after_takeoff();
 
-        // switch to position control mode but maintain current target
-        const Vector3f target = wp_nav->get_wp_destination();
-        set_destination(target, false, 0, false, 0, false, wp_nav->origin_and_destination_are_terrain_alt());
-    }
-}
+//         // switch to position control mode but maintain current target
+//         const Vector3f target = wp_nav->get_wp_destination();
+//         set_destination(target, false, 0, false, 0, false, wp_nav->origin_and_destination_are_terrain_alt());
+//     }
+// }
 
 // guided_pos_control_run - runs the guided position controller
 // called from guided_run

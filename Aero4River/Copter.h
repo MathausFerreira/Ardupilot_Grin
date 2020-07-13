@@ -227,7 +227,7 @@ private:
     RC_Channel *channel_pitch;
     RC_Channel *channel_throttle;
     RC_Channel *channel_yaw;
-    RC_Channel *canalGanho; //Mathaus
+    RC_Channel *channel_gain; //Mathaus
 
 
     AP_Logger logger;
@@ -574,7 +574,7 @@ private:
                              uint8_t &task_count,
                              uint32_t &log_bit) override;
     void fast_loop() override;
-    bool start_takeoff(float alt) override;
+    // bool start_takeoff(float alt) override;
     bool set_target_location(const Location& target_loc) override;
     bool set_target_velocity_NED(const Vector3f& vel_ned) override;
     void rc_loop();
@@ -921,7 +921,7 @@ private:
 //     ModeAcro mode_acro;
 // #endif
 // #endif
-    ModeAltHold mode_althold;
+    // ModeAltHold mode_althold;
 #if MODE_AUTO_ENABLED == ENABLED
     ModeAuto mode_auto;
 #endif
