@@ -43,7 +43,6 @@ void Copter::get_pilot_desired_force_to_boat_M()
     tN = mapCube(Z,X,Y);
 }
 
-
 float Copter::PWMtoNorm(float pwm){
     /// Entra um valor de PWM e sai de 0 a 1
     float V = float(pwm - Pwmmin)/float(Pwmmax-Pwmmin);

@@ -4,7 +4,7 @@
 /// @brief   ArduCopter attitude control library
 
 #include "AC_AttitudeControl.h"
-#include <AP_Motors/AP_MotorsMulticopter.h>
+#include <AP_Motors/AP_MotorsRiver.h>
 
 // default rate controller PID gains
 #ifndef AC_ATC_MULTI_RATE_RP_P
@@ -77,6 +77,13 @@ public:
 
     // sanity check parameters.  should be called once before take-off
     void parameter_sanity_check() override;
+
+
+    // Mathaus
+    void input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds) override;
+
+
+
 
     // user settable parameters
     static const struct AP_Param::GroupInfo var_info[];

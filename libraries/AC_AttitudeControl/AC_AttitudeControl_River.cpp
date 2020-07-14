@@ -70,13 +70,7 @@ const AP_Param::GroupInfo AC_AttitudeControl_River::var_info[] = {
 
     // @Param: RAT_PIT_P
     // @DisplayName: Pitch axis rate controller P gain
-    // @Description: Pitch axis rate controller P gain.  Converts the difference between desired pitch rate and actual pitch rate into a motor speed output
-    // @Range: 0.01 0.50
-    // @Increment: 0.005
-    // @User: Standard
-
-    // @Param: RAT_PIT_I
-    // @DisplayName: Pitch axis rate controller I gain
+    // @Description: Pitch input_euler_angle_roll_pitch_euler_rate_yawaxis rate controller I gain
     // @Description: Pitch axis rate controller I gain.  Corrects long-term difference in desired pitch rate vs actual pitch rate
     // @Range: 0.01 2.0
     // @Increment: 0.01
@@ -223,6 +217,38 @@ AC_AttitudeControl_River::AC_AttitudeControl_River(AP_AHRS_View &ahrs, const AP_
 {
     AP_Param::setup_object_defaults(this, var_info);
 }
+
+
+// Mathaus
+
+void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
+{
+    // Convert from centidegrees on public interface to radians
+    float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
+    float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);
+    float euler_yaw_rate = radians(euler_yaw_rate_cds * 0.01f);
+
+    // calculate the attitude target euler angles
+    _attitude_target_quat.to_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
+
+    // Add roll trim to compensate tail rotor thrust in heli (will return zero on multirotors)
+    euler_roll_angle += get_roll_trim_rad();
+
+        // When feedforward is not enabled, the target euler angle is input into the target and the feedforward rate is zeroed.
+        _attitude_target_euler_angle.x = euler_roll_angle;
+        _attitude_target_euler_angle.y = euler_pitch_angle;
+        _attitude_target_euler_angle.z += euler_yaw_rate * _dt;
+        // Compute quaternion target attitude
+        _attitude_target_quat.from_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
+
+        // Set rate feedforward requests to zero
+        _attitude_target_euler_rate = Vector3f(0.0f, 0.0f, 0.0f);
+        _attitude_target_ang_vel = Vector3f(0.0f, 0.0f, 0.0f);
+
+    // Call quaternion attitude controller
+    attitude_controller_run_quat();
+}
+
 
 // Update Alt_Hold angle maximum
 void AC_AttitudeControl_River::update_althold_lean_angle_max(float throttle_in)

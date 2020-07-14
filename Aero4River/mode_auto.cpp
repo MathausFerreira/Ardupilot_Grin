@@ -141,19 +141,15 @@ void ModeAuto::rtl_start()
 // void ModeAuto::takeoff_start(const Location& dest_loc)
 // {
 //     _mode = Auto_TakeOff;
-
 //     Location dest(dest_loc);
-
 //     if (!copter.current_loc.initialised()) {
 //         // vehicle doesn't know where it is ATM.  We should not
 //         // initialise our takeoff destination without knowing this!
 //         return;
 //     }
-
 //     // set horizontal target
 //     dest.lat = copter.current_loc.lat;
 //     dest.lng = copter.current_loc.lng;
-
 //     // get altitude target
 //     int32_t alt_target;
 //     if (!dest.get_alt_cm(Location::AltFrame::ABOVE_HOME, alt_target)) {
@@ -162,7 +158,6 @@ void ModeAuto::rtl_start()
 //         // fall back to altitude above current altitude
 //         alt_target = copter.current_loc.alt + dest.alt;
 //     }
-
 //     // sanity check target
 //     if (alt_target < copter.current_loc.alt) {
 //         dest.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
@@ -171,20 +166,16 @@ void ModeAuto::rtl_start()
 //     if (alt_target < 100) {
 //         dest.set_alt_cm(100, Location::AltFrame::ABOVE_HOME);
 //     }
-
 //     // set waypoint controller target
 //     if (!wp_nav->set_wp_destination(dest)) {
 //         // failure to set destination can only be because of missing terrain data
 //         copter.failsafe_terrain_on_event();
 //         return;
 //     }
-
 //     // initialise yaw
 //     auto_yaw.set_mode(AUTO_YAW_HOLD);
-
 //     // clear i term when we're taking off
 //     set_throttle_takeoff();
-
 //     // get initial alt for WP_NAVALT_MIN
 //     auto_takeoff_set_start_alt();
 // }
@@ -200,7 +191,6 @@ void ModeAuto::wp_start(const Location& dest_loc)
         copter.failsafe_terrain_on_event();
         return;
     }
-
     // initialise yaw
     // To-Do: reset the yaw only when the previous navigation command is not a WP.  this would allow removing the special check for ROI
     if (auto_yaw.mode() != AUTO_YAW_ROI) {

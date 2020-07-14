@@ -21,6 +21,7 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AP_MotorsRiver.h"
 
+#include <GCS_MAVLink/GCS.h>
 extern const AP_HAL::HAL &hal;
 
 // init
@@ -74,6 +75,14 @@ void AP_MotorsRiver::set_frame_class_and_type(motor_frame_class frame_class, mot
 
 void AP_MotorsRiver::output_to_motors()
 {
+    // static uint8_t counter = 0;
+    // counter++;
+    // if (counter > 50)
+    // {
+    //     counter = 0;
+    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "Murillo is gay");
+    // }
+
     int8_t i;
 
     switch (_spool_state)
@@ -157,8 +166,8 @@ void AP_MotorsRiver::output_armed_stabilizing()
     float throttle_thrust_max;      // throttle thrust maximum value, 0.0 - 1.0
     float throttle_thrust_best_rpy; // throttle providing maximum roll, pitch and yaw range without climbing
     //float rpy_scale = 1.0f;         // this is used to scale the roll, pitch and yaw to fit within the motor limits
-    float yaw_allowed = 1.0f;       // amount of yaw we can fit in
-   // float thr_adj;                  // the difference between the pilot's desired throttle and throttle_thrust_best_rpy
+    float yaw_allowed = 1.0f; // amount of yaw we can fit in
+                              // float thr_adj;                  // the difference between the pilot's desired throttle and throttle_thrust_best_rpy
 
     // apply voltage and air pressure compensation
     const float compensation_gain = get_compensation_gain(); // compensation for battery voltage and altitude
@@ -291,10 +300,10 @@ void AP_MotorsRiver::output_armed_stabilizing()
     //float rpy_high = -1.0f; // highest thrust value
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
     {
-        _thrust_rpyt_out[0] = 0;//Pwm1;
-        _thrust_rpyt_out[1] = 0;//Pwm2;
-        _thrust_rpyt_out[2] = 0;//Pwm3;
-        _thrust_rpyt_out[3] =0;// Pwm4;
+        _thrust_rpyt_out[0] = 0; //Pwm1;
+        _thrust_rpyt_out[1] = 0; //Pwm2;
+        _thrust_rpyt_out[2] = 0; //Pwm3;
+        _thrust_rpyt_out[3] = 0; // Pwm4;
 
         // if (motor_enabled[i])
         // {
@@ -565,11 +574,11 @@ void AP_MotorsRiver::setup_motors(motor_frame_class frame_class, motor_frame_typ
         switch (frame_type)
         {
         case MOTOR_FRAME_TYPE_X:
-        // add_motor(AP_MOTORS_MOT_1, 45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
-            add_motor(AP_MOTORS_MOT_1,   45, 0, 1);
+            // add_motor(AP_MOTORS_MOT_1, 45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
+            add_motor(AP_MOTORS_MOT_1, 45, 0, 1);
             add_motor(AP_MOTORS_MOT_2, -135, 0, 3);
-            add_motor(AP_MOTORS_MOT_3,  -45, 0, 4);
-            add_motor(AP_MOTORS_MOT_4,  135, 0, 2);
+            add_motor(AP_MOTORS_MOT_3, -45, 0, 4);
+            add_motor(AP_MOTORS_MOT_4, 135, 0, 2);
             break;
 
         default:

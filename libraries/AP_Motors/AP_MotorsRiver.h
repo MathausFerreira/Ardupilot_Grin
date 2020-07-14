@@ -5,19 +5,20 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
 #include <RC_Channel/RC_Channel.h>     // RC Channel Library
-#include "AP_MotorsMulticopter.h"
+#include "AP_MotorsMatrix.h"
 
 #define AP_MOTORS_MATRIX_YAW_FACTOR_CW   -1
 #define AP_MOTORS_MATRIX_YAW_FACTOR_CCW   1
 
 /// @class      AP_MotorsRiver
-class AP_MotorsRiver : public AP_MotorsMulticopter {
+class AP_MotorsRiver : public AP_MotorsMatrix {
 public:
 
     /// Constructor
     AP_MotorsRiver(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT) :
-        AP_MotorsMulticopter(loop_rate, speed_hz)
-    {};
+        AP_MotorsMatrix(loop_rate, speed_hz){
+            // AP_Param::setup_object_defaults(this, var_info);
+        };
 
     // init
     void                init(motor_frame_class frame_class, motor_frame_type frame_type) override;
@@ -75,7 +76,7 @@ protected:
     void                remove_motor(int8_t motor_num);
 
     // configures the motors for the defined frame_class and frame_type
-    virtual void        setup_motors(motor_frame_class frame_class, motor_frame_type frame_type);
+    void        setup_motors(motor_frame_class frame_class, motor_frame_type frame_type) override;
 
     // normalizes the roll, pitch and yaw factors so maximum magnitude is 0.5
     void                normalise_rpy_factors();
