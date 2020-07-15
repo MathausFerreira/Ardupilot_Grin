@@ -208,6 +208,7 @@ void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
 
 constexpr int8_t Copter::_failsafe_priorities[7];
 
+
 // Main loop - 400hz
 void Copter::fast_loop()
 {
