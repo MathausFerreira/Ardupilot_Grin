@@ -8,7 +8,7 @@
 // should be called at 100hz or more
 void ModeStabilize::run()
 {
-    copter.get_pilot_desired_force_to_boat_M();
+    get_pilot_desired_force_to_boat_M();
     // apply simple mode transform to pilot inputs
     update_simple_mode(); //Inplementar ---->>> Mathaus
 

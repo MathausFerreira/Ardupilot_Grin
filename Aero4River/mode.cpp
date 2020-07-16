@@ -744,7 +744,7 @@ float Mode::get_pilot_desired_climb_rate(float throttle_control)
 // Mathaus
 void Mode::get_pilot_desired_force_to_boat_M()
 {
-     copter.get_pilot_desired_force_to_boat_M();
+      copter.get_pilot_desired_force_to_boat_M();
 }
 //
 

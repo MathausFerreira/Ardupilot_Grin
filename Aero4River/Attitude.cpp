@@ -36,9 +36,9 @@ void Copter::get_pilot_desired_force_to_boat_M()
     GanhoF < 0.0f ? GanhoF = 0.0f : GanhoF = GanhoF;
     GanhoF > 1.0f ? GanhoF = 1.0f : GanhoF = GanhoF;
 
-    X = X   * GanhoF;
-    Y = Y   * GanhoF;
-    Z = Z   * GanhoF;
+    X = X * GanhoF;
+    Y = Y * GanhoF;
+    Z = Z * GanhoF;
 
     X  = constrain_float(X,-1.0f,1.0f);
     Y  = constrain_float(Y,-1.0f,1.0f);
@@ -47,7 +47,7 @@ void Copter::get_pilot_desired_force_to_boat_M()
     Fx = mapCube(X,Y,Z);
     Fy = mapCube(Y,X,Z);
     tN = mapCube(Z,X,Y);
-
+    
 }
 
 // float Copter::PWMtoNorm(float pwm){

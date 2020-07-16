@@ -75,13 +75,13 @@ void AP_MotorsRiver::set_frame_class_and_type(motor_frame_class frame_class, mot
 
 void AP_MotorsRiver::output_to_motors()
 {
-    // static uint8_t counter = 0;
-    // counter++;
-    // if (counter > 50)
-    // {
-    //     counter = 0;
-    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "Murillo is gay");
-    // }
+    static uint8_t counter = 0;
+    counter++;
+    if (counter > 200)
+    {
+        counter = 0;
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "PitchIN : %5.3f RollIN : %5.3f YawIN : %5.3f", (double)_pitch_in,(double)_roll_in,(double)_yaw_in);
+    }
 
     int8_t i;
 
@@ -157,13 +157,7 @@ uint16_t AP_MotorsRiver::get_motor_mask()
 // includes new scaling stability patch
 void AP_MotorsRiver::output_armed_stabilizing()
 { 
-    static uint8_t counter = 0;
-    counter++;
-    if (counter > 50)
-    {
-        counter = 0;
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "PitchIN : %5.3f RollIN : %5.3f YawIN : %5.3f", (double)_pitch_in,(double)_roll_in,(double)_yaw_in);
-    }
+    
 
     FOSSEN_alocation_matrix(_pitch_in,_roll_in,_yaw_in,theta_m1,theta_m2,theta_m3,theta_m4,Pwm1,Pwm2,Pwm3,Pwm4);
 
