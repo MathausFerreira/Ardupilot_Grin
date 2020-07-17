@@ -13,11 +13,11 @@ void ModeStabilize::run()
     update_simple_mode(); //Inplementar ---->>> Mathaus
 
     // convert pilot input to lean angles
-    float target_roll = 0.0f;
-    float target_pitch = 0.0f;
+    // float target_roll = 0.0f;
+    // float target_pitch = 0.0f;
  
     // get pilot's desired yaw rate
-    float target_yaw_rate = copter.tN;
+    // float target_yaw_rate = copter.tN;
     //  get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
     if (!motors->armed()) {
         // Motors should be Stopped
@@ -56,7 +56,11 @@ void ModeStabilize::run()
     }
 
     // call attitude controller
-     attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
+    //  attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(0, 0, target_yaw_rate);
+
+     motors->set_roll(copter.Fy);
+     motors->set_pitch(copter.Fx);
+     motors->set_yaw(copter.tN);
 
     // output pilot's throttle
     //  attitude_control->set_throttle_out(get_pilot_desired_throttle(),true, g.throttle_filt); //Mathaus --- acredito que essse throtle não existe aqui

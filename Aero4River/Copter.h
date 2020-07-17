@@ -669,7 +669,7 @@ private:
     
     int servo_angle_to_pwm(float angle,float srv_min_pwm,float srv_max_pwm);
     float servo_pwm_to_angle(int PWM_aux);
-      float mapCube(float x, float y, float z);
+    float mapCube(float x, float y, float z);
     
     void get_pilot_desired_force_to_boat_M();
     void pwm_servo_angle();
@@ -687,10 +687,7 @@ private:
     void Log_Write_Accacio();
 
 
-
     //
-
-
 
     // commands.cpp
     void update_home_from_EKF();

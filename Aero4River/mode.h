@@ -287,22 +287,6 @@ private:
 };
 #endif
 
-#if FRAME_CONFIG == HELI_FRAME
-class ModeAcro_Heli : public ModeAcro {
-
-public:
-    // inherit constructor
-    using ModeAcro::Mode;
-
-    bool init(bool ignore_checks) override;
-    void run() override;
-    void virtual_flybar( float &roll_out, float &pitch_out, float &yaw_out, float pitch_leak, float roll_leak);
-
-protected:
-private:
-};
-#endif
-
 
 // class ModeAltHold : public Mode {
 
@@ -441,9 +425,7 @@ private:
     void do_set_home(const AP_Mission::Mission_Command& cmd);
     void do_roi(const AP_Mission::Mission_Command& cmd);
     void do_mount_control(const AP_Mission::Mission_Command& cmd);
-// #if PARACHUTE == ENABLED
-//     void do_parachute(const AP_Mission::Mission_Command& cmd);
-// #endif
+    
 #if WINCH_ENABLED == ENABLED
     void do_winch(const AP_Mission::Mission_Command& cmd);
 #endif

@@ -475,8 +475,6 @@ void Copter::update_throttle_mix()
 // #endif
 }
 
-
-
 // one_hz_loop - runs at 1Hz
 void Copter::one_hz_loop()
 {

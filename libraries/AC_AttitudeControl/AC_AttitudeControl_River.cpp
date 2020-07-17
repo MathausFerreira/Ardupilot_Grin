@@ -223,6 +223,10 @@ AC_AttitudeControl_River::AC_AttitudeControl_River(AP_AHRS_View &ahrs, const AP_
 
 void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
 {
+
+
+
+    
     // Convert from centidegrees on public interface to radians
     float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
     float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);

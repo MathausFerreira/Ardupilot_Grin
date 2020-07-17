@@ -22,9 +22,9 @@
 #include "AP_MotorsRiver.h"
 
 #include <GCS_MAVLink/GCS.h>
+
 extern const AP_HAL::HAL &hal;
 
-// init
 void AP_MotorsRiver::init(motor_frame_class frame_class, motor_frame_type frame_type)
 {
     // record requested frame class and type
@@ -37,6 +37,81 @@ void AP_MotorsRiver::init(motor_frame_class frame_class, motor_frame_type frame_
     // enable fast channels or instant pwm
     set_update_rate(_speed_hz);
 }
+
+void AP_MotorsRiver::setup_motors(motor_frame_class frame_class, motor_frame_type frame_type)
+{
+
+    // add_motor(AP_MOTORS_MOT_1, 45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
+    add_motor(AP_MOTORS_MOT_1, 45, 0, 1);
+    add_motor(AP_MOTORS_MOT_2, -135, 0, 3);
+    add_motor(AP_MOTORS_MOT_3, -45, 0, 4);
+    add_motor(AP_MOTORS_MOT_4, 135, 0, 2);
+    add_motor_raw(AP_MOTORS_MOT_9,0,0,0,5);
+    add_motor_raw(AP_MOTORS_MOT_10,0,0,0,6);
+    add_motor_raw(AP_MOTORS_MOT_11,0,0,0,7);
+    add_motor_raw(AP_MOTORS_MOT_12,0,0,0,8);
+    
+    _flags.initialised_ok  = true;
+
+}
+void AP_MotorsRiver::output_min()
+{
+    set_desired_spool_state(DesiredSpoolState::SHUT_DOWN);
+    _spool_state = SpoolState::SHUT_DOWN;
+    output();
+}
+
+void AP_MotorsRiver::output()
+{
+    // update throttle filter
+    // update_throttle_filter();
+
+    // calc filtered battery voltage and lift_max
+    // update_lift_max_from_batt_voltage();
+
+    // run spool logic
+    // output_logic();
+
+    // calculate thrust
+    output_armed_stabilizing();
+
+    // apply any thrust compensation for the frame
+    // thrust_compensation();
+
+    // convert rpy_thrust values to pwm
+    output_to_motors();
+
+    // output any booster throttle
+    // output_boost_throttle();
+
+    // output raw roll/pitch/yaw/thrust
+    // output_rpyt();
+};
+
+// add_motor
+void AP_MotorsRiver::add_motor_raw(int8_t motor_num, float roll_fac, float pitch_fac, float yaw_fac, uint8_t testing_order)
+{
+    // ensure valid motor number is provided
+    if (motor_num >= 0 && motor_num < AP_MOTORS_MAX_NUM_MOTORS)
+    {
+        // increment number of motors if this motor is being newly motor_enabled
+        if (!motor_enabled[motor_num])
+        {
+            motor_enabled[motor_num] = true;
+        }
+        // set roll, pitch, thottle factors and opposite motor (for stability patch)
+        _roll_factor[motor_num] = roll_fac;
+        _pitch_factor[motor_num] = pitch_fac;
+        _yaw_factor[motor_num] = yaw_fac;
+
+        // set order that motor appears in test
+        _test_order[motor_num] = testing_order;
+
+        // call parent class method
+        add_motor_num(motor_num);
+    }
+}
+
 
 // set update rate to motors - a value in hertz
 void AP_MotorsRiver::set_update_rate(uint16_t speed_hz)
@@ -74,16 +149,10 @@ void AP_MotorsRiver::set_frame_class_and_type(motor_frame_class frame_class, mot
 }
 
 void AP_MotorsRiver::output_to_motors()
-{
-    static uint8_t counter = 0;
-    counter++;
-    if (counter > 200)
-    {
-        counter = 0;
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "PitchIN : %5.3f RollIN : %5.3f YawIN : %5.3f", (double)_pitch_in,(double)_roll_in,(double)_yaw_in);
-    }
-
+{   
     int8_t i;
+
+    //  output_armed_stabilizing();
 
     switch (_spool_state)
     {
@@ -113,6 +182,7 @@ void AP_MotorsRiver::output_to_motors()
     case SpoolState::THROTTLE_UNLIMITED:
     case SpoolState::SPOOLING_DOWN:
         // set motor output based on thrust requests
+
         for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
         {
             if (motor_enabled[i])
@@ -157,23 +227,34 @@ uint16_t AP_MotorsRiver::get_motor_mask()
 // includes new scaling stability patch
 void AP_MotorsRiver::output_armed_stabilizing()
 { 
-    
 
+    // static uint8_t counter = 0;
+    // counter++;
+    // if (counter > 200)
+    // {
+    //     counter = 0;
+    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "Th1 : %5.3f  Th2 : %5.3f  Th3 : %5.3f  Th4 : %5.3f  ", (double)theta_m1,(double)theta_m2,(double)theta_m3,(double)theta_m4);
+    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "M1 : %5.3f  M2 : %5.3f  M3 : %5.3f  M4 : %5.3f  ", (double)Pwm1,(double)Pwm2,(double)Pwm3,(double)Pwm4);
+    // }
     FOSSEN_alocation_matrix(_pitch_in,_roll_in,_yaw_in,theta_m1,theta_m2,theta_m3,theta_m4,Pwm1,Pwm2,Pwm3,Pwm4);
+    pwm_servo_angle();
 
     _thrust_rpyt_out[0] = Pwm1;
     _thrust_rpyt_out[1] = Pwm2;
     _thrust_rpyt_out[2] = Pwm3;
     _thrust_rpyt_out[3] = Pwm4;
 
-    _thrust_rpyt_out[4] = theta_m1;
-    _thrust_rpyt_out[5] = theta_m2;
-    _thrust_rpyt_out[6] = theta_m3;
-    _thrust_rpyt_out[7] = theta_m4;
+    _thrust_rpyt_out[4] = 0.0f;
+    _thrust_rpyt_out[5] = 0.0f;
+    _thrust_rpyt_out[6] = 0.0f;
+    _thrust_rpyt_out[7] = 0.0f;
 
+    _thrust_rpyt_out[8]  = servo_m1;
+    _thrust_rpyt_out[9]  = servo_m2;
+    _thrust_rpyt_out[10] = servo_m3;
+    _thrust_rpyt_out[11] = servo_m4;
     
    }
-
 
 /* ****************************** Mathaus *********************************
 ***************************************************************************/
@@ -193,6 +274,53 @@ float AP_MotorsRiver::PWMtoNorm(float pwm){
 float AP_MotorsRiver::NormtoPWM(float val){
     /// Entra um valor de 0 a 1 e sai um PWM
     return val*(Pwmmax-Pwmmin) + Pwmmin;
+}
+
+int AP_MotorsRiver::servo_angle_to_pwm(float angle,float srv_min_pwm, float srv_max_pwm)
+{
+    /// Nessa função deve-se inserir os valores mínimos e maxímos do pwm  considerando 0 a 180 como angulos mínimos e máximos
+
+    //Entrada de angulo deve ser  de -90 a 90 ELE CHEGARÁ A 180 DEVIDO A ENGRENAGEM
+    angle = constrain_float(angle,-180.0f,180.0f);
+
+    angle = 180 - angle;
+
+    //valor que o servo entende como 0 graus
+    float srv_min_angle = 0.0;
+
+    //valor que o servo entende como 360
+    float srv_max_angle = 360.0;
+
+    int pwm =  srv_min_pwm + angle * (srv_max_pwm - srv_min_pwm)/(srv_max_angle - srv_min_angle);
+
+    return pwm;
+}
+
+void AP_MotorsRiver::pwm_servo_angle()
+{
+    /// todos os angulos devem estar em graus nesta função
+    // if(!motors->armed())
+    // {
+    //     theta_m1 = 0.0;
+    //     theta_m2 = 0.0;
+    //     theta_m3 = 0.0;
+    //     theta_m4 = 0.0;
+    // }
+//Linha utilizada para medir valores de pwm min e max
+   // servo_m4 = (channel_throttle->get_radio_in()-channel_throttle->get_radio_min()) + 1.5*(canalGanho->get_radio_in()-canalGanho->get_radio_min());
+
+    //BARCO GRANDE
+    // theta_m1 = servo_angle_to_pwm(theta_m1,444.0,2490.0);//675.0,2329.0);
+    // theta_m2 = servo_angle_to_pwm(theta_m2,421.0,2501.0);//664.0,2144.0);
+    // theta_m3 = servo_angle_to_pwm(theta_m3,418.0,2461.0);//656.0,2400.0);
+    // theta_m4 = servo_angle_to_pwm(theta_m4,421.0,2501.0);//700.0,2345.0);
+
+    //BARCO PEQUENO
+   servo_m1 = servo_angle_to_pwm(theta_m1,986.0,1897.0);
+   servo_m2 = servo_angle_to_pwm(theta_m2,550.0,2270.0);
+   servo_m3 = servo_angle_to_pwm(theta_m3,502.0,2408.0);
+   servo_m4 = servo_angle_to_pwm(theta_m4,520.0,2390.0);
+
 }
 
 void AP_MotorsRiver::FOSSEN_alocation_matrix(float FX,float FY,float TN,float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4)
@@ -272,7 +400,7 @@ void AP_MotorsRiver::FOSSEN_alocation_matrix(float FX,float FY,float TN,float &T
         Theta4 = constrain_float(Theta4,-M_PI,M_PI);
     }
 
-    // Allocacao_Direta(Theta1, Theta2, Theta3, Theta4, PWM1, PWM2, PWM3, PWM4);
+    //  Allocacao_Direta(Theta1, Theta2, Theta3, Theta4, PWM1, PWM2, PWM3, PWM4);
 
     // Normaliza o valor de PWM encontrado entre 0 e 1 para ativar a saida entre mínima e maxima potência
     PWM1 = PWMtoNorm(PWM1);
@@ -405,31 +533,6 @@ bool AP_MotorsRiver::output_test_num(uint8_t output_channel, int16_t pwm)
     return true;
 }
 
-// add_motor
-void AP_MotorsRiver::add_motor_raw(int8_t motor_num, float roll_fac, float pitch_fac, float yaw_fac, uint8_t testing_order)
-{
-    // ensure valid motor number is provided
-    if (motor_num >= 0 && motor_num < AP_MOTORS_MAX_NUM_MOTORS)
-    {
-
-        // increment number of motors if this motor is being newly motor_enabled
-        if (!motor_enabled[motor_num])
-        {
-            motor_enabled[motor_num] = true;
-        }
-
-        // set roll, pitch, thottle factors and opposite motor (for stability patch)
-        _roll_factor[motor_num] = roll_fac;
-        _pitch_factor[motor_num] = pitch_fac;
-        _yaw_factor[motor_num] = yaw_fac;
-
-        // set order that motor appears in test
-        _test_order[motor_num] = testing_order;
-
-        // call parent class method
-        add_motor_num(motor_num);
-    }
-}
 
 // add_motor using just position and prop direction - assumes that for each motor, roll and pitch factors are equal
 void AP_MotorsRiver::add_motor(int8_t motor_num, float angle_degrees, float yaw_factor, uint8_t testing_order)
@@ -460,48 +563,6 @@ void AP_MotorsRiver::remove_motor(int8_t motor_num)
         _pitch_factor[motor_num] = 0;
         _yaw_factor[motor_num] = 0;
     }
-}
-
-void AP_MotorsRiver::setup_motors(motor_frame_class frame_class, motor_frame_type frame_type)
-{
-    // remove existing motors
-    for (int8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-    {
-        remove_motor(i);
-    }
-
-    bool success = true;
-
-    switch (frame_class)
-    {
-    case MOTOR_FRAME_QUAD:
-        switch (frame_type)
-        {
-        case MOTOR_FRAME_TYPE_X:
-            // add_motor(AP_MOTORS_MOT_1, 45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
-            add_motor(AP_MOTORS_MOT_1, 45, 0, 1);
-            add_motor(AP_MOTORS_MOT_2, -135, 0, 3);
-            add_motor(AP_MOTORS_MOT_3, -45, 0, 4);
-            add_motor(AP_MOTORS_MOT_4, 135, 0, 2);
-            break;
-
-        default:
-            // quad frame class does not support this frame type
-            success = false;
-            break;
-        }
-        break; // quad
-    default:
-        // quad frame class does not support this frame type
-        success = false;
-        break;
-
-    } // switch frame_class
-
-    // normalise factors to magnitude 0.5
-    normalise_rpy_factors();
-
-    _flags.initialised_ok = success;
 }
 
 // normalizes the roll, pitch and yaw factors so maximum magnitude is 0.5

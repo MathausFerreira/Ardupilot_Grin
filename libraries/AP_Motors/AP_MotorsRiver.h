@@ -42,14 +42,27 @@ public:
     float theta_m3 =  0.0f;
     float theta_m4 =  0.0f;
 
+    int servo_m1 =0;
+    int servo_m2 =0;
+    int servo_m3 =0;
+    int servo_m4 =0;
+
     float Pwm1 = 0.0f;
     float Pwm2 = 0.0f;
     float Pwm3 = 0.0f;
     float Pwm4 = 0.0f;
     
 
+    // output - sends commands to the motors
+    virtual void        output() override;
+    // output_min - sends minimum values out to the motors
+    void                output_min() override;
+    
+    int servo_angle_to_pwm(float angle,float srv_min_pwm,float srv_max_pwm);
+    float servo_pwm_to_angle(int PWM_aux);
+    void pwm_servo_angle();
     float PWMtoNorm(float pwm);
-    void Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
+    // void Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
     float NormtoPWM(float pwm);
     void FOSSEN_alocation_matrix(float FX,float FY,float TN,float &theta_motor1,float &theta_motor2,float &theta_motor3,float &theta_motor4,float &PWM1 ,float &PWM2 ,float &PWM3 ,float &PWM4);
     

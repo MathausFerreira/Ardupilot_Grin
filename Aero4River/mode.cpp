@@ -1,5 +1,4 @@
 #include "Copter.h"
-
 /*
  * High level calls to set and update flight modes logic for individual
  * flight modes is in control_acro.cpp, control_stabilize.cpp, etc
@@ -137,7 +136,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 // ACRO, STABILIZE, ALTHOLD, LAND, DRIFT and SPORT can always be set successfully but the return state of other flight modes should be checked and the caller should deal with failures appropriately
 bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 {
-
     // return immediately if we are already in the desired mode
     if (mode == control_mode)
     {
@@ -487,21 +485,6 @@ void Mode::land_run_vertical_control(bool pause_descent)
         // Constrain the demanded vertical velocity so that it is between the configured maximum descent speed and the configured minimum descent speed.
         cmb_rate = constrain_float(cmb_rate, max_land_descent_velocity, -abs(g.land_speed));
 
-// #if PRECISION_LANDING == ENABLED
-//         const bool navigating = pos_control->is_active_xy();
-//         bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired() && navigating;
-
-//         if (doing_precision_landing && copter.rangefinder_alt_ok() && copter.rangefinder_state.alt_cm > 35.0f && copter.rangefinder_state.alt_cm < 200.0f)
-//         {
-//             // compute desired velocity
-//             const float precland_acceptable_error = 15.0f;
-//             const float precland_min_descent_speed = 10.0f;
-
-//             float max_descent_speed = abs(g.land_speed) * 0.5f;
-//             float land_slowdown = MAX(0.0f, pos_control->get_horizontal_error() * (max_descent_speed / precland_acceptable_error));
-//             cmb_rate = MIN(-precland_min_descent_speed, -max_descent_speed + land_slowdown);
-//         }
-// #endif
     }
 
     // update altitude target and call position controller
@@ -747,7 +730,6 @@ void Mode::get_pilot_desired_force_to_boat_M()
       copter.get_pilot_desired_force_to_boat_M();
 }
 //
-
 
 float Mode::get_non_takeoff_throttle()
 {
