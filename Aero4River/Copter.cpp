@@ -208,6 +208,7 @@ void Copter::get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
 
 constexpr int8_t Copter::_failsafe_priorities[7];
 
+
 // Main loop - 400hz
 void Copter::fast_loop()
 {
@@ -254,19 +255,19 @@ void Copter::fast_loop()
 }
 
 // start takeoff to given altitude (for use by scripting)
-bool Copter::start_takeoff(float alt)
-{
-    // exit if vehicle is not in Guided mode or Auto-Guided mode
-    if (!flightmode->in_guided_mode()) {
-        return false;
-    }
+// bool Copter::start_takeoff(float alt)
+// {
+//     // exit if vehicle is not in Guided mode or Auto-Guided mode
+//     if (!flightmode->in_guided_mode()) {
+//         return false;
+//     }
 
-    if (mode_guided.do_user_takeoff_start(alt * 100.0f)) {
-        copter.set_auto_armed(true);
-        return true;
-    }
-    return false;
-}
+//     if (mode_guided.do_user_takeoff_start(alt * 100.0f)) {
+//         copter.set_auto_armed(true);
+//         return true;
+//     }
+//     return false;
+// }
 
 // set target location (for use by scripting)
 bool Copter::set_target_location(const Location& target_loc)
@@ -429,22 +430,21 @@ void Copter::three_hz_loop()
     tuning();
 }
 
-//Mathaus
+// //Mathaus
 
-// Code to detect a crash main ArduCopter code
-#define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing
-#define LAND_CHECK_LARGE_ANGLE_CD   1500.0f     // maximum angle target to be considered landing
-#define LAND_CHECK_ACCEL_MOVING     3.0f        // maximum acceleration after subtracting gravity
+// // Code to detect a crash main ArduCopter code
+// #define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing
+// #define LAND_CHECK_LARGE_ANGLE_CD   1500.0f     // maximum angle target to be considered landing
+// #define LAND_CHECK_ACCEL_MOVING     3.0f        // maximum acceleration after subtracting gravity
 
-void Copter::update_throttle_mix()
-{
+// void Copter::update_throttle_mix()
+// {
 // #if FRAME_CONFIG != HELI_FRAME
 //     // if disarmed or landed prioritise throttle
 //     if (!motors->armed() || ap.land_complete) {
 //         attitude_control->set_throttle_mix_min();
 //         return;
 //     }
-
 //     if (flightmode->has_manual_throttle()) {
 //         // manual throttle
 //         if(channel_throttle->get_control_in() <= 0) {
@@ -454,34 +454,26 @@ void Copter::update_throttle_mix()
 //         }
 //     } else {
 //         // autopilot controlled throttle
-
 //         // check for aggressive flight requests - requested roll or pitch angle below 15 degrees
 //         const Vector3f angle_target = attitude_control->get_att_target_euler_cd();
 //          bool large_angle_request = (norm(angle_target.x, angle_target.y) > LAND_CHECK_LARGE_ANGLE_CD);
-
 //         // check for large external disturbance - angle error over 30 degrees
 //         const float angle_error = attitude_control->get_att_error_angle_deg();
 //          bool large_angle_error = (angle_error > LAND_CHECK_ANGLE_ERROR_DEG);
-
 //         // check for large acceleration - falling or high turbulence
 //          const bool accel_moving = (land_accel_ef_filter.get().length() > LAND_CHECK_ACCEL_MOVING);
-
 //         // check for requested decent
 //         bool descent_not_demanded = pos_control->get_desired_velocity().z >= 0.0f;
-
 //         // check if landing
 //         const bool landing = flightmode->is_landing();
-
-//         // if ((large_angle_request && !landing) || large_angle_error || accel_moving || descent_not_demanded) {
-//         //     attitude_control->set_throttle_mix_max(pos_control->get_vel_z_control_ratio());
-//         // } else {
+//         if ((large_angle_request && !landing) || large_angle_error || accel_moving || descent_not_demanded) {
+//             attitude_control->set_throttle_mix_max(pos_control->get_vel_z_control_ratio());
+//         } else {
 //             attitude_control->set_throttle_mix_min();
-//         // }
+//         }
 //     }
 // #endif
-}
-
-
+// }
 
 // one_hz_loop - runs at 1Hz
 void Copter::one_hz_loop()
