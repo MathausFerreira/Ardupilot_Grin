@@ -86,6 +86,9 @@ public:
     float get_pilot_desired_yaw_rate(int16_t stick_angle);
     float get_pilot_desired_throttle() const;
 
+    // Mathaus
+    void get_pilot_desired_force_to_boat();
+
     const Vector3f& get_desired_velocity() {
         // note that position control isn't used in every mode, so
         // this may return bogus data:

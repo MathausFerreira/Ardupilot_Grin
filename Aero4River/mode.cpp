@@ -800,6 +800,11 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
 // pass-through functions to reduce code churn on conversion;
 // these are candidates for moving into the Mode base
 // class.
+void Mode::get_pilot_desired_force_to_boat()
+{
+    get_pilot_desired_force_to_boat();
+}
+
 float Mode::get_pilot_desired_yaw_rate(int16_t stick_angle)
 {
     return copter.get_pilot_desired_yaw_rate(stick_angle);

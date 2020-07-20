@@ -20,6 +20,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include "AP_MotorsRiver.h"
+#include <GCS_MAVLink/GCS.h>
 
 extern const AP_HAL::HAL &hal;
 
@@ -64,7 +65,7 @@ int AP_MotorsRiver::servo_angle_to_pwm(float angle,float srv_min_pwm, float srv_
     return pwm;
 }
 
-void AP_MotorsRiver::pwm_servo_angle()
+void AP_MotorsRiver::pwm_servo_angle(float &Pwm_servo_m1,float &Pwm_servo_m2,float &Pwm_servo_m3,float &Pwm_servo_m4,float theta_1,float theta_2,float theta_3,float theta_4)
 {
     /// todos os angulos devem estar em graus nesta função
     // if(!motors->armed())
@@ -84,10 +85,10 @@ void AP_MotorsRiver::pwm_servo_angle()
     // theta_m4 = servo_angle_to_pwm(theta_m4,421.0,2501.0);//700.0,2345.0);
 
     //BARCO PEQUENO
-   servo_m1 = servo_angle_to_pwm(theta_m1,986.0,1897.0);
-   servo_m2 = servo_angle_to_pwm(theta_m2,550.0,2270.0);
-   servo_m3 = servo_angle_to_pwm(theta_m3,502.0,2408.0);
-   servo_m4 = servo_angle_to_pwm(theta_m4,520.0,2390.0);
+   Pwm_servo_m1 = servo_angle_to_pwm(theta_1,986.0,1897.0);
+   Pwm_servo_m2 = servo_angle_to_pwm(theta_2,550.0,2270.0);
+   Pwm_servo_m3 = servo_angle_to_pwm(theta_3,502.0,2408.0);
+   Pwm_servo_m4 = servo_angle_to_pwm(theta_4,520.0,2390.0);
 
 }
 
@@ -237,6 +238,8 @@ void AP_MotorsRiver::set_frame_class_and_type(motor_frame_class frame_class, mot
 
 void AP_MotorsRiver::output_to_motors()
 {
+
+
     int8_t i;
 
     switch (_spool_state)
@@ -542,7 +545,27 @@ void AP_MotorsRiver::output_armed_stabilizing()
 
     // check for failed motor
     check_for_failed_motor(throttle_thrust_best_plus_adj);
+
+
+     FOSSEN_alocation_matrix(_pitch_in, _roll_in, _yaw_in, theta_m1, theta_m2, theta_m3, theta_m4, Pwm1, Pwm2, Pwm3, Pwm4);
+     pwm_servo_angle(_thrust_rpyt_out[8],_thrust_rpyt_out[9],_thrust_rpyt_out[10],_thrust_rpyt_out[11],theta_m1, theta_m2, theta_m3, theta_m4);
+
+     _thrust_rpyt_out[0] = Pwm1;
+     _thrust_rpyt_out[1] = Pwm2;
+     _thrust_rpyt_out[2] = Pwm3;
+     _thrust_rpyt_out[3] = Pwm4;
+
+     counter++;
+    if (counter > 50)
+    {
+        counter = 0;
+        // gcs().send_text(MAV_SEVERITY_CRITICAL, "_pitch_in:  %5.3f, _roll_in:  %5.3f, _yaw_in:  %5.3f,", _pitch_in, _roll_in, _yaw_in);
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "PWM1:  %5.3f, PWM2:  %5.3f, PWM3:  %5.3f, PWM4:  %5.3f",Pwm1, Pwm2, Pwm3, Pwm4);
+    }
+     
+
 }
+
 
 // check for failed motor
 //   should be run immediately after output_armed_stabilizing

@@ -14,6 +14,47 @@
 class AP_MotorsRiver : public AP_MotorsMulticopter {
 public:
 
+ // Propriedade Física do Barco
+    float FT = 0.0f;
+    float FM1 = GRAVITY_MSS*2.1f;
+    float FM2 = GRAVITY_MSS*2.1f;
+    float FM3 = GRAVITY_MSS*2.1f;
+    float FM4 = GRAVITY_MSS*2.1f;
+
+    float Fmax = FM1 + FM2 + FM3 + FM4;       // Força e torque maximos do barco
+
+    float L    = 0.54f;          // Tamanho do braço do barco
+    float Lx = L*cosf(M_PI/4.0f);
+    float Ly = L*cosf(M_PI/4.0f);
+
+    //
+    float Pwmmax = 1001.0f; // Esse valor será a faixa de pwm que eu vou escolher para trabalhar --------------- // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float Pwmmin = 1.0f;    // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float Nmax = L*Fmax;
+
+    float k1 = (FM1)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k2 = (FM2)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k3 = (FM3)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+    float k4 = (FM4)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
+
+ uint8_t counter = 0;
+    //  PWM do Servo Motores Barco
+    float servo_m1 = 0.0f;
+    float servo_m2 = 0.0f;
+    float servo_m3 = 0.0f;
+    float servo_m4 = 0.0f;
+
+    // Angulo dos Servo Motores Barco
+    float theta_m1 =  0.0f;
+    float theta_m2 =  0.0f;
+    float theta_m3 =  0.0f;
+    float theta_m4 =  0.0f;
+
+    float Pwm1 = 0.0f;
+    float Pwm2 = 0.0f;
+    float Pwm3 = 0.0f;
+    float Pwm4 = 0.0f;
+
     /// Constructor
     AP_MotorsRiver(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT) :
         AP_MotorsMulticopter(loop_rate, speed_hz)
@@ -56,6 +97,13 @@ public:
     float               get_roll_factor(uint8_t i) override { return _roll_factor[i]; }
 
 protected:
+ 
+    void FOSSEN_alocation_matrix(float FX,float FY,float tN,float &theta_motor1,float &theta_motor2,float &theta_motor3,float &theta_motor4,float &PWM1 ,float &PWM2 ,float &PWM3 ,float &PWM4);
+    int servo_angle_to_pwm(float angle,float srv_min_pwm,float srv_max_pwm);
+    void pwm_servo_angle(float &Pwm_servo_m1,float &Pwm_servo_m2,float &Pwm_servo_m3,float &Pwm_servo_m4,float theta_m1,float theta_m2,float theta_m3,float theta_m4);
+    float PWMtoNorm(float pwm);
+    float NormtoPWM(float pwm);
+
     // output - sends commands to the motors
     void                output_armed_stabilizing() override;
 
