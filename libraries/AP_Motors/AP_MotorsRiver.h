@@ -5,13 +5,13 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>        // ArduPilot Mega Vector/Matrix math Library
 #include <RC_Channel/RC_Channel.h>     // RC Channel Library
-#include "AP_MotorsMatrix.h"
+#include "AP_MotorsMulticopter.h"
 
 #define AP_MOTORS_MATRIX_YAW_FACTOR_CW   -1
 #define AP_MOTORS_MATRIX_YAW_FACTOR_CCW   1
 
 /// @class      AP_MotorsRiver
-class AP_MotorsRiver : public AP_MotorsMatrix {
+class AP_MotorsRiver : public AP_MotorsMulticopter {
 public:
 
 // Propriedade Física do Barco
@@ -23,7 +23,7 @@ public:
 
     float Fmax = FM1 + FM2 + FM3 + FM4;       // Força e torque maximos do barco
 
-    float L    = 0.54f;          // Tamanho do braço do barco
+    float L  = 0.54f;          // Tamanho do braço do barco
     float Lx = L*cosf(M_PI/4.0f);
     float Ly = L*cosf(M_PI/4.0f);
 
@@ -52,11 +52,6 @@ public:
     float Pwm3 = 0.0f;
     float Pwm4 = 0.0f;
     
-
-    // output - sends commands to the motors
-    virtual void        output() override;
-    // output_min - sends minimum values out to the motors
-    void                output_min() override;
     
     int servo_angle_to_pwm(float angle,float srv_min_pwm,float srv_max_pwm);
     float servo_pwm_to_angle(int PWM_aux);
@@ -69,7 +64,7 @@ public:
 
     /// Constructor
     AP_MotorsRiver(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT) :
-        AP_MotorsMatrix(loop_rate, speed_hz){
+        AP_MotorsMulticopter(loop_rate, speed_hz){
             // AP_Param::setup_object_defaults(this, var_info);
         };
 
@@ -110,6 +105,7 @@ public:
     float               get_roll_factor(uint8_t i) override { return _roll_factor[i]; }
 
 protected:
+       
     // output - sends commands to the motors
     void                output_armed_stabilizing() override;
 
@@ -129,7 +125,7 @@ protected:
     void                remove_motor(int8_t motor_num);
 
     // configures the motors for the defined frame_class and frame_type
-    void        setup_motors(motor_frame_class frame_class, motor_frame_type frame_type) override;
+    virtual void        setup_motors(motor_frame_class frame_class, motor_frame_type frame_type);
 
     // normalizes the roll, pitch and yaw factors so maximum magnitude is 0.5
     void                normalise_rpy_factors();

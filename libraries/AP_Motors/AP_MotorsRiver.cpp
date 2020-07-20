@@ -25,236 +25,6 @@
 
 extern const AP_HAL::HAL &hal;
 
-void AP_MotorsRiver::init(motor_frame_class frame_class, motor_frame_type frame_type)
-{
-    // record requested frame class and type
-    _last_frame_class = frame_class;
-    _last_frame_type = frame_type;
-
-    // setup the motors
-    setup_motors(frame_class, frame_type);
-
-    // enable fast channels or instant pwm
-    set_update_rate(_speed_hz);
-}
-
-void AP_MotorsRiver::setup_motors(motor_frame_class frame_class, motor_frame_type frame_type)
-{
-
-    // add_motor(AP_MOTORS_MOT_1, 45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
-    add_motor(AP_MOTORS_MOT_1, 45, 0, 1);
-    add_motor(AP_MOTORS_MOT_2, -135, 0, 3);
-    add_motor(AP_MOTORS_MOT_3, -45, 0, 4);
-    add_motor(AP_MOTORS_MOT_4, 135, 0, 2);
-    add_motor_raw(AP_MOTORS_MOT_9,0,0,0,5);
-    add_motor_raw(AP_MOTORS_MOT_10,0,0,0,6);
-    add_motor_raw(AP_MOTORS_MOT_11,0,0,0,7);
-    add_motor_raw(AP_MOTORS_MOT_12,0,0,0,8);
-    
-    _flags.initialised_ok  = true;
-
-}
-void AP_MotorsRiver::output_min()
-{
-    set_desired_spool_state(DesiredSpoolState::SHUT_DOWN);
-    _spool_state = SpoolState::SHUT_DOWN;
-    output();
-}
-
-void AP_MotorsRiver::output()
-{
-    // update throttle filter
-    // update_throttle_filter();
-
-    // calc filtered battery voltage and lift_max
-    // update_lift_max_from_batt_voltage();
-
-    // run spool logic
-    // output_logic();
-
-    // calculate thrust
-    output_armed_stabilizing();
-
-    // apply any thrust compensation for the frame
-    // thrust_compensation();
-
-    // convert rpy_thrust values to pwm
-    output_to_motors();
-
-    // output any booster throttle
-    // output_boost_throttle();
-
-    // output raw roll/pitch/yaw/thrust
-    // output_rpyt();
-};
-
-// add_motor
-void AP_MotorsRiver::add_motor_raw(int8_t motor_num, float roll_fac, float pitch_fac, float yaw_fac, uint8_t testing_order)
-{
-    // ensure valid motor number is provided
-    if (motor_num >= 0 && motor_num < AP_MOTORS_MAX_NUM_MOTORS)
-    {
-        // increment number of motors if this motor is being newly motor_enabled
-        if (!motor_enabled[motor_num])
-        {
-            motor_enabled[motor_num] = true;
-        }
-        // set roll, pitch, thottle factors and opposite motor (for stability patch)
-        _roll_factor[motor_num] = roll_fac;
-        _pitch_factor[motor_num] = pitch_fac;
-        _yaw_factor[motor_num] = yaw_fac;
-
-        // set order that motor appears in test
-        _test_order[motor_num] = testing_order;
-
-        // call parent class method
-        add_motor_num(motor_num);
-    }
-}
-
-
-// set update rate to motors - a value in hertz
-void AP_MotorsRiver::set_update_rate(uint16_t speed_hz)
-{
-    // record requested speed
-    _speed_hz = speed_hz;
-
-    uint16_t mask = 0;
-    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-    {
-        if (motor_enabled[i])
-        {
-            mask |= 1U << i;
-        }
-    }
-    rc_set_freq(mask, _speed_hz);
-}
-
-// set frame class (i.e. quad, hexa, heli) and type (i.e. x, plus)
-void AP_MotorsRiver::set_frame_class_and_type(motor_frame_class frame_class, motor_frame_type frame_type)
-{
-    // exit immediately if armed or no change
-    if (armed() || (frame_class == _last_frame_class && _last_frame_type == frame_type))
-    {
-        return;
-    }
-    _last_frame_class = frame_class;
-    _last_frame_type = frame_type;
-
-    // setup the motors
-    setup_motors(frame_class, frame_type);
-
-    // enable fast channels or instant pwm
-    set_update_rate(_speed_hz);
-}
-
-void AP_MotorsRiver::output_to_motors()
-{   
-    int8_t i;
-
-    //  output_armed_stabilizing();
-
-    switch (_spool_state)
-    {
-    case SpoolState::SHUT_DOWN:
-    {
-        // no output
-        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-        {
-            if (motor_enabled[i])
-            {
-                _actuator[i] = 0.0f;
-            }
-        }
-        break;
-    }
-    case SpoolState::GROUND_IDLE:
-        // sends output to motors when armed but not flying
-        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-        {
-            if (motor_enabled[i])
-            {
-                set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
-            }
-        }
-        break;
-    case SpoolState::SPOOLING_UP:
-    case SpoolState::THROTTLE_UNLIMITED:
-    case SpoolState::SPOOLING_DOWN:
-        // set motor output based on thrust requests
-
-        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-        {
-            if (motor_enabled[i])
-            {
-                _actuator[i] = _thrust_rpyt_out[i];
-            }
-        }
-        break;
-    }
-
-    // convert output to PWM and send to each motor
-    for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-    {
-        if (motor_enabled[i])
-        {
-            rc_write(i, output_to_pwm(_actuator[i]));
-        }
-    }
-}
-
-// get_motor_mask - returns a bitmask of which outputs are being used for motors (1 means being used)
-//  this can be used to ensure other pwm outputs (i.e. for servos) do not conflict
-uint16_t AP_MotorsRiver::get_motor_mask()
-{
-    uint16_t motor_mask = 0;
-    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
-    {
-        if (motor_enabled[i])
-        {
-            motor_mask |= 1U << i;
-        }
-    }
-    uint16_t mask = rc_map_mask(motor_mask);
-
-    // add parent's mask
-    mask |= AP_MotorsMulticopter::get_motor_mask();
-
-    return mask;
-}
-
-// output_armed - sends commands to the motors
-// includes new scaling stability patch
-void AP_MotorsRiver::output_armed_stabilizing()
-{ 
-
-    // static uint8_t counter = 0;
-    // counter++;
-    // if (counter > 200)
-    // {
-    //     counter = 0;
-    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "Th1 : %5.3f  Th2 : %5.3f  Th3 : %5.3f  Th4 : %5.3f  ", (double)theta_m1,(double)theta_m2,(double)theta_m3,(double)theta_m4);
-    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "M1 : %5.3f  M2 : %5.3f  M3 : %5.3f  M4 : %5.3f  ", (double)Pwm1,(double)Pwm2,(double)Pwm3,(double)Pwm4);
-    // }
-    FOSSEN_alocation_matrix(_pitch_in,_roll_in,_yaw_in,theta_m1,theta_m2,theta_m3,theta_m4,Pwm1,Pwm2,Pwm3,Pwm4);
-    pwm_servo_angle();
-
-    _thrust_rpyt_out[0] = Pwm1;
-    _thrust_rpyt_out[1] = Pwm2;
-    _thrust_rpyt_out[2] = Pwm3;
-    _thrust_rpyt_out[3] = Pwm4;
-
-    _thrust_rpyt_out[4] = 0.0f;
-    _thrust_rpyt_out[5] = 0.0f;
-    _thrust_rpyt_out[6] = 0.0f;
-    _thrust_rpyt_out[7] = 0.0f;
-
-    _thrust_rpyt_out[8]  = servo_m1;
-    _thrust_rpyt_out[9]  = servo_m2;
-    _thrust_rpyt_out[10] = servo_m3;
-    _thrust_rpyt_out[11] = servo_m4;
-    
-   }
 
 /* ****************************** Mathaus *********************************
 ***************************************************************************/
@@ -419,6 +189,364 @@ void AP_MotorsRiver::FOSSEN_alocation_matrix(float FX,float FY,float TN,float &T
 ***************************************************************************/
 
 
+void AP_MotorsRiver::init(motor_frame_class frame_class, motor_frame_type frame_type)
+{
+    // record requested frame class and type
+    _last_frame_class = frame_class;
+    _last_frame_type = frame_type;
+
+    // setup the motors
+    setup_motors(frame_class, frame_type);
+
+    // enable fast channels or instant pwm
+    set_update_rate(_speed_hz);
+}
+
+// set update rate to motors - a value in hertz
+void AP_MotorsRiver::set_update_rate(uint16_t speed_hz)
+{
+    // record requested speed
+    _speed_hz = speed_hz;
+
+    uint16_t mask = 0;
+    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+    {
+        if (motor_enabled[i])
+        {
+            mask |= 1U << i;
+        }
+    }
+    rc_set_freq(mask, _speed_hz);
+}
+
+// set frame class (i.e. quad, hexa, heli) and type (i.e. x, plus)
+void AP_MotorsRiver::set_frame_class_and_type(motor_frame_class frame_class, motor_frame_type frame_type)
+{
+    // exit immediately if armed or no change
+    if (armed() || (frame_class == _last_frame_class && _last_frame_type == frame_type))
+    {
+        return;
+    }
+    _last_frame_class = frame_class;
+    _last_frame_type = frame_type;
+
+    // setup the motors
+    setup_motors(frame_class, frame_type);
+
+    // enable fast channels or instant pwm
+    set_update_rate(_speed_hz);
+}
+
+void AP_MotorsRiver::output_to_motors()
+{   
+    int8_t i;
+
+    switch (_spool_state)
+    {
+    case SpoolState::SHUT_DOWN:
+    {
+        // no output
+        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+        {
+            if (motor_enabled[i])
+            {
+                _actuator[i] = 0.0f;
+            }
+        }
+        break;
+    }
+    case SpoolState::GROUND_IDLE:
+        // sends output to motors when armed but not flying
+        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+        {
+            if (motor_enabled[i])
+            {
+                set_actuator_with_slew(_actuator[i], actuator_spin_up_to_ground_idle());
+            }
+        }
+        break;
+    case SpoolState::SPOOLING_UP:
+    case SpoolState::THROTTLE_UNLIMITED:
+    case SpoolState::SPOOLING_DOWN:
+        // set motor output based on thrust requests
+
+        for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+        {
+            if (motor_enabled[i])
+            {
+                // _actuator[i] = _thrust_rpyt_out[i];
+                 set_actuator_with_slew(_actuator[i], thrust_to_actuator(_thrust_rpyt_out[i]));
+            }
+        }
+        break;
+    }
+
+    // convert output to PWM and send to each motor
+    for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+    {
+        if (motor_enabled[i])
+        {
+            rc_write(i, output_to_pwm(_actuator[i]));
+        }
+    }
+}
+
+// get_motor_mask - returns a bitmask of which outputs are being used for motors (1 means being used)
+//  this can be used to ensure other pwm outputs (i.e. for servos) do not conflict
+uint16_t AP_MotorsRiver::get_motor_mask()
+{
+    uint16_t motor_mask = 0;
+    for (uint8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+    {
+        if (motor_enabled[i])
+        {
+            motor_mask |= 1U << i;
+        }
+    }
+    uint16_t mask = rc_map_mask(motor_mask);
+
+    // add parent's mask
+    mask |= AP_MotorsMulticopter::get_motor_mask();
+
+    return mask;
+}
+
+// output_armed - sends commands to the motors
+// includes new scaling stability patch
+void AP_MotorsRiver::output_armed_stabilizing()
+{
+    uint8_t i;                          // general purpose counter
+    float   roll_thrust;                // roll thrust input value, +/- 1.0
+    float   pitch_thrust;               // pitch thrust input value, +/- 1.0
+    float   yaw_thrust;                 // yaw thrust input value, +/- 1.0
+    float   throttle_thrust;            // throttle thrust input value, 0.0 - 1.0
+    float   throttle_avg_max;           // throttle thrust average maximum value, 0.0 - 1.0
+    float   throttle_thrust_max;        // throttle thrust maximum value, 0.0 - 1.0
+    float   throttle_thrust_best_rpy;   // throttle providing maximum roll, pitch and yaw range without climbing
+    float   rpy_scale = 1.0f;           // this is used to scale the roll, pitch and yaw to fit within the motor limits
+    float   yaw_allowed = 1.0f;         // amount of yaw we can fit in
+    float   thr_adj;                    // the difference between the pilot's desired throttle and throttle_thrust_best_rpy
+
+    // apply voltage and air pressure compensation
+    const float compensation_gain = get_compensation_gain(); // compensation for battery voltage and altitude
+    roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;
+    pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;
+    yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;
+    throttle_thrust = get_throttle() * compensation_gain;
+    throttle_avg_max = _throttle_avg_max * compensation_gain;
+
+    // If thrust boost is active then do not limit maximum thrust
+    throttle_thrust_max = _thrust_boost_ratio + (1.0f - _thrust_boost_ratio) * _throttle_thrust_max * compensation_gain;
+
+    // sanity check throttle is above zero and below current limited throttle
+    if (throttle_thrust <= 0.0f) {
+        throttle_thrust = 0.0f;
+        limit.throttle_lower = true;
+    }
+    if (throttle_thrust >= throttle_thrust_max) {
+        throttle_thrust = throttle_thrust_max;
+        limit.throttle_upper = true;
+    }
+
+    // ensure that throttle_avg_max is between the input throttle and the maximum throttle
+    throttle_avg_max = constrain_float(throttle_avg_max, throttle_thrust, throttle_thrust_max);
+
+    // calculate the highest allowed average thrust that will provide maximum control range
+    throttle_thrust_best_rpy = MIN(0.5f, throttle_avg_max);
+
+    // calculate throttle that gives most possible room for yaw which is the lower of:
+    //      1. 0.5f - (rpy_low+rpy_high)/2.0 - this would give the maximum possible margin above the highest motor and below the lowest
+    //      2. the higher of:
+    //            a) the pilot's throttle input
+    //            b) the point _throttle_rpy_mix between the pilot's input throttle and hover-throttle
+    //      Situation #2 ensure we never increase the throttle above hover throttle unless the pilot has commanded this.
+    //      Situation #2b allows us to raise the throttle above what the pilot commanded but not so far that it would actually cause the copter to rise.
+    //      We will choose #1 (the best throttle for yaw control) if that means reducing throttle to the motors (i.e. we favor reducing throttle *because* it provides better yaw control)
+    //      We will choose #2 (a mix of pilot and hover throttle) only when the throttle is quite low.  We favor reducing throttle instead of better yaw control because the pilot has commanded it
+
+    // Under the motor lost condition we remove the highest motor output from our calculations and let that motor go greater than 1.0
+    // To ensure control and maximum righting performance Hex and Octo have some optimal settings that should be used
+    // Y6               : MOT_YAW_HEADROOM = 350, ATC_RAT_RLL_IMAX = 1.0,   ATC_RAT_PIT_IMAX = 1.0,   ATC_RAT_YAW_IMAX = 0.5
+    // Octo-Quad (x8) x : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.375, ATC_RAT_PIT_IMAX = 0.375, ATC_RAT_YAW_IMAX = 0.375
+    // Octo-Quad (x8) + : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.75,  ATC_RAT_PIT_IMAX = 0.75,  ATC_RAT_YAW_IMAX = 0.375
+    // Usable minimums below may result in attitude offsets when motors are lost. Hex aircraft are only marginal and must be handles with care
+    // Hex              : MOT_YAW_HEADROOM = 0,   ATC_RAT_RLL_IMAX = 1.0,   ATC_RAT_PIT_IMAX = 1.0,   ATC_RAT_YAW_IMAX = 0.5
+    // Octo-Quad (x8) x : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.25,  ATC_RAT_PIT_IMAX = 0.25,  ATC_RAT_YAW_IMAX = 0.25
+    // Octo-Quad (x8) + : MOT_YAW_HEADROOM = 300, ATC_RAT_RLL_IMAX = 0.5,   ATC_RAT_PIT_IMAX = 0.5,   ATC_RAT_YAW_IMAX = 0.25
+    // Quads cannot make use of motor loss handling because it doesn't have enough degrees of freedom.
+
+    // calculate amount of yaw we can fit into the throttle range
+    // this is always equal to or less than the requested yaw from the pilot or rate controller
+    float rp_low = 1.0f;    // lowest thrust value
+    float rp_high = -1.0f;  // highest thrust value
+    for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            // calculate the thrust outputs for roll and pitch
+            _thrust_rpyt_out[i] = roll_thrust * _roll_factor[i] + pitch_thrust * _pitch_factor[i];
+            // record lowest roll + pitch command
+            if (_thrust_rpyt_out[i] < rp_low) {
+                rp_low = _thrust_rpyt_out[i];
+            }
+            // record highest roll + pitch command
+            if (_thrust_rpyt_out[i] > rp_high && (!_thrust_boost || i != _motor_lost_index)) {
+                rp_high = _thrust_rpyt_out[i];
+            }
+
+            // Check the maximum yaw control that can be used on this channel
+            // Exclude any lost motors if thrust boost is enabled
+            if (!is_zero(_yaw_factor[i]) && (!_thrust_boost || i != _motor_lost_index)){
+                if (is_positive(yaw_thrust * _yaw_factor[i])) {
+                    yaw_allowed = MIN(yaw_allowed, fabsf(MAX(1.0f - (throttle_thrust_best_rpy + _thrust_rpyt_out[i]), 0.0f)/_yaw_factor[i]));
+                } else {
+                    yaw_allowed = MIN(yaw_allowed, fabsf(MAX(throttle_thrust_best_rpy + _thrust_rpyt_out[i], 0.0f)/_yaw_factor[i]));
+                }
+            }
+        }
+    }
+
+    // calculate the maximum yaw control that can be used
+    // todo: make _yaw_headroom 0 to 1
+    float yaw_allowed_min = (float)_yaw_headroom / 1000.0f;
+
+    // increase yaw headroom to 50% if thrust boost enabled
+    yaw_allowed_min = _thrust_boost_ratio * 0.5f + (1.0f - _thrust_boost_ratio) * yaw_allowed_min;
+
+    // Let yaw access minimum amount of head room
+    yaw_allowed = MAX(yaw_allowed, yaw_allowed_min);
+
+    // Include the lost motor scaled by _thrust_boost_ratio to smoothly transition this motor in and out of the calculation
+    if (_thrust_boost && motor_enabled[_motor_lost_index]) {
+        // record highest roll + pitch command
+        if (_thrust_rpyt_out[_motor_lost_index] > rp_high) {
+            rp_high = _thrust_boost_ratio * rp_high + (1.0f - _thrust_boost_ratio) * _thrust_rpyt_out[_motor_lost_index];
+        }
+
+        // Check the maximum yaw control that can be used on this channel
+        // Exclude any lost motors if thrust boost is enabled
+        if (!is_zero(_yaw_factor[_motor_lost_index])){
+            if (is_positive(yaw_thrust * _yaw_factor[_motor_lost_index])) {
+                yaw_allowed = _thrust_boost_ratio * yaw_allowed + (1.0f - _thrust_boost_ratio) * MIN(yaw_allowed, fabsf(MAX(1.0f - (throttle_thrust_best_rpy + _thrust_rpyt_out[_motor_lost_index]), 0.0f)/_yaw_factor[_motor_lost_index]));
+            } else {
+                yaw_allowed = _thrust_boost_ratio * yaw_allowed + (1.0f - _thrust_boost_ratio) * MIN(yaw_allowed, fabsf(MAX(throttle_thrust_best_rpy + _thrust_rpyt_out[_motor_lost_index], 0.0f)/_yaw_factor[_motor_lost_index]));
+            }
+        }
+    }
+
+    if (fabsf(yaw_thrust) > yaw_allowed) {
+        // not all commanded yaw can be used
+        yaw_thrust = constrain_float(yaw_thrust, -yaw_allowed, yaw_allowed);
+        limit.yaw = true;
+    }
+
+    // add yaw control to thrust outputs
+    float rpy_low = 1.0f;   // lowest thrust value
+    float rpy_high = -1.0f; // highest thrust value
+    for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            _thrust_rpyt_out[i] = _thrust_rpyt_out[i] + yaw_thrust * _yaw_factor[i];
+
+            // record lowest roll + pitch + yaw command
+            if (_thrust_rpyt_out[i] < rpy_low) {
+                rpy_low = _thrust_rpyt_out[i];
+            }
+            // record highest roll + pitch + yaw command
+            // Exclude any lost motors if thrust boost is enabled
+            if (_thrust_rpyt_out[i] > rpy_high && (!_thrust_boost || i != _motor_lost_index)) {
+                rpy_high = _thrust_rpyt_out[i];
+            }
+        }
+    }
+    // Include the lost motor scaled by _thrust_boost_ratio to smoothly transition this motor in and out of the calculation
+    if (_thrust_boost) {
+        // record highest roll + pitch + yaw command
+        if (_thrust_rpyt_out[_motor_lost_index] > rpy_high && motor_enabled[_motor_lost_index]) {
+            rpy_high = _thrust_boost_ratio * rpy_high + (1.0f - _thrust_boost_ratio) * _thrust_rpyt_out[_motor_lost_index];
+        }
+    }
+
+    // calculate any scaling needed to make the combined thrust outputs fit within the output range
+    if (rpy_high - rpy_low > 1.0f) {
+        rpy_scale = 1.0f / (rpy_high - rpy_low);
+    }
+    if (throttle_avg_max + rpy_low < 0) {
+        rpy_scale = MIN(rpy_scale, -throttle_avg_max / rpy_low);
+    }
+
+    // calculate how close the motors can come to the desired throttle
+    rpy_high *= rpy_scale;
+    rpy_low *= rpy_scale;
+    throttle_thrust_best_rpy = -rpy_low;
+    thr_adj = throttle_thrust - throttle_thrust_best_rpy;
+    if (rpy_scale < 1.0f) {
+        // Full range is being used by roll, pitch, and yaw.
+        limit.roll = true;
+        limit.pitch = true;
+        limit.yaw = true;
+        if (thr_adj > 0.0f) {
+            limit.throttle_upper = true;
+        }
+        thr_adj = 0.0f;
+    } else {
+        if (thr_adj < 0.0f) {
+            // Throttle can't be reduced to desired value
+            // todo: add lower limit flag and ensure it is handled correctly in altitude controller
+            thr_adj = 0.0f;
+        } else if (thr_adj > 1.0f - (throttle_thrust_best_rpy + rpy_high)) {
+            // Throttle can't be increased to desired value
+            thr_adj = 1.0f - (throttle_thrust_best_rpy + rpy_high);
+            limit.throttle_upper = true;
+        }
+    }
+
+    // add scaled roll, pitch, constrained yaw and throttle for each motor
+    for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++) {
+        if (motor_enabled[i]) {
+            _thrust_rpyt_out[i] = throttle_thrust_best_rpy + thr_adj + (rpy_scale * _thrust_rpyt_out[i]);
+        }
+    }
+
+    // determine throttle thrust for harmonic notch
+    const float throttle_thrust_best_plus_adj = throttle_thrust_best_rpy + thr_adj;
+    // compensation_gain can never be zero
+    _throttle_out = throttle_thrust_best_plus_adj / compensation_gain;
+
+    // check for failed motor
+    check_for_failed_motor(throttle_thrust_best_plus_adj);
+}
+
+
+// void AP_MotorsRiver::output_armed_stabilizing()
+// { 
+
+//     static uint8_t counter = 0;
+//     counter++;
+//     if (counter > 200)
+//     {
+//         counter = 0;
+//         gcs().send_text(MAV_SEVERITY_CRITICAL, "Th1 : %5.3f  Th2 : %5.3f  Th3 : %5.3f  Th4 : %5.3f  ", (double)theta_m1,(double)theta_m2,(double)theta_m3,(double)theta_m4);
+//         gcs().send_text(MAV_SEVERITY_CRITICAL, "M1 : %5.3f  M2 : %5.3f  M3 : %5.3f  M4 : %5.3f  ", (double)Pwm1,(double)Pwm2,(double)Pwm3,(double)Pwm4);
+//     }
+//     FOSSEN_alocation_matrix(_pitch_in,_roll_in,_yaw_in,theta_m1,theta_m2,theta_m3,theta_m4,Pwm1,Pwm2,Pwm3,Pwm4);
+//     pwm_servo_angle();
+
+//     _thrust_rpyt_out[0] = Pwm1;
+//     _thrust_rpyt_out[1] = Pwm2;
+//     _thrust_rpyt_out[2] = Pwm3;
+//     _thrust_rpyt_out[3] = Pwm4;
+
+//     _thrust_rpyt_out[4] = 0.0f;
+//     _thrust_rpyt_out[5] = 0.0f;
+//     _thrust_rpyt_out[6] = 0.0f;
+//     _thrust_rpyt_out[7] = 0.0f;
+
+//     _thrust_rpyt_out[8]  = servo_m1;
+//     _thrust_rpyt_out[9]  = servo_m2;
+//     _thrust_rpyt_out[10] = servo_m3;
+//     _thrust_rpyt_out[11] = servo_m4;
+    
+// }
+
+
 // check for failed motor
 //   should be run immediately after output_armed_stabilizing
 //   first argument is the sum of:
@@ -533,6 +661,29 @@ bool AP_MotorsRiver::output_test_num(uint8_t output_channel, int16_t pwm)
     return true;
 }
 
+// add_motor
+void AP_MotorsRiver::add_motor_raw(int8_t motor_num, float roll_fac, float pitch_fac, float yaw_fac, uint8_t testing_order)
+{
+    // ensure valid motor number is provided
+    if (motor_num >= 0 && motor_num < AP_MOTORS_MAX_NUM_MOTORS)
+    {
+        // increment number of motors if this motor is being newly motor_enabled
+        if (!motor_enabled[motor_num])
+        {
+            motor_enabled[motor_num] = true;
+        }
+        // set roll, pitch, thottle factors and opposite motor (for stability patch)
+        _roll_factor[motor_num] = roll_fac;
+        _pitch_factor[motor_num] = pitch_fac;
+        _yaw_factor[motor_num] = yaw_fac;
+
+        // set order that motor appears in test
+        _test_order[motor_num] = testing_order;
+
+        // call parent class method
+        add_motor_num(motor_num);
+    }
+}
 
 // add_motor using just position and prop direction - assumes that for each motor, roll and pitch factors are equal
 void AP_MotorsRiver::add_motor(int8_t motor_num, float angle_degrees, float yaw_factor, uint8_t testing_order)
@@ -563,6 +714,43 @@ void AP_MotorsRiver::remove_motor(int8_t motor_num)
         _pitch_factor[motor_num] = 0;
         _yaw_factor[motor_num] = 0;
     }
+}
+
+void AP_MotorsRiver::setup_motors(motor_frame_class frame_class, motor_frame_type frame_type)
+{
+    // remove existing motors
+    for (int8_t i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
+    {
+        remove_motor(i);
+    }
+
+    bool success = true;
+    switch (frame_class)
+    {
+    case MOTOR_FRAME_QUAD:
+    case MOTOR_FRAME_HEXA:
+    case MOTOR_FRAME_OCTA:
+    case MOTOR_FRAME_OCTAQUAD:
+    case MOTOR_FRAME_DODECAHEXA:
+    case MOTOR_FRAME_Y6:
+        // add_motor(AP_MOTORS_MOT_1, 45, AP_MOTORS_MATRIX_YAW_FACTOR_CCW, 1);
+        add_motor(AP_MOTORS_MOT_1, 45, 0, 1);
+        add_motor(AP_MOTORS_MOT_2, -135, 0, 3);
+        add_motor(AP_MOTORS_MOT_3, -45, 0, 4);
+        add_motor(AP_MOTORS_MOT_4, 135, 0, 2);
+        add_motor_raw(AP_MOTORS_MOT_9, 0, 0, 0, 5);
+        add_motor_raw(AP_MOTORS_MOT_10, 0, 0, 0, 6);
+        add_motor_raw(AP_MOTORS_MOT_11, 0, 0, 0, 7);
+        add_motor_raw(AP_MOTORS_MOT_12, 0, 0, 0, 8);
+
+    default:
+        // matrix doesn't support the configured class
+        success = false;
+        break;
+    } // switch frame_class
+     // normalise factors to magnitude 0.5
+    normalise_rpy_factors();
+    _flags.initialised_ok = success;
 }
 
 // normalizes the roll, pitch and yaw factors so maximum magnitude is 0.5

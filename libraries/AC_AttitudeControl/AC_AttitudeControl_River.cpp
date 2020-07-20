@@ -219,39 +219,39 @@ AC_AttitudeControl_River::AC_AttitudeControl_River(AP_AHRS_View &ahrs, const AP_
 }
 
 
-// Mathaus
+// // Mathaus
 
-void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
-{
+// void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
+// {
 
 
 
     
-    // Convert from centidegrees on public interface to radians
-    float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
-    float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);
-    float euler_yaw_rate = radians(euler_yaw_rate_cds * 0.01f);
+//     // Convert from centidegrees on public interface to radians
+//     float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
+//     float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);
+//     float euler_yaw_rate = radians(euler_yaw_rate_cds * 0.01f);
 
-    // calculate the attitude target euler angles
-    _attitude_target_quat.to_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
+//     // calculate the attitude target euler angles
+//     _attitude_target_quat.to_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
 
-    // Add roll trim to compensate tail rotor thrust in heli (will return zero on multirotors)
-    euler_roll_angle += get_roll_trim_rad();
+//     // Add roll trim to compensate tail rotor thrust in heli (will return zero on multirotors)
+//     euler_roll_angle += get_roll_trim_rad();
 
-        // When feedforward is not enabled, the target euler angle is input into the target and the feedforward rate is zeroed.
-        _attitude_target_euler_angle.x = euler_roll_angle;
-        _attitude_target_euler_angle.y = euler_pitch_angle;
-        _attitude_target_euler_angle.z += euler_yaw_rate * _dt;
-        // Compute quaternion target attitude
-        _attitude_target_quat.from_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
+//         // When feedforward is not enabled, the target euler angle is input into the target and the feedforward rate is zeroed.
+//         _attitude_target_euler_angle.x = euler_roll_angle;
+//         _attitude_target_euler_angle.y = euler_pitch_angle;
+//         _attitude_target_euler_angle.z += euler_yaw_rate * _dt;
+//         // Compute quaternion target attitude
+//         _attitude_target_quat.from_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
 
-        // Set rate feedforward requests to zero
-        _attitude_target_euler_rate = Vector3f(0.0f, 0.0f, 0.0f);
-        _attitude_target_ang_vel = Vector3f(0.0f, 0.0f, 0.0f);
+//         // Set rate feedforward requests to zero
+//         _attitude_target_euler_rate = Vector3f(0.0f, 0.0f, 0.0f);
+//         _attitude_target_ang_vel = Vector3f(0.0f, 0.0f, 0.0f);
 
-    // Call quaternion attitude controller
-    attitude_controller_run_quat();
-}
+//     // Call quaternion attitude controller
+//     attitude_controller_run_quat();
+// }
 
 
 // Update Alt_Hold angle maximum

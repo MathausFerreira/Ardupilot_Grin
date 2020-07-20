@@ -21,6 +21,7 @@ void Copter::init_ardupilot()
 #endif
 
     BoardConfig.init();
+
 #if HAL_WITH_UAVCAN
     BoardConfig_CAN.init();
 #endif
@@ -35,10 +36,11 @@ void Copter::init_ardupilot()
 #endif
 
     // init winch and wheel encoder
-    winch_init();
+    // winch_init();
 
     // initialise notify system
     notify.init();
+    
     notify_flight_mode();
 
     // initialise battery monitor
@@ -114,11 +116,11 @@ void Copter::init_ardupilot()
     pos_control->set_dt(scheduler.get_loop_period_s());
 
     // init the optical flow sensor
-    init_optflow();
+    // init_optflow();
 
 #if MOUNT == ENABLED
     // initialise camera mount
-    camera_mount.init();
+    // camera_mount.init();
 #endif
 
 
@@ -180,8 +182,8 @@ void Copter::init_ardupilot()
 #endif // ENABLE_SCRIPTING
 
     // set landed flags
-    // set_land_complete(true);
-    // set_land_complete_maybe(true);
+     set_land_complete(true);
+     set_land_complete_maybe(true);
 
     // we don't want writes to the serial port to cause us to pause
     // mid-flight, so set the serial ports non-blocking once we are
@@ -202,7 +204,7 @@ void Copter::init_ardupilot()
     // disable safety if requested
     BoardConfig.init_safety();
 
-    hal.console->printf("\nReady to RIVER ");
+    hal.console->printf("\nReady to AERO4RIVER ");
 
     // flag that initialisation has completed
     ap.initialised = true;
@@ -536,6 +538,30 @@ void Copter::allocate_motors(void)
         AP_HAL::panic("Unable to allocate PosControl");
     }
     AP_Param::load_object_from_eeprom(pos_control, pos_control->var_info);
+    
+#if AC_OAPATHPLANNER_ENABLED == ENABLED
+    wp_nav = new AC_WPNav_OA(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+#else
+    wp_nav = new AC_WPNav(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+#endif
+    if (wp_nav == nullptr) {
+        AP_HAL::panic("Unable to allocate WPNav");
+    }
+    AP_Param::load_object_from_eeprom(wp_nav, wp_nav->var_info);
+
+    loiter_nav = new AC_Loiter(inertial_nav, *ahrs_view, *pos_control, *attitude_control);
+    if (loiter_nav == nullptr) {
+        AP_HAL::panic("Unable to allocate LoiterNav");
+    }
+    AP_Param::load_object_from_eeprom(loiter_nav, loiter_nav->var_info);
+
+#if MODE_CIRCLE_ENABLED == ENABLED
+    circle_nav = new AC_Circle(inertial_nav, *ahrs_view, *pos_control);
+    if (circle_nav == nullptr) {
+        AP_HAL::panic("Unable to allocate CircleNav");
+    }
+    AP_Param::load_object_from_eeprom(circle_nav, circle_nav->var_info);
+#endif
 
     // reload lines from the defaults file that may now be accessible
     AP_Param::reload_defaults_file(true);

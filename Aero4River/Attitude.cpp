@@ -81,84 +81,69 @@ void Copter::get_pilot_desired_force_to_boat_M()
 //     /// Fy = força no eixo y - Seu valor deve variar de -1 a 1
 //     /// N  = tork de guinada - Seu valor deve variar de -1 a 1
 //     /// Função para alocar as forças do barco a partir da metodologia descrita em FOSSEN
-
 //     //Tratamento para o stick do throttle estar sempre acima da zona morta --- (TALvez tirar daqui)
 //     if(channel_throttle->get_radio_in()<channel_throttle->get_radio_min()*1.1){
 //         FX = 0.0f;
 //         FY = 0.0f;
 //         TN = 0.0f;
 //     }
-
 //     FX = constrain_float(FX,-1.0f,1.0f);
 //     FY = constrain_float(FY,-1.0f,1.0f);
 //     TN = constrain_float(TN,-1.0f,1.0f);
-
 //     TN = TN * Nmax;
 //     FX = FX * Fmax;
 //     FY = FY * Fmax;
-
 //     FT = safe_sqrt(sq(TN) + sq(FX) + sq(FY));
 //     FT = constrain_float(FT,0.0f,Fmax);
-
 //     // Converte o valor normalizado de 0  a 1 para PWM
 //     PWM1 = NormtoPWM(PWM1);
 //     PWM2 = NormtoPWM(PWM2);
 //     PWM3 = NormtoPWM(PWM3);
 //     PWM4 = NormtoPWM(PWM4);
-
 //     // Convertendo de grau para Radianos
 //     Theta1 = Theta1 * DEG_TO_RAD;
 //     Theta2 = Theta2 * DEG_TO_RAD;
 //     Theta3 = Theta3 * DEG_TO_RAD;
 //     Theta4 = Theta4 * DEG_TO_RAD;
-
 //     if(FT<0.02*Fmax){
 //         // Se as forças são muito pequenas (proximas a zero) nao executa a matriz de alocação envia todos os angulos  nulos
 //         Theta1 = 0.0f;
 //         Theta2 = 0.0f;
 //         Theta3 = 0.0f;
 //         Theta4 = 0.0f;
-
 //         //Envia todos os PWMs muito pequenos (Nulos-Na prática) Os valores aqui, não estão normalizados entre 0 e 1
 //         PWM1 = NormtoPWM(0.0f);
 //         PWM2 = NormtoPWM(0.0f);
 //         PWM3 = NormtoPWM(0.0f);
 //         PWM4 = NormtoPWM(0.0f);
-
 //     }else{
 //         // ========================================== PWM calculado a partir da força e dos angulos ====================================
 //         PWM1 = (safe_sqrt(sq(FX/(4*k1) - (Ly*TN)/(4*k1*(sq(Lx) + sq(Ly)))) + sq(FY/(4*k1) + (Lx*TN)/(4*k1*(sq(Lx) + sq(Ly))))));
 //         PWM2 = (safe_sqrt(sq(FX/(4*k2) + (Ly*TN)/(4*k2*(sq(Lx) + sq(Ly)))) + sq(FY/(4*k2) - (Lx*TN)/(4*k2*(sq(Lx) + sq(Ly))))));
 //         PWM3 = (safe_sqrt(sq(FX/(4*k3) + (Ly*TN)/(4*k3*(sq(Lx) + sq(Ly)))) + sq(FY/(4*k3) + (Lx*TN)/(4*k3*(sq(Lx) + sq(Ly))))));
 //         PWM4 = (safe_sqrt(sq(FX/(4*k4) - (Ly*TN)/(4*k4*(sq(Lx) + sq(Ly)))) + sq(FY/(4*k4) - (Lx*TN)/(4*k4*(sq(Lx) + sq(Ly))))));
-
 //         // Saturação
 //         PWM1 = constrain_float(PWM1,Pwmmin,Pwmmax);
 //         PWM2 = constrain_float(PWM2,Pwmmin,Pwmmax);
 //         PWM3 = constrain_float(PWM3,Pwmmin,Pwmmax);
 //         PWM4 = constrain_float(PWM4,Pwmmin,Pwmmax);
-
 //         // =============================== Arco seno do angulo calculado a partir da força e do novo PWM ===============================
 //         Theta1 = atan2f((FY/(4*k1) + (Lx*TN)/(4*k1*(sq(Lx) + sq(Ly)))),(FX/(4*k1) - (Ly*TN)/(4*k1*(sq(Lx) + sq(Ly)))));
 //         Theta2 = atan2f((FY/(4*k2) - (Lx*TN)/(4*k2*(sq(Lx) + sq(Ly)))),(FX/(4*k2) + (Ly*TN)/(4*k2*(sq(Lx) + sq(Ly)))));
 //         Theta3 = atan2f((FY/(4*k3) + (Lx*TN)/(4*k3*(sq(Lx) + sq(Ly)))),(FX/(4*k3) + (Ly*TN)/(4*k3*(sq(Lx) + sq(Ly)))));
 //         Theta4 = atan2f((FY/(4*k4) - (Lx*TN)/(4*k4*(sq(Lx) + sq(Ly)))),(FX/(4*k4) - (Ly*TN)/(4*k4*(sq(Lx) + sq(Ly)))));
-
 //         // Saturação
 //         Theta1 = constrain_float(Theta1,-M_PI,M_PI);
 //         Theta2 = constrain_float(Theta2,-M_PI,M_PI);
 //         Theta3 = constrain_float(Theta3,-M_PI,M_PI);
 //         Theta4 = constrain_float(Theta4,-M_PI,M_PI);
 //     }
-
 //     Allocacao_Direta(Theta1, Theta2, Theta3, Theta4, PWM1, PWM2, PWM3, PWM4);
-
 //     // Normaliza o valor de PWM encontrado entre 0 e 1 para ativar a saida entre mínima e maxima potência
 //     PWM1 = PWMtoNorm(PWM1);
 //     PWM2 = PWMtoNorm(PWM2);
 //     PWM3 = PWMtoNorm(PWM3);
 //     PWM4 = PWMtoNorm(PWM4);
-
 //     // Conveter o valor de Theta para Graus
 //     Theta1 = Theta1 * RAD_TO_DEG;
 //     Theta2 = Theta2 * RAD_TO_DEG;
@@ -202,6 +187,40 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
 /*************************************************************
  *  throttle control
  *************************************************************/
+// update estimated throttle required to hover (if necessary)
+//  called at 100hz
+void Copter::update_throttle_hover()
+{
+#if FRAME_CONFIG != HELI_FRAME
+    // if not armed or landed exit
+    if (!motors->armed() || ap.land_complete) {
+        return;
+    }
+
+    // do not update in manual throttle modes or Drift
+    if (flightmode->has_manual_throttle() || (control_mode == Mode::Number::DRIFT)) {
+        return;
+    }
+
+    // do not update while climbing or descending
+    if (!is_zero(pos_control->get_desired_velocity().z)) {
+        return;
+    }
+
+    // get throttle output
+    float throttle = motors->get_throttle();
+
+    // calc average throttle if we are in a level hover
+    if (throttle > 0.0f && fabsf(inertial_nav.get_velocity_z()) < 60 &&
+        labs(ahrs.roll_sensor) < 500 && labs(ahrs.pitch_sensor) < 500) {
+        // Can we set the time constant automatically
+        motors->update_throttle_hover(0.01f);
+#if HAL_GYROFFT_ENABLED
+        gyro_fft.update_freq_hover(0.01f, motors->get_throttle_out());
+#endif
+    }
+#endif
+}
 
 // set_throttle_takeoff - allows parents to tell throttle controller we are taking off so I terms can be cleared
 void Copter::set_throttle_takeoff()

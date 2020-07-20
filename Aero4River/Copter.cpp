@@ -114,7 +114,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
     SCHED_TASK(update_altitude,       10,    100),
     SCHED_TASK(run_nav_updates,       50,    100),
-    // SCHED_TASK(update_throttle_hover,100,     90),
+    SCHED_TASK(update_throttle_hover,100,     90),
 #if MODE_SMARTRTL_ENABLED == ENABLED
     SCHED_TASK_CLASS(ModeSmartRTL, &copter.mode_smartrtl,       save_position,    3, 100),
 #endif
@@ -216,7 +216,7 @@ void Copter::fast_loop()
     ins.update();
 
     // run low level rate controllers that only require IMU data
-    // attitude_control->rate_controller_run();
+    attitude_control->rate_controller_run();
 
     // send outputs to the motors library immediately
     motors_output();
@@ -239,7 +239,7 @@ void Copter::fast_loop()
     update_home_from_EKF();
 
     // check if we've landed or crashed
-    // update_land_and_crash_detectors();
+     update_land_and_crash_detectors();
 
 #if MOUNT == ENABLED
     // camera mount's fast update
@@ -430,15 +430,15 @@ void Copter::three_hz_loop()
     tuning();
 }
 
-//Mathaus
+// //Mathaus
 
-// Code to detect a crash main ArduCopter code
-#define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing
-#define LAND_CHECK_LARGE_ANGLE_CD   1500.0f     // maximum angle target to be considered landing
-#define LAND_CHECK_ACCEL_MOVING     3.0f        // maximum acceleration after subtracting gravity
+// // Code to detect a crash main ArduCopter code
+// #define LAND_CHECK_ANGLE_ERROR_DEG  30.0f       // maximum angle error to be considered landing
+// #define LAND_CHECK_LARGE_ANGLE_CD   1500.0f     // maximum angle target to be considered landing
+// #define LAND_CHECK_ACCEL_MOVING     3.0f        // maximum acceleration after subtracting gravity
 
-void Copter::update_throttle_mix()
-{
+// void Copter::update_throttle_mix()
+// {
 // #if FRAME_CONFIG != HELI_FRAME
 //     // if disarmed or landed prioritise throttle
 //     if (!motors->armed() || ap.land_complete) {
@@ -466,14 +466,14 @@ void Copter::update_throttle_mix()
 //         bool descent_not_demanded = pos_control->get_desired_velocity().z >= 0.0f;
 //         // check if landing
 //         const bool landing = flightmode->is_landing();
-//         // if ((large_angle_request && !landing) || large_angle_error || accel_moving || descent_not_demanded) {
-//         //     attitude_control->set_throttle_mix_max(pos_control->get_vel_z_control_ratio());
-//         // } else {
+//         if ((large_angle_request && !landing) || large_angle_error || accel_moving || descent_not_demanded) {
+//             attitude_control->set_throttle_mix_max(pos_control->get_vel_z_control_ratio());
+//         } else {
 //             attitude_control->set_throttle_mix_min();
-//         // }
+//         }
 //     }
 // #endif
-}
+// }
 
 // one_hz_loop - runs at 1Hz
 void Copter::one_hz_loop()
