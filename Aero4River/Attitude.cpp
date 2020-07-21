@@ -45,6 +45,15 @@ void Copter::get_pilot_desired_force_to_boat()
     Fx = mapCube(X,Y,Z);
     Fy = mapCube(Y,X,Z);
     Tn = mapCube(Z,X,Y);
+    
+    // channel_pitch->set_control_in(Fx);
+    // channel_roll->set_control_in(Fy);
+    // channel_yaw->set_control_in(Tn);
+
+    motors->set_roll(Fy);
+    motors->set_pitch(Fx);
+    motors->set_yaw(Tn);
+
 }
 /****************************************************************/
 

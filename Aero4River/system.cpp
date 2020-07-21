@@ -64,7 +64,6 @@ void Copter::init_ardupilot()
     // update motor interlock state
     update_using_interlock();
 
-
     init_rc_in();               // sets up rc channels from radio
 
     // allocate the motors class
@@ -210,7 +209,7 @@ void Copter::init_ardupilot()
     // disable safety if requested
     BoardConfig.init_safety();
 
-    hal.console->printf("\nReady to FLY ");
+    hal.console->printf("\nReady to AERO4RIVER ");
 
     // flag that initialisation has completed
     ap.initialised = true;

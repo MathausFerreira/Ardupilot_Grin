@@ -315,7 +315,7 @@ uint16_t AP_MotorsRiver::get_motor_mask()
 void AP_MotorsRiver::output_armed_stabilizing()
 {
     uint8_t i;                      // general purpose counter
-    float roll_thrust;              // roll thrust input value, +/- 1.0
+    float Fy_thrust;              // roll thrust input value, +/- 1.0
     float pitch_thrust;             // pitch thrust input value, +/- 1.0
     float yaw_thrust;               // yaw thrust input value, +/- 1.0
     float throttle_thrust;          // throttle thrust input value, 0.0 - 1.0
@@ -328,7 +328,7 @@ void AP_MotorsRiver::output_armed_stabilizing()
 
     // apply voltage and air pressure compensation
     const float compensation_gain = get_compensation_gain(); // compensation for battery voltage and altitude
-    roll_thrust = (_roll_in + _roll_in_ff) * compensation_gain;
+    Fy_thrust = (_roll_in + _roll_in_ff) * compensation_gain;
     pitch_thrust = (_pitch_in + _pitch_in_ff) * compensation_gain;
     yaw_thrust = (_yaw_in + _yaw_in_ff) * compensation_gain;
     throttle_thrust = get_throttle() * compensation_gain;
@@ -355,7 +355,7 @@ void AP_MotorsRiver::output_armed_stabilizing()
     // calculate the highest allowed average thrust that will provide maximum control range
     throttle_thrust_best_rpy = MIN(0.5f, throttle_avg_max);
 
-    // calculate throttle that gives most possible room for yaw which is the lower of:
+    // // calculate throttle that gives most possible room for yaw which is the lower of:
     //      1. 0.5f - (rpy_low+rpy_high)/2.0 - this would give the maximum possible margin above the highest motor and below the lowest
     //      2. the higher of:
     //            a) the pilot's throttle input
@@ -385,7 +385,7 @@ void AP_MotorsRiver::output_armed_stabilizing()
         if (motor_enabled[i])
         {
             // calculate the thrust outputs for roll and pitch
-            _thrust_rpyt_out[i] = roll_thrust * _roll_factor[i] + pitch_thrust * _pitch_factor[i];
+            _thrust_rpyt_out[i] = Fy_thrust * _roll_factor[i] + pitch_thrust * _pitch_factor[i];
             // record lowest roll + pitch command
             if (_thrust_rpyt_out[i] < rp_low)
             {
@@ -413,7 +413,7 @@ void AP_MotorsRiver::output_armed_stabilizing()
         }
     }
 
-    // calculate the maximum yaw control that can be used
+    //  calculate the maximum yaw control that can be used
     // todo: make _yaw_headroom 0 to 1
     float yaw_allowed_min = (float)_yaw_headroom / 1000.0f;
 
@@ -454,7 +454,7 @@ void AP_MotorsRiver::output_armed_stabilizing()
         limit.yaw = true;
     }
 
-    // add yaw control to thrust outputs
+    //add yaw control to thrust outputs
     float rpy_low = 1.0f;   // lowest thrust value
     float rpy_high = -1.0f; // highest thrust value
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
@@ -529,7 +529,7 @@ void AP_MotorsRiver::output_armed_stabilizing()
         }
     }
 
-    // add scaled roll, pitch, constrained yaw and throttle for each motor
+   // add scaled roll, pitch, constrained yaw and throttle for each motor
     for (i = 0; i < AP_MOTORS_MAX_NUM_MOTORS; i++)
     {
         if (motor_enabled[i])
@@ -543,17 +543,28 @@ void AP_MotorsRiver::output_armed_stabilizing()
     // compensation_gain can never be zero
     _throttle_out = throttle_thrust_best_plus_adj / compensation_gain;
 
-    // check for failed motor
-    check_for_failed_motor(throttle_thrust_best_plus_adj);
+    //check for failed motor
+    // check_for_failed_motor(throttle_thrust_best_plus_adj);
 
+    float ang1 = 0.0f;
+    float ang2 = 0.0f;
+    float ang3 = 0.0f;
+    float ang4 = 0.0f;
 
      FOSSEN_alocation_matrix(_pitch_in, _roll_in, _yaw_in, theta_m1, theta_m2, theta_m3, theta_m4, Pwm1, Pwm2, Pwm3, Pwm4);
-     pwm_servo_angle(_thrust_rpyt_out[8],_thrust_rpyt_out[9],_thrust_rpyt_out[10],_thrust_rpyt_out[11],theta_m1, theta_m2, theta_m3, theta_m4);
+     pwm_servo_angle(ang1, ang2, ang3,ang4,theta_m1, theta_m2, theta_m3, theta_m4);
 
-     _thrust_rpyt_out[0] = Pwm1;
-     _thrust_rpyt_out[1] = Pwm2;
-     _thrust_rpyt_out[2] = Pwm3;
-     _thrust_rpyt_out[3] = Pwm4;
+     motor_enabled[0]? _thrust_rpyt_out[0] = Pwm1: _thrust_rpyt_out[0]= 0.0f;
+     motor_enabled[1]? _thrust_rpyt_out[1] = Pwm2: _thrust_rpyt_out[1]= 0.0f;
+     motor_enabled[2]? _thrust_rpyt_out[2] = Pwm3: _thrust_rpyt_out[2]= 0.0f;
+     motor_enabled[3]? _thrust_rpyt_out[3] = Pwm4: _thrust_rpyt_out[3]= 0.0f;
+
+     motor_enabled[8]?  _thrust_rpyt_out[8]  = Pwm1: _thrust_rpyt_out[8] = 0.0f;
+     motor_enabled[9]?  _thrust_rpyt_out[9]  = Pwm2: _thrust_rpyt_out[9] = 0.0f;
+     motor_enabled[10]? _thrust_rpyt_out[10] = Pwm3: _thrust_rpyt_out[10]= 0.0f;
+     motor_enabled[11]? _thrust_rpyt_out[11] = Pwm4: _thrust_rpyt_out[11]= 0.0f;
+
+
 
      counter++;
     if (counter > 50)

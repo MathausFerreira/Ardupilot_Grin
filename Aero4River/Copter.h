@@ -667,7 +667,6 @@ private:
     float GanhoF ;
 
     ////////////////////////////    Funções    ///////////////////////////////////
-
     
     float servo_pwm_to_angle(int PWM_aux);
     // float PWMtoNorm(float pwm);
