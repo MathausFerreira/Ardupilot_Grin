@@ -1,6 +1,5 @@
 #include "Copter.h"
 
-
 /****************************************************************
  *  Aero4River Code Mathaus
  ****************************************************************/
@@ -91,8 +90,7 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
  *  throttle control
  ****************************************************************/
 // set_throttle_takeoff - allows parents to tell throttle controller we are taking off so I terms can be cleared
-void Copter::set_throttle_takeoff()
-{
+void Copter::set_throttle_takeoff(){
     // tell position controller to reset alt target and reset I terms
     pos_control->init_takeoff();
 }
