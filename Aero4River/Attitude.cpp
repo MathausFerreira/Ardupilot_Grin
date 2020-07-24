@@ -49,8 +49,8 @@ void Copter::get_pilot_desired_force_to_boat()
     // channel_roll->set_control_in(Fy);
     // channel_yaw->set_control_in(Tn);
 
-    motors->set_roll(Fy);
-    motors->set_pitch(Fx);
+    motors->set_forward(Fx);
+    motors->set_lateral(Fy);
     motors->set_yaw(Tn);
 
 }

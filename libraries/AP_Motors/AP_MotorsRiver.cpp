@@ -516,7 +516,8 @@ void AP_MotorsRiver::output_armed_stabilizing(){
     float ang3 = 0.0f;
     float ang4 = 0.0f;
 
-    FOSSEN_alocation_matrix(_pitch_in, _roll_in, _yaw_in, theta_m1, theta_m2, theta_m3, theta_m4, Pwm1, Pwm2, Pwm3, Pwm4);
+    FOSSEN_alocation_matrix(get_forward(), get_lateral(), get_yaw(), theta_m1, theta_m2, theta_m3, theta_m4, Pwm1, Pwm2, Pwm3, Pwm4);
+    
     pwm_servo_angle(ang1, ang2, ang3, ang4, theta_m1, theta_m2, theta_m3, theta_m4);
 
     motor_enabled[0] ? _thrust_rpyt_out[0] = Pwm1 : _thrust_rpyt_out[0] = 0.0f;
