@@ -21,6 +21,7 @@ Mode::Mode(void) : g(copter.g),
                    channel_pitch(copter.channel_pitch),
                    channel_throttle(copter.channel_throttle),
                    channel_yaw(copter.channel_yaw),
+                   channel_gain(copter.channel_gain),
                    G_Dt(copter.G_Dt){};
 
 // return the static controller object corresponding to supplied mode
@@ -65,7 +66,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         ret = &mode_guided;
         break;
 #endif
-
 
 #if MODE_RTL_ENABLED == ENABLED
     case Mode::Number::RTL:

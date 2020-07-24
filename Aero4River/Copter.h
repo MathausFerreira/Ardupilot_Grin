@@ -689,12 +689,7 @@ private:
     // Accacio
     void Log_Write_Accacio();
 
-
-
     //
-
-
-
     // commands.cpp
     void update_home_from_EKF();
     void set_home_to_current_location_inflight();
