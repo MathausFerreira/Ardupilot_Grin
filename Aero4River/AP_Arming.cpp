@@ -668,11 +668,11 @@ bool AP_Arming_Copter::arm_checks(AP_Arming::Method method)
 
         // check throttle is not too high - skips checks if arming from GCS in Guided
         if (!(method == AP_Arming::Method::MAVLINK && (control_mode == Mode::Number::GUIDED || control_mode == Mode::Number::GUIDED_NOGPS))) {
-            // above top of deadband is too always high
-            if (copter.get_pilot_desired_climb_rate(copter.channel_throttle->get_control_in()) > 0.0f) {
-                check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
-                return false;
-            }
+            // // above top of deadband is too always high
+            // if (copter.get_pilot_desired_climb_rate(copter.channel_throttle->get_control_in()) > 0.0f) {
+            //     check_failed(ARMING_CHECK_RC, true, "%s too high", rc_item);
+            //     return false;
+            // }
             // in manual modes throttle must be at zero
             #if FRAME_CONFIG != HELI_FRAME
             if ((copter.flightmode->has_manual_throttle() || control_mode == Mode::Number::DRIFT) && copter.channel_throttle->get_control_in() > 0) {

@@ -190,7 +190,7 @@ public:
     // friend class AutoTune;
 
     friend class Mode;
-    friend class ModeAltHold;
+    // friend class ModeAltHold;
     friend class ModeAuto;
     // friend class ModeAutoTune;
     friend class ModeBrake;
@@ -227,7 +227,8 @@ private:
     RC_Channel *channel_pitch;
     RC_Channel *channel_throttle;
     RC_Channel *channel_yaw;
-    RC_Channel *canalGanho; //Mathaus
+    
+    RC_Channel *channel_gain; //Mathaus
 
 
     AP_Logger logger;
@@ -754,18 +755,18 @@ private:
     // fence.cpp
     void fence_check();
 
-    // heli.cpp
-    void heli_init();
-    void check_dynamic_flight(void);
-    bool should_use_landing_swash() const;
-    void update_heli_control_dynamics(void);
-    void heli_update_landing_swash();
-    float get_pilot_desired_rotor_speed() const;
-    void heli_update_rotor_speed_targets();
-    void heli_update_autorotation();
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-    void heli_set_autorotation(bool autotrotation);
-#endif
+//     // heli.cpp
+//     void heli_init();
+//     void check_dynamic_flight(void);
+//     bool should_use_landing_swash() const;
+//     void update_heli_control_dynamics(void);
+//     void heli_update_landing_swash();
+//     float get_pilot_desired_rotor_speed() const;
+//     void heli_update_rotor_speed_targets();
+//     void heli_update_autorotation();
+// #if MODE_AUTOROTATE_ENABLED == ENABLED
+//     void heli_set_autorotation(bool autotrotation);
+// #endif
     // inertia.cpp
     void read_inertia();
 
@@ -795,9 +796,6 @@ private:
     void Log_Write_Data(LogDataID id, float value);
     void Log_Write_Parameter_Tuning(uint8_t param, float tuning_val, float tune_min, float tune_max);
     void Log_Sensor_Health();
-// #if FRAME_CONFIG == HELI_FRAME
-//     void Log_Write_Heli(void);
-// #endif
     void Log_Write_Precland();
     void Log_Write_GuidedTarget(uint8_t target_type, const Vector3f& pos_target, const Vector3f& vel_target);
     void Log_Write_SysID_Setup(uint8_t systemID_axis, float waveform_magnitude, float frequency_start, float frequency_stop, float time_fade_in, float time_const_freq, float time_record, float time_fade_out);

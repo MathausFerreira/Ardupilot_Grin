@@ -29,7 +29,7 @@ void Copter::get_pilot_desired_force_to_boat()
     Z = float(channel_yaw->get_radio_in()-  med_yaw)/float(channel_yaw->get_radio_max() - med_yaw);
 
 
-    GanhoF    = (float)(1.0f*canalGanho->get_radio_in() - canalGanho->get_radio_min())/(canalGanho->get_radio_max()-canalGanho->get_radio_min());
+    GanhoF    = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
 
     GanhoF = constrain_float(GanhoF,0.0f,1.0f);
 
@@ -90,55 +90,55 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
  *  throttle control
  ****************************************************************/
 // set_throttle_takeoff - allows parents to tell throttle controller we are taking off so I terms can be cleared
-void Copter::set_throttle_takeoff(){
-    // tell position controller to reset alt target and reset I terms
-    pos_control->init_takeoff();
-}
+// void Copter::set_throttle_takeoff(){
+//     // tell position controller to reset alt target and reset I terms
+//     pos_control->init_takeoff();
+// }
 
-// get_pilot_desired_climb_rate - transform pilot's throttle input to climb rate in cm/s
-// without any deadzone at the bottom
-float Copter::get_pilot_desired_climb_rate(float throttle_control)
-{
-    // throttle failsafe check
-    if (failsafe.radio || !ap.rc_receiver_present) {
-        return 0.0f;
-    }
+// // get_pilot_desired_climb_rate - transform pilot's throttle input to climb rate in cm/s
+// // without any deadzone at the bottom
+// float Copter::get_pilot_desired_climb_rate(float throttle_control)
+// {
+//     // throttle failsafe check
+//     if (failsafe.radio || !ap.rc_receiver_present) {
+//         return 0.0f;
+//     }
 
-#if TOY_MODE_ENABLED == ENABLED
-    if (g2.toy_mode.enabled()) {
-        // allow throttle to be reduced after throttle arming and for
-        // slower descent close to the ground
-        g2.toy_mode.throttle_adjust(throttle_control);
-    }
-#endif
+// #if TOY_MODE_ENABLED == ENABLED
+//     if (g2.toy_mode.enabled()) {
+//         // allow throttle to be reduced after throttle arming and for
+//         // slower descent close to the ground
+//         g2.toy_mode.throttle_adjust(throttle_control);
+//     }
+// #endif
 
-    float desired_rate = 0.0f;
-    float mid_stick = get_throttle_mid();
-    float deadband_top = mid_stick + g.throttle_deadzone;
-    float deadband_bottom = mid_stick - g.throttle_deadzone;
+//     float desired_rate = 0.0f;
+//     float mid_stick = get_throttle_mid();
+//     float deadband_top = mid_stick + g.throttle_deadzone;
+//     float deadband_bottom = mid_stick - g.throttle_deadzone;
 
-    // ensure a reasonable throttle value
-    throttle_control = constrain_float(throttle_control,0.0f,1000.0f);
+//     // ensure a reasonable throttle value
+//     throttle_control = constrain_float(throttle_control,0.0f,1000.0f);
 
-    // ensure a reasonable deadzone
-    g.throttle_deadzone = constrain_int16(g.throttle_deadzone, 0, 400);
+//     // ensure a reasonable deadzone
+//     g.throttle_deadzone = constrain_int16(g.throttle_deadzone, 0, 400);
 
-    // check throttle is above, below or in the deadband
-    if (throttle_control < deadband_bottom) {
-        // below the deadband
-        desired_rate = get_pilot_speed_dn() * (throttle_control-deadband_bottom) / deadband_bottom;
-    } else if (throttle_control > deadband_top) {
-        // above the deadband
-        desired_rate = g.pilot_speed_up * (throttle_control-deadband_top) / (1000.0f-deadband_top);
-    } else {
-        // must be in the deadband
-        desired_rate = 0.0f;
-    }
+//     // check throttle is above, below or in the deadband
+//     if (throttle_control < deadband_bottom) {
+//         // below the deadband
+//         desired_rate = get_pilot_speed_dn() * (throttle_control-deadband_bottom) / deadband_bottom;
+//     } else if (throttle_control > deadband_top) {
+//         // above the deadband
+//         desired_rate = g.pilot_speed_up * (throttle_control-deadband_top) / (1000.0f-deadband_top);
+//     } else {
+//         // must be in the deadband
+//         desired_rate = 0.0f;
+//     }
 
-    return desired_rate;
-}
+//     return desired_rate;
+// }
 
-// get_non_takeoff_throttle - a throttle somewhere between min and mid throttle which should not lead to a takeoff
+// // get_non_takeoff_throttle - a throttle somewhere between min and mid throttle which should not lead to a takeoff
 float Copter::get_non_takeoff_throttle()
 {
     return MAX(0,motors->get_throttle_hover()/2.0f);

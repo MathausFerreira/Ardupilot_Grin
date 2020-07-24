@@ -76,7 +76,7 @@ bool ModeGuided::do_user_takeoff_start(float takeoff_alt_cm)
     auto_yaw.set_mode(AUTO_YAW_HOLD);
 
     // clear i term when we're taking off
-    set_throttle_takeoff();
+    // set_throttle_takeoff();
 
     // get initial alt for WP_NAVALT_MIN
     auto_takeoff_set_start_alt();

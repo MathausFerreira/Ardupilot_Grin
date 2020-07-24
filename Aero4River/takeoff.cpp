@@ -54,7 +54,7 @@ void Mode::_TakeOff::start(float alt_cm)
     // indicate we are taking off
     // copter.set_land_complete(false);
     // tell position controller to reset alt target and reset I terms
-    copter.set_throttle_takeoff();
+    // copter.set_throttle_takeoff();
 
     // calculate climb rate
     const float speed = MIN(copter.wp_nav->get_default_speed_up(), MAX(copter.g.pilot_speed_up*2.0f/3.0f, copter.g.pilot_speed_up-50.0f));
@@ -82,8 +82,7 @@ void Mode::_TakeOff::stop()
 //  pilot_climb_rate is both an input and an output
 //  takeoff_climb_rate is only an output
 //  has side-effect of turning takeoff off when timeout as expired
-void Mode::_TakeOff::get_climb_rates(float& pilot_climb_rate,
-                                                  float& takeoff_climb_rate)
+void Mode::_TakeOff::get_climb_rates(float& pilot_climb_rate,float& takeoff_climb_rate)
 {
     // return pilot_climb_rate if take-off inactive
     if (!_running) {
