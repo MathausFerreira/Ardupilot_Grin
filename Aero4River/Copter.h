@@ -24,7 +24,6 @@
 #include <cmath>
 #include <stdio.h>
 #include <stdarg.h>
-
 #include <AP_HAL/AP_HAL.h>
 
 // Common dependencies
@@ -35,45 +34,40 @@
 
 // Application dependencies
 #include <GCS_MAVLink/GCS.h>
-#include <AP_Logger/AP_Logger.h>          // ArduPilot Mega Flash Memory Library
-#include <AP_Math/AP_Math.h>            // ArduPilot Mega Vector/Matrix math Library
-#include <AP_AccelCal/AP_AccelCal.h>                // interface and maths for accelerometer calibration
-#include <AP_InertialSensor/AP_InertialSensor.h>  // ArduPilot Mega Inertial Sensor (accel & gyro) Library
+#include <AP_Logger/AP_Logger.h>                            // ArduPilot Mega Flash Memory Library
+#include <AP_Math/AP_Math.h>                                // ArduPilot Mega Vector/Matrix math Library
+#include <AP_AccelCal/AP_AccelCal.h>                        // interface and maths for accelerometer calibration
+#include <AP_InertialSensor/AP_InertialSensor.h>            // ArduPilot Mega Inertial Sensor (accel & gyro) Library
 #include <AP_AHRS/AP_AHRS.h>
-#include <AP_Mission/AP_Mission.h>     // Mission command library
-#include <AC_AttitudeControl/AC_AttitudeControl_River.h> // Attitude control library
-// #include <AC_AttitudeControl/AC_AttitudeControl_Heli.h> // Attitude control library for traditional helicopter
-#include <AC_AttitudeControl/AC_PosControl.h>      // Position control library
-#include <AP_Motors/AP_Motors.h>          // AP Motors library
-#include <AP_Stats/AP_Stats.h>     // statistics library
-#include <Filter/Filter.h>             // Filter library
-#include <AP_Airspeed/AP_Airspeed.h>        // needed for AHRS build
-#include <AP_Vehicle/AP_Vehicle.h>         // needed for AHRS build
-#include <AP_InertialNav/AP_InertialNav.h>     // ArduPilot Mega inertial navigation library
-#include <AC_WPNav/AC_WPNav.h>           // ArduCopter waypoint navigation library
+#include <AP_Mission/AP_Mission.h>                          // Mission command library
+#include <AC_AttitudeControl/AC_AttitudeControl_River.h>    // Attitude control library
+
+#include <AC_AttitudeControl/AC_PosControl.h>               // Position control library
+#include <AP_Motors/AP_Motors.h>                            // AP Motors library
+#include <AP_Stats/AP_Stats.h>                              // statistics library
+#include <Filter/Filter.h>                                  // Filter library
+#include <AP_Airspeed/AP_Airspeed.h>                        // needed for AHRS build
+#include <AP_Vehicle/AP_Vehicle.h>                          // needed for AHRS build
+#include <AP_InertialNav/AP_InertialNav.h>                  // ArduPilot Mega inertial navigation library
+#include <AC_WPNav/AC_WPNav.h>                              // ArduCopter waypoint navigation library
 #include <AC_WPNav/AC_Loiter.h>
-#include <AC_WPNav/AC_Circle.h>          // circle navigation library
-#include <AP_Declination/AP_Declination.h>     // ArduPilot Mega Declination Helper Library
-#include <AP_RCMapper/AP_RCMapper.h>        // RC input mapping library
-#include <AP_BattMonitor/AP_BattMonitor.h>     // Battery monitor library
-// #include <AP_LandingGear/AP_LandingGear.h>     // Landing Gear library
-#include <AC_InputManager/AC_InputManager.h>        // Pilot input handling library
-// #include <AC_InputManager/AC_InputManager_Heli.h>   // Heli specific pilot input handling library
+#include <AC_WPNav/AC_Circle.h>                             // circle navigation library
+#include <AP_Declination/AP_Declination.h>                  // ArduPilot Mega Declination Helper Library
+#include <AP_RCMapper/AP_RCMapper.h>                        // RC input mapping library
+#include <AP_BattMonitor/AP_BattMonitor.h>                  // Battery monitor library
+#include <AC_InputManager/AC_InputManager.h>                // Pilot input handling library
+
 #include <AP_Arming/AP_Arming.h>
 #include <AP_SmartRTL/AP_SmartRTL.h>
 #include <AP_TempCalibration/AP_TempCalibration.h>
 // #include <AC_AutoTune/AC_AutoTune.h>
-// #include <AP_Parachute/AP_Parachute.h>
-// #include <AC_Sprayer/AC_Sprayer.h>
 
 // Configuration
 #include "defines.h"
 #include "config.h"
 
-
 #define AC_AttitudeControl_t AC_AttitudeControl_River
 #define MOTOR_CLASS AP_MotorsRiver
-
 
 #if MODE_AUTOROTATE_ENABLED == ENABLED
  #include <AC_Autorotation/AC_Autorotation.h> // Autorotation controllers
@@ -98,12 +92,15 @@
  #include <AC_WPNav/AC_WPNav_OA.h>
  #include <AC_Avoidance/AP_OAPathPlanner.h>
 #endif
-#if GRIPPER_ENABLED == ENABLED
- # include <AP_Gripper/AP_Gripper.h>
-#endif
+// #if GRIPPER_ENABLED == ENABLED
+//  # include <AP_Gripper/AP_Gripper.h>
+// #endif
 // #if PRECISION_LANDING == ENABLED
 //  # include <AC_PrecLand/AC_PrecLand.h>
 //  # include <AP_IRLock/AP_IRLock.h>
+// #endif
+// #if OPTFLOW == ENABLED
+//  # include <AP_OpticalFlow/AP_OpticalFlow.h>
 // #endif
 #if MODE_FOLLOW_ENABLED == ENABLED
  # include <AP_Follow/AP_Follow.h>
@@ -113,9 +110,6 @@
 #endif
 #if AC_TERRAIN == ENABLED
  # include <AP_Terrain/AP_Terrain.h>
-#endif
-#if OPTFLOW == ENABLED
- # include <AP_OpticalFlow/AP_OpticalFlow.h>
 #endif
 #if RANGEFINDER_ENABLED == ENABLED
  # include <AP_RangeFinder/AP_RangeFinder.h>
@@ -300,10 +294,10 @@ private:
     // Arming/Disarming management class
     AP_Arming_Copter arming;
 
-    // Optical flow sensor
-#if OPTFLOW == ENABLED
-    OpticalFlow optflow;
-#endif
+//     // Optical flow sensor
+// #if OPTFLOW == ENABLED
+//     OpticalFlow optflow;
+// #endif
 
     // system time in milliseconds of last recorded yaw reset from ekf
     uint32_t ekfYawReset_ms;
@@ -595,9 +589,9 @@ private:
 
     // Attitude.cpp
     float get_pilot_desired_yaw_rate(int16_t stick_angle);
-    void update_throttle_hover();
-    void set_throttle_takeoff();
-    float get_pilot_desired_climb_rate(float throttle_control);
+    // void update_throttle_hover();
+    // void set_throttle_takeoff();
+    // float get_pilot_desired_climb_rate(float throttle_control);
     float get_non_takeoff_throttle();
     void set_accel_throttle_I_from_pilot_throttle();
     void rotate_body_frame_to_NE(float &x, float &y);
@@ -610,46 +604,6 @@ private:
     /////////////////////////////////////////////////////////////////////////////////////
     /// Declaração de Variáveis ( Mathaus )
     /////////////////////////////////////////////////////////////////////////////////////
-
-    // Propriedade Física do Barco
-    // float FT = 0.0f;
-    // float FM1 = GRAVITY_MSS*2.1f;
-    // float FM2 = GRAVITY_MSS*2.1f;
-    // float FM3 = GRAVITY_MSS*2.1f;
-    // float FM4 = GRAVITY_MSS*2.1f;
-
-    // float Fmax = FM1 + FM2 + FM3 + FM4;       // Força e torque maximos do barco
-
-    // float L    = 0.54f;          // Tamanho do braço do barco
-    // float Lx = L*cosf(M_PI/4.0f);
-    // float Ly = L*cosf(M_PI/4.0f);
-
-    // //
-    // float Pwmmax = 1001.0f; // Esse valor será a faixa de pwm que eu vou escolher para trabalhar --------------- // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
-    // float Pwmmin = 1.0f;    // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
-    // float Nmax = L*Fmax;
-
-    // float k1 = (FM1)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
-    // float k2 = (FM2)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
-    // float k3 = (FM3)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
-    // float k4 = (FM4)/(Pwmmax-Pwmmin); // Esse valor é atualizado no AduCopter.cpp para corresponder aos valores de memória
-
-    // //  PWM do Servo Motores Barco
-    // float servo_m1 = 0.0f;
-    // float servo_m2 = 0.0f;
-    // float servo_m3 = 0.0f;
-    // float servo_m4 = 0.0f;
-
-    // // Angulo dos Servo Motores Barco
-    // float theta_m1 =  0.0f;
-    // float theta_m2 =  0.0f;
-    // float theta_m3 =  0.0f;
-    // float theta_m4 =  0.0f;
-
-    // float Pwm1 = 0.0f;
-    // float Pwm2 = 0.0f;
-    // float Pwm3 = 0.0f;
-    // float Pwm4 = 0.0f;
 
     //    Forcas enviadas para a alocacao
     float Fx = 0.0f;
@@ -670,26 +624,16 @@ private:
     ////////////////////////////    Funções    ///////////////////////////////////
     
     float servo_pwm_to_angle(int PWM_aux);
-    // float PWMtoNorm(float pwm);
-    // float NormtoPWM(float pwm);
     float mapCube(float x, float y, float z);
     void Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
-    // void get_pilot_desired_force_to_boat();
     void pwm_servo_angle();
     void FxFy_calc(float roll, float pitch);
-
-    // void get_pilot_desired_force_to_boat(float roll, float pitch, float yaw);
     void get_pilot_desired_force_to_boat();
-    // void calcPWM();
-    // int servo_angle_to_pwm(float ang);
-
+    // log grin
     void Log_Write_Mathaus();
     void Log_Write_Grin();
-
-    // Accacio
     void Log_Write_Accacio();
 
-    //
     // commands.cpp
     void update_home_from_EKF();
     void set_home_to_current_location_inflight();
@@ -773,7 +717,7 @@ private:
     void update_throttle_mix();
 
     // landing_gear.cpp
-    void landinggear_update();
+    // void landinggear_update();
 
     // standby.cpp
     void standby_update();
@@ -855,7 +799,7 @@ private:
     bool rangefinder_alt_ok();
     bool rangefinder_up_ok();
     void rpm_update();
-    void init_optflow();
+    // void init_optflow();
     void update_optical_flow(void);
     void compass_cal_update(void);
     void accel_cal_update(void);
@@ -905,7 +849,6 @@ private:
     void publish_osd_info();
 #endif
 
-    Mode *flightmode;
 // #if MODE_ACRO_ENABLED == ENABLED
 // #if FRAME_CONFIG == HELI_FRAME
 //     ModeAcro_Heli mode_acro;
@@ -913,14 +856,31 @@ private:
 //     ModeAcro mode_acro;
 // #endif
 // #endif
-    ModeAltHold mode_althold;
-#if MODE_AUTO_ENABLED == ENABLED
-    ModeAuto mode_auto;
-#endif
+    // ModeAltHold mode_althold;
 // #if AUTOTUNE_ENABLED == ENABLED
 //     AutoTune autotune;
 //     ModeAutoTune mode_autotune;
 // #endif
+// #if MODE_FLIP_ENABLED == ENABLED
+//     ModeFlip mode_flip;
+// #endif
+// #if MODE_SPORT_ENABLED == ENABLED
+//     ModeSport mode_sport;
+// #endif
+// #if ADSB_ENABLED == ENABLED
+//     ModeAvoidADSB mode_avoid_adsb;
+// #endif
+// #if MODE_THROW_ENABLED == ENABLED
+//     ModeThrow mode_throw;
+// #endif
+// #if !HAL_MINIMIZE_FEATURES && OPTFLOW == ENABLED
+//     ModeFlowHold mode_flowhold;
+// #endif
+
+    Mode *flightmode;
+#if MODE_AUTO_ENABLED == ENABLED
+    ModeAuto mode_auto;
+#endif
 #if MODE_BRAKE_ENABLED == ENABLED
     ModeBrake mode_brake;
 #endif
@@ -930,16 +890,12 @@ private:
 #if MODE_DRIFT_ENABLED == ENABLED
     ModeDrift mode_drift;
 #endif
-// #if MODE_FLIP_ENABLED == ENABLED
-//     ModeFlip mode_flip;
-// #endif
 #if MODE_FOLLOW_ENABLED == ENABLED
     ModeFollow mode_follow;
 #endif
 #if MODE_GUIDED_ENABLED == ENABLED
     ModeGuided mode_guided;
 #endif
-    //  ModeLand mode_land;
 #if MODE_LOITER_ENABLED == ENABLED
     ModeLoiter mode_loiter;
 #endif
@@ -949,32 +905,16 @@ private:
 #if MODE_RTL_ENABLED == ENABLED
     ModeRTL mode_rtl;
 #endif
-#if FRAME_CONFIG == HELI_FRAME
-    ModeStabilize_Heli mode_stabilize;
-#else
     ModeStabilize mode_stabilize;
-#endif
-// #if MODE_SPORT_ENABLED == ENABLED
-//     ModeSport mode_sport;
-// #endif
 #if MODE_SYSTEMID_ENABLED == ENABLED
     ModeSystemId mode_systemid;
 #endif
-// #if ADSB_ENABLED == ENABLED
-//     ModeAvoidADSB mode_avoid_adsb;
-// #endif
-// #if MODE_THROW_ENABLED == ENABLED
-//     ModeThrow mode_throw;
-// #endif
 #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
     ModeGuidedNoGPS mode_guided_nogps;
 #endif
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
 #endif
-// #if !HAL_MINIMIZE_FEATURES && OPTFLOW == ENABLED
-//     ModeFlowHold mode_flowhold;
-// #endif
 #if MODE_ZIGZAG_ENABLED == ENABLED
     ModeZigZag mode_zigzag;
 #endif

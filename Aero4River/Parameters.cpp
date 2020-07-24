@@ -661,11 +661,11 @@ const AP_Param::Info Copter::var_info[] = {
     GOBJECT(terrain,                "TERRAIN_", AP_Terrain),
 #endif
 
-#if OPTFLOW == ENABLED
-    // @Group: FLOW
-    // @Path: ../libraries/AP_OpticalFlow/OpticalFlow.cpp
-    GOBJECT(optflow,   "FLOW", OpticalFlow),
-#endif
+// #if OPTFLOW == ENABLED
+//     // @Group: FLOW
+//     // @Path: ../libraries/AP_OpticalFlow/OpticalFlow.cpp
+//     GOBJECT(optflow,   "FLOW", OpticalFlow),
+// #endif
 
 // #if PRECISION_LANDING == ENABLED
 //     // @Group: PLND_

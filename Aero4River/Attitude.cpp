@@ -94,7 +94,6 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
 //     // tell position controller to reset alt target and reset I terms
 //     pos_control->init_takeoff();
 // }
-
 // // get_pilot_desired_climb_rate - transform pilot's throttle input to climb rate in cm/s
 // // without any deadzone at the bottom
 // float Copter::get_pilot_desired_climb_rate(float throttle_control)
@@ -103,7 +102,6 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
 //     if (failsafe.radio || !ap.rc_receiver_present) {
 //         return 0.0f;
 //     }
-
 // #if TOY_MODE_ENABLED == ENABLED
 //     if (g2.toy_mode.enabled()) {
 //         // allow throttle to be reduced after throttle arming and for
@@ -111,18 +109,14 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
 //         g2.toy_mode.throttle_adjust(throttle_control);
 //     }
 // #endif
-
 //     float desired_rate = 0.0f;
 //     float mid_stick = get_throttle_mid();
 //     float deadband_top = mid_stick + g.throttle_deadzone;
 //     float deadband_bottom = mid_stick - g.throttle_deadzone;
-
 //     // ensure a reasonable throttle value
 //     throttle_control = constrain_float(throttle_control,0.0f,1000.0f);
-
 //     // ensure a reasonable deadzone
 //     g.throttle_deadzone = constrain_int16(g.throttle_deadzone, 0, 400);
-
 //     // check throttle is above, below or in the deadband
 //     if (throttle_control < deadband_bottom) {
 //         // below the deadband
@@ -134,7 +128,6 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
 //         // must be in the deadband
 //         desired_rate = 0.0f;
 //     }
-
 //     return desired_rate;
 // }
 

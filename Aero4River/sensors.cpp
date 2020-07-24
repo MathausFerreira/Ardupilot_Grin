@@ -158,13 +158,13 @@ void Copter::rpm_update(void)
 }
 
 // initialise optical flow sensor
-void Copter::init_optflow()
-{
-#if OPTFLOW == ENABLED
-    // initialise optical flow sensor
-    optflow.init(MASK_LOG_OPTFLOW);
-#endif      // OPTFLOW == ENABLED
-}
+// void Copter::init_optflow()
+// {
+// #if OPTFLOW == ENABLED
+//     // initialise optical flow sensor
+//     optflow.init(MASK_LOG_OPTFLOW);
+// #endif      // OPTFLOW == ENABLED
+// }
 
 void Copter::compass_cal_update()
 {

@@ -96,10 +96,10 @@ void Copter::init_ardupilot()
     AP::compass().set_log_bit(MASK_LOG_COMPASS);
     AP::compass().init();
 
-#if OPTFLOW == ENABLED
-    // make optflow available to AHRS
-    ahrs.set_optflow(&optflow);
-#endif
+// #if OPTFLOW == ENABLED
+//     // make optflow available to AHRS
+//     ahrs.set_optflow(&optflow);
+// #endif
 
     // init Location class
 #if AP_TERRAIN_AVAILABLE && AC_TERRAIN
@@ -116,7 +116,7 @@ void Copter::init_ardupilot()
 
 
     // init the optical flow sensor
-    init_optflow();
+    // init_optflow();
 
 #if MOUNT == ENABLED
     // initialise camera mount
@@ -323,11 +323,11 @@ bool Copter::optflow_position_ok() const
 
     // return immediately if neither optflow nor visual odometry is enabled
     bool enabled = false;
-#if OPTFLOW == ENABLED
-    if (optflow.enabled()) {
-        enabled = true;
-    }
-#endif
+// #if OPTFLOW == ENABLED
+//     if (optflow.enabled()) {
+//         enabled = true;
+//     }
+// #endif
 #if HAL_VISUALODOM_ENABLED
     if (visual_odom.enabled()) {
         enabled = true;
