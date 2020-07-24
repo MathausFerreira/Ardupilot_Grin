@@ -10,8 +10,7 @@ float Copter::mapCube(float x, float y, float z){
     return out;
 }
 
-void Copter::get_pilot_desired_force_to_boat()
-{
+void Copter::get_pilot_desired_force_to_boat(){
     //Essa abordagem considera que o stick direito controla a força em X e Y.
     //a posição do stick determina a intensidade da foça nos eixos onde, o ponto médio é o (0,0).
     //O Yaw é controlado da mesma maneira que em um quadrotor, contudo, o código foi construido de forma empirica.
@@ -28,14 +27,13 @@ void Copter::get_pilot_desired_force_to_boat()
     //Calcula o torque em Z a partir do stick de Guinada
     Z = float(channel_yaw->get_radio_in()-  med_yaw)/float(channel_yaw->get_radio_max() - med_yaw);
 
+    Gain = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
 
-    GanhoF    = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
+    Gain = constrain_float(Gain,0.0f,1.0f);
 
-    GanhoF = constrain_float(GanhoF,0.0f,1.0f);
-
-    X = X * GanhoF;
-    Y = Y * GanhoF;
-    Z = Z * GanhoF;
+    X = X * Gain;
+    Y = Y * Gain;
+    Z = Z * Gain;
 
     X = constrain_float(X,-1.0f,1.0f);
     Y = constrain_float(Y,-1.0f,1.0f);
@@ -45,14 +43,13 @@ void Copter::get_pilot_desired_force_to_boat()
     Fy = mapCube(Y,X,Z);
     Tn = mapCube(Z,X,Y);
     
-    // channel_pitch->set_control_in(Fx);
-    // channel_roll->set_control_in(Fy);
-    // channel_yaw->set_control_in(Tn);
-
     motors->set_forward(Fx);
     motors->set_lateral(Fy);
     motors->set_yaw(Tn);
 
+    // channel_pitch->set_control_in(Fx);
+    // channel_roll->set_control_in(Fy);
+    // channel_yaw->set_control_in(Tn);
 }
 /****************************************************************/
 
@@ -84,6 +81,36 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
     }
     // convert pilot input to the desired yaw rate
     return yaw_request; //talvez colocar o torque aqui
+}
+
+// get_non_takeoff_throttle - a throttle somewhere between min and mid throttle which should not lead to a takeoff
+float Copter::get_non_takeoff_throttle(){
+    return MAX(0,motors->get_throttle_hover()/2.0f);
+}
+
+// set_accel_throttle_I_from_pilot_throttle - smoothes transition from pilot controlled throttle to autopilot throttle
+void Copter::set_accel_throttle_I_from_pilot_throttle(){
+    // get last throttle input sent to attitude controller
+    float pilot_throttle = constrain_float(attitude_control->get_throttle_in(), 0.0f, 1.0f);
+    // shift difference between pilot's throttle and hover throttle into accelerometer I
+    pos_control->get_accel_z_pid().set_integrator((pilot_throttle-motors->get_throttle_hover()) * 1000.0f);
+}
+
+// rotate vector from vehicle's perspective to North-East frame
+void Copter::rotate_body_frame_to_NE(float &x, float &y){
+    float ne_x = x*ahrs.cos_yaw() - y*ahrs.sin_yaw();
+    float ne_y = x*ahrs.sin_yaw() + y*ahrs.cos_yaw();
+    x = ne_x;
+    y = ne_y;
+}
+
+// It will return the PILOT_SPEED_DN value if non zero, otherwise if zero it returns the PILOT_SPEED_UP value.
+uint16_t Copter::get_pilot_speed_dn(){
+    if (g2.pilot_speed_dn == 0) {
+        return abs(g.pilot_speed_up);
+    } else {
+        return abs(g2.pilot_speed_dn);
+    }
 }
 
 /*************************************************************
@@ -131,36 +158,3 @@ float Copter::get_pilot_desired_yaw_rate(int16_t stick_angle)
 //     return desired_rate;
 // }
 
-// // get_non_takeoff_throttle - a throttle somewhere between min and mid throttle which should not lead to a takeoff
-float Copter::get_non_takeoff_throttle()
-{
-    return MAX(0,motors->get_throttle_hover()/2.0f);
-}
-
-// set_accel_throttle_I_from_pilot_throttle - smoothes transition from pilot controlled throttle to autopilot throttle
-void Copter::set_accel_throttle_I_from_pilot_throttle()
-{
-    // get last throttle input sent to attitude controller
-    float pilot_throttle = constrain_float(attitude_control->get_throttle_in(), 0.0f, 1.0f);
-    // shift difference between pilot's throttle and hover throttle into accelerometer I
-    pos_control->get_accel_z_pid().set_integrator((pilot_throttle-motors->get_throttle_hover()) * 1000.0f);
-}
-
-// rotate vector from vehicle's perspective to North-East frame
-void Copter::rotate_body_frame_to_NE(float &x, float &y)
-{
-    float ne_x = x*ahrs.cos_yaw() - y*ahrs.sin_yaw();
-    float ne_y = x*ahrs.sin_yaw() + y*ahrs.cos_yaw();
-    x = ne_x;
-    y = ne_y;
-}
-
-// It will return the PILOT_SPEED_DN value if non zero, otherwise if zero it returns the PILOT_SPEED_UP value.
-uint16_t Copter::get_pilot_speed_dn()
-{
-    if (g2.pilot_speed_dn == 0) {
-        return abs(g.pilot_speed_up);
-    } else {
-        return abs(g2.pilot_speed_dn);
-    }
-}
