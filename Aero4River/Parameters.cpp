@@ -896,11 +896,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
 //     AP_SUBGROUPPTR(mode_flowhold_ptr, "FHLD", 26, ParametersG2, ModeFlowHold),
 // #endif
 
-#if MODE_FOLLOW_ENABLED == ENABLED
-    // @Group: FOLL
-    // @Path: ../libraries/AP_Follow/AP_Follow.cpp
-    AP_SUBGROUPINFO(follow, "FOLL", 27, ParametersG2, AP_Follow),
-#endif
+// #if MODE_FOLLOW_ENABLED == ENABLED
+//     // @Group: FOLL
+//     // @Path: ../libraries/AP_Follow/AP_Follow.cpp
+//     AP_SUBGROUPINFO(follow, "FOLL", 27, ParametersG2, AP_Follow),
+// #endif
 
 #ifdef USER_PARAMS_ENABLED
     AP_SUBGROUPINFO(user_parameters, "USR", 28, ParametersG2, UserParameters),
@@ -936,11 +936,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(oa, "OA_", 33, ParametersG2, AP_OAPathPlanner),
 #endif
 
-#if MODE_SYSTEMID_ENABLED == ENABLED
-    // @Group: SID
-    // @Path: mode_systemid.cpp
-    AP_SUBGROUPPTR(mode_systemid_ptr, "SID", 34, ParametersG2, ModeSystemId),
-#endif
+// #if MODE_SYSTEMID_ENABLED == ENABLED
+//     // @Group: SID
+//     // @Path: mode_systemid.cpp
+//     AP_SUBGROUPPTR(mode_systemid_ptr, "SID", 34, ParametersG2, ModeSystemId),
+// #endif
 
     // @Param: FS_VIBE_ENABLE
     // @DisplayName: Vibration Failsafe enable
@@ -963,11 +963,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     AP_SUBGROUPINFO(arot, "AROT_", 37, ParametersG2, AC_Autorotation),
 #endif
 
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    // @Group: ZIGZ_
-    // @Path: mode_zigzag.cpp
-    AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//     // @Group: ZIGZ_
+//     // @Path: mode_zigzag.cpp
+//     AP_SUBGROUPPTR(mode_zigzag_ptr, "ZIGZ_", 38, ParametersG2, ModeZigZag),
+// #endif
 
     AP_GROUPEND
 };
@@ -992,25 +992,25 @@ ParametersG2::ParametersG2(void)
 // #if !HAL_MINIMIZE_FEATURES && OPTFLOW == ENABLED
 //     ,mode_flowhold_ptr(&copter.mode_flowhold)
 // #endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    ,follow()
-#endif
+// #if MODE_FOLLOW_ENABLED == ENABLED
+//     ,follow()
+// #endif
 #ifdef USER_PARAMS_ENABLED
     ,user_parameters()
 #endif
 // #if AUTOTUNE_ENABLED == ENABLED
 //     ,autotune_ptr(&copter.autotune)
 // #endif
-#if MODE_SYSTEMID_ENABLED == ENABLED
-    ,mode_systemid_ptr(&copter.mode_systemid)
-#endif
+// #if MODE_SYSTEMID_ENABLED == ENABLED
+//     ,mode_systemid_ptr(&copter.mode_systemid)
+// #endif
 #if MODE_AUTOROTATE_ENABLED == ENABLED
     ,arot(copter.inertial_nav)
 #endif
     ,button_ptr(&copter.button)
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    ,mode_zigzag_ptr(&copter.mode_zigzag)
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//     ,mode_zigzag_ptr(&copter.mode_zigzag)
+// #endif
 {
     AP_Param::setup_object_defaults(this, var_info);
 }

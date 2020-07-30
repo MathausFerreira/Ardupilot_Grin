@@ -485,29 +485,29 @@ void RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
 #endif
 
         case AUX_FUNC::ZIGZAG:
-#if MODE_ZIGZAG_ENABLED == ENABLED
-            do_aux_function_change_mode(Mode::Number::ZIGZAG, ch_flag);
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//             do_aux_function_change_mode(Mode::Number::ZIGZAG, ch_flag);
+// #endif
             break;
 
         case AUX_FUNC::ZIGZAG_SaveWP:
-#if MODE_ZIGZAG_ENABLED == ENABLED
-            if (copter.flightmode == &copter.mode_zigzag) {
-                // initialize zigzag auto
-                copter.mode_zigzag.init_auto();
-                switch (ch_flag) {
-                    case AuxSwitchPos::LOW:
-                        copter.mode_zigzag.save_or_move_to_destination(ModeZigZag::Destination::A);
-                        break;
-                    case AuxSwitchPos::MIDDLE:
-                        copter.mode_zigzag.return_to_manual_control(false);
-                        break;
-                    case AuxSwitchPos::HIGH:
-                        copter.mode_zigzag.save_or_move_to_destination(ModeZigZag::Destination::B);
-                        break;
-                }
-            }
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//             if (copter.flightmode == &copter.mode_zigzag) {
+//                 // initialize zigzag auto
+//                 copter.mode_zigzag.init_auto();
+//                 switch (ch_flag) {
+//                     case AuxSwitchPos::LOW:
+//                         copter.mode_zigzag.save_or_move_to_destination(ModeZigZag::Destination::A);
+//                         break;
+//                     case AuxSwitchPos::MIDDLE:
+//                         copter.mode_zigzag.return_to_manual_control(false);
+//                         break;
+//                     case AuxSwitchPos::HIGH:
+//                         copter.mode_zigzag.save_or_move_to_destination(ModeZigZag::Destination::B);
+//                         break;
+//                 }
+//             }
+// #endif
             break;
 
         case AUX_FUNC::STABILIZE:
@@ -573,18 +573,18 @@ void RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
             break;
 
         case AUX_FUNC::ZIGZAG_Auto:
-#if MODE_ZIGZAG_ENABLED == ENABLED
-            if (copter.flightmode == &copter.mode_zigzag) {
-                switch (ch_flag) {
-                case AuxSwitchPos::HIGH:
-                    copter.mode_zigzag.run_auto();
-                    break;
-                default:
-                    copter.mode_zigzag.suspend_auto();
-                    break;
-                }
-            }
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//             if (copter.flightmode == &copter.mode_zigzag) {
+//                 switch (ch_flag) {
+//                 case AuxSwitchPos::HIGH:
+//                     copter.mode_zigzag.run_auto();
+//                     break;
+//                 default:
+//                     copter.mode_zigzag.suspend_auto();
+//                     break;
+//                 }
+//             }
+// #endif
             break;
             
     default:

@@ -887,12 +887,6 @@ private:
 #if MODE_CIRCLE_ENABLED == ENABLED
     ModeCircle mode_circle;
 #endif
-#if MODE_DRIFT_ENABLED == ENABLED
-    ModeDrift mode_drift;
-#endif
-#if MODE_FOLLOW_ENABLED == ENABLED
-    ModeFollow mode_follow;
-#endif
 #if MODE_GUIDED_ENABLED == ENABLED
     ModeGuided mode_guided;
 #endif
@@ -906,21 +900,28 @@ private:
     ModeRTL mode_rtl;
 #endif
     ModeStabilize mode_stabilize;
-#if MODE_SYSTEMID_ENABLED == ENABLED
-    ModeSystemId mode_systemid;
-#endif
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-    ModeGuidedNoGPS mode_guided_nogps;
-#endif
+
 #if MODE_SMARTRTL_ENABLED == ENABLED
     ModeSmartRTL mode_smartrtl;
 #endif
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    ModeZigZag mode_zigzag;
-#endif
-#if MODE_AUTOROTATE_ENABLED == ENABLED
-    ModeAutorotate mode_autorotate;
-#endif
+// #if MODE_DRIFT_ENABLED == ENABLED
+//     ModeDrift mode_drift;
+// #endif
+// #if MODE_FOLLOW_ENABLED == ENABLED
+//     ModeFollow mode_follow;
+// #endif
+// #if MODE_SYSTEMID_ENABLED == ENABLED
+//     ModeSystemId mode_systemid;
+// #endif
+// #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
+//     ModeGuidedNoGPS mode_guided_nogps;
+// #endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//     ModeZigZag mode_zigzag;
+// #endif
+// #if MODE_AUTOROTATE_ENABLED == ENABLED
+//     ModeAutorotate mode_autorotate;
+// #endif
 
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);

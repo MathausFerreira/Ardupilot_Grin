@@ -73,11 +73,11 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-#if MODE_DRIFT_ENABLED == ENABLED
-    case Mode::Number::DRIFT:
-        ret = &mode_drift;
-        break;
-#endif
+// #if MODE_DRIFT_ENABLED == ENABLED
+//     case Mode::Number::DRIFT:
+//         ret = &mode_drift;
+//         break;
+// #endif
 
         // #if MODE_SPORT_ENABLED == ENABLED
         //         case Mode::Number::SPORT:
@@ -121,11 +121,11 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 //         break;
 // #endif
 
-#if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-    case Mode::Number::GUIDED_NOGPS:
-        ret = &mode_guided_nogps;
-        break;
-#endif
+// #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
+//     case Mode::Number::GUIDED_NOGPS:
+//         ret = &mode_guided_nogps;
+//         break;
+// #endif
 
 #if MODE_SMARTRTL_ENABLED == ENABLED
     case Mode::Number::SMART_RTL:
@@ -139,17 +139,17 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-#if MODE_FOLLOW_ENABLED == ENABLED
-    case Mode::Number::FOLLOW:
-        ret = &mode_follow;
-        break;
-#endif
+// #if MODE_FOLLOW_ENABLED == ENABLED
+//     case Mode::Number::FOLLOW:
+//         ret = &mode_follow;
+//         break;
+// #endif
 
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    case Mode::Number::ZIGZAG:
-        ret = &mode_zigzag;
-        break;
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//     case Mode::Number::ZIGZAG:
+//         ret = &mode_zigzag;
+//         break;
+// #endif
 
 #if MODE_SYSTEMID_ENABLED == ENABLED
     case Mode::Number::SYSTEMID:
@@ -200,12 +200,12 @@ bool Copter::set_mode(Mode::Number mode, ModeReason reason)
     // (e.g. user arms in guided, raises throttle to 1300 (not enough to
     // trigger auto takeoff), then switches into manual):
     bool user_throttle = new_flightmode->has_manual_throttle();
-#if MODE_DRIFT_ENABLED == ENABLED
-    if (new_flightmode == &mode_drift)
-    {
-        user_throttle = true;
-    }
-#endif
+// #if MODE_DRIFT_ENABLED == ENABLED
+//     if (new_flightmode == &mode_drift)
+//     {
+//         user_throttle = true;
+//     }
+// #endif
     if (!ignore_checks && ap.land_complete && user_throttle && !copter.flightmode->has_manual_throttle())
     {
         gcs().send_text(MAV_SEVERITY_WARNING, "Mode change failed: throttle too high");
@@ -330,43 +330,43 @@ void Copter::exit_mode(Mode *&old_flightmode,
     }
 #endif
 
-#if MODE_FOLLOW_ENABLED == ENABLED
-    if (old_flightmode == &mode_follow)
-    {
-        mode_follow.exit();
-    }
-#endif
+// #if MODE_FOLLOW_ENABLED == ENABLED
+//     if (old_flightmode == &mode_follow)
+//     {
+//         mode_follow.exit();
+//     }
+// #endif
 
-#if MODE_ZIGZAG_ENABLED == ENABLED
-    if (old_flightmode == &mode_zigzag)
-    {
-        mode_zigzag.exit();
-    }
-#endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//     if (old_flightmode == &mode_zigzag)
+//     {
+//         mode_zigzag.exit();
+//     }
+// #endif
 
-#if FRAME_CONFIG == HELI_FRAME
-    // firmly reset the flybar passthrough to false when exiting acro mode.
-    if (old_flightmode == &mode_acro)
-    {
-        attitude_control->use_flybar_passthrough(false, false);
-        motors->set_acro_tail(false);
-    }
+// #if FRAME_CONFIG == HELI_FRAME
+//     // firmly reset the flybar passthrough to false when exiting acro mode.
+//     if (old_flightmode == &mode_acro)
+//     {
+//         attitude_control->use_flybar_passthrough(false, false);
+//         motors->set_acro_tail(false);
+//     }
 
-    // if we are changing from a mode that did not use manual throttle,
-    // stab col ramp value should be pre-loaded to the correct value to avoid a twitch
-    // heli_stab_col_ramp should really only be active switching between Stabilize and Acro modes
-    if (!old_flightmode->has_manual_throttle())
-    {
-        if (new_flightmode == &mode_stabilize)
-        {
-            input_manager.set_stab_col_ramp(1.0);
-        }
-        else if (new_flightmode == &mode_acro)
-        {
-            input_manager.set_stab_col_ramp(0.0);
-        }
-    }
-#endif //HELI_FRAME
+//     // if we are changing from a mode that did not use manual throttle,
+//     // stab col ramp value should be pre-loaded to the correct value to avoid a twitch
+//     // heli_stab_col_ramp should really only be active switching between Stabilize and Acro modes
+//     if (!old_flightmode->has_manual_throttle())
+//     {
+//         if (new_flightmode == &mode_stabilize)
+//         {
+//             input_manager.set_stab_col_ramp(1.0);
+//         }
+//         else if (new_flightmode == &mode_acro)
+//         {
+//             input_manager.set_stab_col_ramp(0.0);
+//         }
+//     }
+// #endif //HELI_FRAME
 }
 
 // notify_flight_mode - sets notify object based on current flight mode.  Only used for OreoLED notify device
