@@ -10,6 +10,10 @@ float Copter::mapCube(float x, float y, float z){
     return out;
 }
 
+float Copter::get_gain(){
+    return channel_gain->norm_input();
+}
+
 void Copter::get_pilot_desired_force_to_boat(){
     //Essa abordagem considera que o stick direito controla a força em X e Y.
     //a posição do stick determina a intensidade da foça nos eixos onde, o ponto médio é o (0,0).
@@ -19,7 +23,6 @@ void Copter::get_pilot_desired_force_to_boat(){
     // float_t med_roll  = (channel_roll->get_radio_min() + ((channel_roll->get_radio_max() - channel_roll->get_radio_min())/2.0f));
     // float_t med_pitch = (channel_pitch->get_radio_min()+ ((channel_pitch->get_radio_max()- channel_pitch->get_radio_min())/2.0f));
     // float_t med_yaw   = (channel_yaw->get_radio_min()  + ((channel_yaw->get_radio_max()  - channel_yaw->get_radio_min())/2.0f));
-
     // //Calcula a força em Y a partir do stick de Rolagem
     // Y = float(channel_roll->get_radio_in()- med_roll)/float(channel_roll->get_radio_max() - med_roll);
     // //Calcula a força em X a partir do stick de Arfagem

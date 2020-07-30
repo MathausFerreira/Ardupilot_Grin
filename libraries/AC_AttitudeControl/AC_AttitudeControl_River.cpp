@@ -504,7 +504,6 @@ void AC_AttitudeControl_River::input_euler_rate_roll_pitch_yaw(float euler_roll_
 }
 
 
-
 void AC_AttitudeControl_River::rate_controller_run()
 {
     // move throttle vs attitude mixing towards desired (called from here because this is conveniently called on every iteration)

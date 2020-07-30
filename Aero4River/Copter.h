@@ -629,6 +629,7 @@ private:
     void pwm_servo_angle();
     void FxFy_calc(float roll, float pitch);
     void get_pilot_desired_force_to_boat();
+    float get_gain();
     
     // log grin
     void Log_Write_Mathaus();

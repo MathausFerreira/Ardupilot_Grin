@@ -55,10 +55,12 @@ void ModeStabilize::run()
     }
 
     // call attitude controller
-    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate);
+    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll*get_gain(), target_pitch*get_gain(), target_yaw_rate*get_gain());
 
     // output pilot's throttle
     attitude_control->set_throttle_out(get_pilot_desired_throttle(),true, g.throttle_filt);
+
+    // gain = channel_gain->norm_input();
 
     //  get_pilot_desired_force_to_boat(); // Mathaus
 }

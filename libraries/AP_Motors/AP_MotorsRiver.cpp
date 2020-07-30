@@ -194,16 +194,16 @@ void AP_MotorsRiver::pwm_servo_angle(float &Pwm_servo_m1, float &Pwm_servo_m2, f
         theta_4 = 0.0f;
     }
     //BARCO GRANDE
-    // theta_m1 = servo_angle_to_pwm(theta_m1,444.0,2490.0);//675.0,2329.0);
-    // theta_m2 = servo_angle_to_pwm(theta_m2,421.0,2501.0);//664.0,2144.0);
-    // theta_m3 = servo_angle_to_pwm(theta_m3,418.0,2461.0);//656.0,2400.0);
-    // theta_m4 = servo_angle_to_pwm(theta_m4,421.0,2501.0);//700.0,2345.0);
+    Pwm_servo_m1 = servo_angle_to_pwm(theta_m1,444.0,2490.0);//675.0,2329.0);
+    Pwm_servo_m2 = servo_angle_to_pwm(theta_m2,421.0,2501.0);//664.0,2144.0);
+    Pwm_servo_m3 = servo_angle_to_pwm(theta_m3,418.0,2461.0);//656.0,2400.0);
+    Pwm_servo_m4 = servo_angle_to_pwm(theta_m4,421.0,2501.0);//700.0,2345.0);
 
     //BARCO PEQUENO
-    Pwm_servo_m1 = servo_angle_to_pwm(theta_1, 986.0, 1897.0);
-    Pwm_servo_m2 = servo_angle_to_pwm(theta_2, 550.0, 2270.0);
-    Pwm_servo_m3 = servo_angle_to_pwm(theta_3, 502.0, 2408.0);
-    Pwm_servo_m4 = servo_angle_to_pwm(theta_4, 520.0, 2390.0);
+    // Pwm_servo_m1 = servo_angle_to_pwm(theta_1, 986.0, 1897.0);
+    // Pwm_servo_m2 = servo_angle_to_pwm(theta_2, 550.0, 2270.0);
+    // Pwm_servo_m3 = servo_angle_to_pwm(theta_3, 502.0, 2408.0);
+    // Pwm_servo_m4 = servo_angle_to_pwm(theta_4, 520.0, 2390.0);
 }
 
 void AP_MotorsRiver::FOSSEN_alocation_matrix(float FX,float FY,float TN,float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4){

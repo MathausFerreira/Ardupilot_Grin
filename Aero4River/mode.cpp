@@ -388,8 +388,8 @@ void Mode::update_navigation()
 void Mode::get_pilot_desired_lean_angles(float &roll_out, float &pitch_out, float angle_max, float angle_limit) const
 {
 
-    roll_out  = channel_roll->norm_input();
-    pitch_out = channel_pitch->norm_input();
+    // roll_out  = channel_roll->norm_input();
+    // pitch_out = channel_pitch->norm_input();
     if (copter.failsafe.radio || !copter.ap.rc_receiver_present)
     {
         roll_out = 0;
@@ -783,6 +783,11 @@ void Mode::get_pilot_desired_force_to_boat()
 float Mode::get_pilot_desired_yaw_rate(int16_t stick_angle)
 {
     return copter.get_pilot_desired_yaw_rate(stick_angle);
+}
+
+float Mode::get_gain()
+{
+    return copter.get_gain();
 }
 
 float Mode::get_pilot_desired_climb_rate(float throttle_control)
