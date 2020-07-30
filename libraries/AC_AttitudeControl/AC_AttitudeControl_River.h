@@ -69,8 +69,19 @@ public:
     void set_throttle_mix_value(float value) override { _throttle_rpy_mix_desired = _throttle_rpy_mix = value; }
     float get_throttle_mix(void) const override { return _throttle_rpy_mix; }
 
-    // are we producing min throttle?
-    bool is_throttle_mix_min() const override { return (_throttle_rpy_mix < 1.25f * _thr_mix_min); }
+    //Mathaus
+    virtual void input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds);
+    virtual void input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw);
+    virtual void input_euler_rate_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd);
+
+    float mapCube(float x, float y, float z);
+    void roll_pitch_transform(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds);
+    // input_euler_rate_yaw_euler_angle_pitch_bf_roll(bool plane_controls, float body_roll_cd, float euler_pitch_cd, float euler_yaw_rate_cds)
+        // are we producing min throttle?
+        bool is_throttle_mix_min() const override
+    {
+      return (_throttle_rpy_mix < 1.25f * _thr_mix_min);
+    }
 
     // run lowest level body-frame rate controller and send outputs to the motors
     void rate_controller_run() override;

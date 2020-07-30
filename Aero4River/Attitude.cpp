@@ -16,16 +16,20 @@ void Copter::get_pilot_desired_force_to_boat(){
     //O Yaw é controlado da mesma maneira que em um quadrotor, contudo, o código foi construido de forma empirica.
 
     // Calcula o valor médio dos sticks do controle para que seja possível dividir em forças positivas e negativas
-    float_t med_roll  = (channel_roll->get_radio_min() + ((channel_roll->get_radio_max() - channel_roll->get_radio_min())/2.0f));
-    float_t med_pitch = (channel_pitch->get_radio_min()+ ((channel_pitch->get_radio_max()- channel_pitch->get_radio_min())/2.0f));
-    float_t med_yaw   = (channel_yaw->get_radio_min()  + ((channel_yaw->get_radio_max()  - channel_yaw->get_radio_min())/2.0f));
+    // float_t med_roll  = (channel_roll->get_radio_min() + ((channel_roll->get_radio_max() - channel_roll->get_radio_min())/2.0f));
+    // float_t med_pitch = (channel_pitch->get_radio_min()+ ((channel_pitch->get_radio_max()- channel_pitch->get_radio_min())/2.0f));
+    // float_t med_yaw   = (channel_yaw->get_radio_min()  + ((channel_yaw->get_radio_max()  - channel_yaw->get_radio_min())/2.0f));
 
-    //Calcula a força em Y a partir do stick de Rolagem
-    Y = float(channel_roll->get_radio_in()- med_roll)/float(channel_roll->get_radio_max() - med_roll);
-    //Calcula a força em X a partir do stick de Arfagem
-    X = float(channel_pitch->get_radio_in()-med_pitch)/float(channel_pitch->get_radio_max()- med_pitch);
-    //Calcula o torque em Z a partir do stick de Guinada
-    Z = float(channel_yaw->get_radio_in()-  med_yaw)/float(channel_yaw->get_radio_max() - med_yaw);
+    // //Calcula a força em Y a partir do stick de Rolagem
+    // Y = float(channel_roll->get_radio_in()- med_roll)/float(channel_roll->get_radio_max() - med_roll);
+    // //Calcula a força em X a partir do stick de Arfagem
+    // X = float(channel_pitch->get_radio_in()-med_pitch)/float(channel_pitch->get_radio_max()- med_pitch);
+    // //Calcula o torque em Z a partir do stick de Guinada
+    // Z = float(channel_yaw->get_radio_in()-  med_yaw)/float(channel_yaw->get_radio_max() - med_yaw);
+
+    X = channel_pitch->norm_input();
+    Y = channel_roll->norm_input();
+    Z = channel_yaw->norm_input();
 
     Gain = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
 
