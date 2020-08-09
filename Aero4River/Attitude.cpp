@@ -3,62 +3,62 @@
 /****************************************************************
  *  Aero4River Code Mathaus
  ****************************************************************/
-float Copter::mapCube(float x, float y, float z){
-    // Faz o  mapeamento da ações de controle em xyz para valores normalizados. Produzindo um Pseudo-Acoplamento
-    float out =0.0f;
-    out = x*sqrtf(1 - powf(y,2)/2.0f - powf(z,2)/2.0f + (powf(y,2)*powf(z,2))/3.0f);
-    return out;
-}
+// float Copter::mapCube(float x, float y, float z){
+//     // Faz o  mapeamento da ações de controle em xyz para valores normalizados. Produzindo um Pseudo-Acoplamento
+//     float out =0.0f;
+//     out = x*sqrtf(1 - powf(y,2)/2.0f - powf(z,2)/2.0f + (powf(y,2)*powf(z,2))/3.0f);
+//     return out;
+// }
 
 float Copter::get_gain(){
     Gain = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
     return Gain;
 }
 
-void Copter::get_pilot_desired_force_to_boat(){
-    //Essa abordagem considera que o stick direito controla a força em X e Y.
-    //a posição do stick determina a intensidade da foça nos eixos onde, o ponto médio é o (0,0).
-    //O Yaw é controlado da mesma maneira que em um quadrotor, contudo, o código foi construido de forma empirica.
+// void Copter::get_pilot_desired_force_to_boat(){
+//     //Essa abordagem considera que o stick direito controla a força em X e Y.
+//     //a posição do stick determina a intensidade da foça nos eixos onde, o ponto médio é o (0,0).
+//     //O Yaw é controlado da mesma maneira que em um quadrotor, contudo, o código foi construido de forma empirica.
 
-    // Calcula o valor médio dos sticks do controle para que seja possível dividir em forças positivas e negativas
-    // float_t med_roll  = (channel_roll->get_radio_min() + ((channel_roll->get_radio_max() - channel_roll->get_radio_min())/2.0f));
-    // float_t med_pitch = (channel_pitch->get_radio_min()+ ((channel_pitch->get_radio_max()- channel_pitch->get_radio_min())/2.0f));
-    // float_t med_yaw   = (channel_yaw->get_radio_min()  + ((channel_yaw->get_radio_max()  - channel_yaw->get_radio_min())/2.0f));
-    // //Calcula a força em Y a partir do stick de Rolagem
-    // Y = float(channel_roll->get_radio_in()- med_roll)/float(channel_roll->get_radio_max() - med_roll);
-    // //Calcula a força em X a partir do stick de Arfagem
-    // X = float(channel_pitch->get_radio_in()-med_pitch)/float(channel_pitch->get_radio_max()- med_pitch);
-    // //Calcula o torque em Z a partir do stick de Guinada
-    // Z = float(channel_yaw->get_radio_in()-  med_yaw)/float(channel_yaw->get_radio_max() - med_yaw);
+//     // Calcula o valor médio dos sticks do controle para que seja possível dividir em forças positivas e negativas
+//     // float_t med_roll  = (channel_roll->get_radio_min() + ((channel_roll->get_radio_max() - channel_roll->get_radio_min())/2.0f));
+//     // float_t med_pitch = (channel_pitch->get_radio_min()+ ((channel_pitch->get_radio_max()- channel_pitch->get_radio_min())/2.0f));
+//     // float_t med_yaw   = (channel_yaw->get_radio_min()  + ((channel_yaw->get_radio_max()  - channel_yaw->get_radio_min())/2.0f));
+//     // //Calcula a força em Y a partir do stick de Rolagem
+//     // Y = float(channel_roll->get_radio_in()- med_roll)/float(channel_roll->get_radio_max() - med_roll);
+//     // //Calcula a força em X a partir do stick de Arfagem
+//     // X = float(channel_pitch->get_radio_in()-med_pitch)/float(channel_pitch->get_radio_max()- med_pitch);
+//     // //Calcula o torque em Z a partir do stick de Guinada
+//     // Z = float(channel_yaw->get_radio_in()-  med_yaw)/float(channel_yaw->get_radio_max() - med_yaw);
 
-    X = channel_pitch->norm_input();
-    Y = channel_roll->norm_input();
-    Z = channel_yaw->norm_input();
+//     X = channel_pitch->norm_input();
+//     Y = channel_roll->norm_input();
+//     Z = channel_yaw->norm_input();
 
-    Gain = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
+//     Gain = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
 
-    Gain = constrain_float(Gain,0.0f,1.0f);
+//     Gain = constrain_float(Gain,0.0f,1.0f);
 
-    X = X * Gain;
-    Y = Y * Gain;
-    Z = Z * Gain;
+//     X = X * Gain;
+//     Y = Y * Gain;
+//     Z = Z * Gain;
 
-    X = constrain_float(X,-1.0f,1.0f);
-    Y = constrain_float(Y,-1.0f,1.0f);
-    Z = constrain_float(Z,-1.0f,1.0f);
+//     X = constrain_float(X,-1.0f,1.0f);
+//     Y = constrain_float(Y,-1.0f,1.0f);
+//     Z = constrain_float(Z,-1.0f,1.0f);
 
-    Fx = mapCube(X,Y,Z);
-    Fy = mapCube(Y,X,Z);
-    Tn = mapCube(Z,X,Y);
+//     Fx = mapCube(X,Y,Z);
+//     Fy = mapCube(Y,X,Z);
+//     Tn = mapCube(Z,X,Y);
     
-    motors->set_forward(Fx);
-    motors->set_lateral(Fy);
-    motors->set_yaw(Tn);
+//     motors->set_forward(Fx);
+//     motors->set_lateral(Fy);
+//     motors->set_yaw(Tn);
 
-    // channel_pitch->set_control_in(Fx);
-    // channel_roll->set_control_in(Fy);
-    // channel_yaw->set_control_in(Tn);
-}
+//     // channel_pitch->set_control_in(Fx);
+//     // channel_roll->set_control_in(Fy);
+//     // channel_yaw->set_control_in(Tn);
+// }
 /****************************************************************/
 
 // transform pilot's yaw input into a desired yaw rate

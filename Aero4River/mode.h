@@ -87,7 +87,7 @@ public:
     float get_pilot_desired_throttle() const;
 
     // Mathaus
-    void get_pilot_desired_force_to_boat();
+    // void get_pilot_desired_force_to_boat();
     float get_gain();
 
     const Vector3f& get_desired_velocity() {

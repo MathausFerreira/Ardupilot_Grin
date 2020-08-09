@@ -624,11 +624,11 @@ private:
     ////////////////////////////    Funções    ///////////////////////////////////
     
     float servo_pwm_to_angle(int PWM_aux);
-    float mapCube(float x, float y, float z);
+    // float mapCube(float x, float y, float z);
     void Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
     void pwm_servo_angle();
-    void FxFy_calc(float roll, float pitch);
-    void get_pilot_desired_force_to_boat();
+    // void FxFy_calc(float roll, float pitch);
+    // void get_pilot_desired_force_to_boat();
     float get_gain();
     
     // log grin

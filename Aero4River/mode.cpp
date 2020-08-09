@@ -362,33 +362,33 @@ void Mode::get_pilot_desired_lean_angles(float &fy, float &fx, float angle_max, 
     // pitch_out = channel_pitch->norm_input();
     if (copter.failsafe.radio || !copter.ap.rc_receiver_present)
     {
-        fy = 0;
-        fx = 0;
+        fy = 0.0f;
+        fx = 0.0f;
         return;
     }
     // fetch roll and pitch inputs
-    fy = channel_roll->get_control_in();
-    fx = channel_pitch->get_control_in();
+    fy = 1.0f * channel_roll->norm_input();
+    fx = 1.0f * channel_pitch->norm_input();
 
-    // limit max lean angle
-    angle_limit = constrain_float(angle_limit, 1000.0f, angle_max);
+    // // limit max lean angle
+    // angle_limit = constrain_float(angle_limit, 1000.0f, angle_max);
 
-    // scale roll and pitch inputs to ANGLE_MAX parameter range
-    float scaler = angle_max / (float)ROLL_PITCH_YAW_INPUT_MAX;
-    fy *= scaler;
-    fx *= scaler;
+    // // scale roll and pitch inputs to ANGLE_MAX parameter range
+    // float scaler = angle_max / (float)ROLL_PITCH_YAW_INPUT_MAX;
+    // fy *= scaler;
+    // fx *= scaler;
 
-    // do circular limit
-    float total_in = norm(fx, fy);
-    if (total_in > angle_limit)
-    {
-        float ratio = angle_limit / total_in;
-        fy *= ratio;
-        fx *= ratio;
-    }
+    // // do circular limit
+    // float total_in = norm(fx, fy);
+    // if (total_in > angle_limit)
+    // {
+    //     float ratio = angle_limit / total_in;
+    //     fy *= ratio;
+    //     fx *= ratio;
+    // }
 
-    // do lateral tilt to euler roll conversion
-    fy = (18000 / M_PI) * atanf(cosf(fx * (M_PI / 18000)) * tanf(fy * (M_PI / 18000)));
+    // // do lateral tilt to euler roll conversion
+    // fy = (18000 / M_PI) * atanf(cosf(fx * (M_PI / 18000)) * tanf(fy * (M_PI / 18000)));
 
     // roll_out and pitch_out are returned
 }
@@ -744,10 +744,10 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
 // pass-through functions to reduce code churn on conversion;
 // these are candidates for moving into the Mode base
 // class.
-void Mode::get_pilot_desired_force_to_boat()
-{
-    copter.get_pilot_desired_force_to_boat();
-}
+// void Mode::get_pilot_desired_force_to_boat()
+// {
+//     copter.get_pilot_desired_force_to_boat();
+// }
 
 float Mode::get_pilot_desired_yaw_rate(int16_t stick_angle)
 {

@@ -12,8 +12,8 @@ void ModeStabilize::run()
     update_simple_mode();
 
     // convert pilot input to lean angles
-    float target_roll, target_pitch;
-    get_pilot_desired_lean_angles(target_roll, target_pitch, copter.aparm.angle_max, copter.aparm.angle_max);
+    float fy, fx;
+    get_pilot_desired_lean_angles(fy, fx, copter.aparm.angle_max, copter.aparm.angle_max);
 
     // get pilot's desired yaw rate
     float target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
@@ -55,7 +55,7 @@ void ModeStabilize::run()
     }
 
     // call attitude controller
-    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(target_roll*get_gain(), target_pitch*get_gain(), target_yaw_rate*get_gain());
+    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(fy*get_gain(), fx*get_gain(), target_yaw_rate*get_gain());
 
     // output pilot's throttle
     attitude_control->set_throttle_out(get_pilot_desired_throttle(),true, g.throttle_filt);

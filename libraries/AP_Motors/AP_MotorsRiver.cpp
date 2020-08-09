@@ -193,17 +193,17 @@ void AP_MotorsRiver::pwm_servo_angle(float &Pwm_servo_m1, float &Pwm_servo_m2, f
         theta_3 = 0.0f;
         theta_4 = 0.0f;
     }
-    //BARCO GRANDE
-    Pwm_servo_m1 = servo_angle_to_pwm(theta_m1,444.0,2490.0);//675.0,2329.0);
-    Pwm_servo_m2 = servo_angle_to_pwm(theta_m2,421.0,2501.0);//664.0,2144.0);
-    Pwm_servo_m3 = servo_angle_to_pwm(theta_m3,418.0,2461.0);//656.0,2400.0);
-    Pwm_servo_m4 = servo_angle_to_pwm(theta_m4,421.0,2501.0);//700.0,2345.0);
+    // // BARCO GRANDE
+    // Pwm_servo_m1 = servo_angle_to_pwm(theta_1,444.0,2490.0);//675.0,2329.0);
+    // Pwm_servo_m2 = servo_angle_to_pwm(theta_2,421.0,2501.0);//664.0,2144.0);
+    // Pwm_servo_m3 = servo_angle_to_pwm(theta_3,418.0,2461.0);//656.0,2400.0);
+    // Pwm_servo_m4 = servo_angle_to_pwm(theta_4,421.0,2501.0);//700.0,2345.0);
 
-    //BARCO PEQUENO
-    // Pwm_servo_m1 = servo_angle_to_pwm(theta_1, 986.0, 1897.0);
-    // Pwm_servo_m2 = servo_angle_to_pwm(theta_2, 550.0, 2270.0);
-    // Pwm_servo_m3 = servo_angle_to_pwm(theta_3, 502.0, 2408.0);
-    // Pwm_servo_m4 = servo_angle_to_pwm(theta_4, 520.0, 2390.0);
+    // BARCO PEQUENO
+    Pwm_servo_m1 = servo_angle_to_pwm(theta_1, 986.0, 1897.0);
+    Pwm_servo_m2 = servo_angle_to_pwm(theta_2, 550.0, 2270.0);
+    Pwm_servo_m3 = servo_angle_to_pwm(theta_3, 502.0, 2408.0);
+    Pwm_servo_m4 = servo_angle_to_pwm(theta_4, 520.0, 2390.0);
 }
 
 void AP_MotorsRiver::FOSSEN_alocation_matrix(float FX,float FY,float TN,float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4){
@@ -526,12 +526,6 @@ void AP_MotorsRiver::output_armed_stabilizing(){
     motor_enabled[1] ? _thrust_rpyt_out[1] = Pwm2 : _thrust_rpyt_out[1] = 0.0f;
     motor_enabled[2] ? _thrust_rpyt_out[2] = Pwm3 : _thrust_rpyt_out[2] = 0.0f;
     motor_enabled[3] ? _thrust_rpyt_out[3] = Pwm4 : _thrust_rpyt_out[3] = 0.0f;
-
-    // motor_enabled[8] ? _thrust_rpyt_out[8]   = ang1 : _thrust_rpyt_out[8] = 0.0f;
-    // motor_enabled[9] ? _thrust_rpyt_out[9]   = ang2 : _thrust_rpyt_out[9] = 0.0f;
-    // motor_enabled[10] ? _thrust_rpyt_out[10] = ang3 : _thrust_rpyt_out[10] = 0.0f;
-    // motor_enabled[11] ? _thrust_rpyt_out[11] = ang4 : _thrust_rpyt_out[11] = 0.0f;
-
     
 }
 
