@@ -304,7 +304,6 @@ void AC_AttitudeControl_River::update_throttle_rpy_mix()
     _throttle_rpy_mix = constrain_float(_throttle_rpy_mix, 0.1f, AC_ATTITUDE_CONTROL_MAX);
 }
 
-
 // sanity check parameters.  should be called once before takeoff
 void AC_AttitudeControl_River::parameter_sanity_check()
 {
@@ -328,38 +327,39 @@ void AC_AttitudeControl_River::parameter_sanity_check()
     }
 }
 
-float AC_AttitudeControl_River::mapCube(float x, float y, float z)
+float AC_AttitudeControl_River::map_cube(float x, float y, float z)
 {
-    float out =0.0f;
+    float out = 0.0f;
     out = x*sqrtf(1 - powf(y,2)/2.0f - powf(z,2)/2.0f + (powf(y,2)*powf(z,2))/3.0f);
     return out;
 }
 
-void AC_AttitudeControl_River::roll_pitch_transform(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds){
+void AC_AttitudeControl_River::roll_pitch_transform(float fy, float fx, float euler_yaw_rate_cds){
         // Mathaus 
-    float X = -(euler_pitch_angle_cd/_aparm.angle_max);
-    float Y = (euler_roll_angle_cd/_aparm.angle_max);
+    float X = -(fx/_aparm.angle_max);
+    float Y = (fy/_aparm.angle_max);
     float Z = (euler_yaw_rate_cds/ _aparm.angle_max);
     
-    _motors.set_forward(mapCube(X,Y,Z));
-    _motors.set_lateral(mapCube(Y,X,Z));
+    float x = map_cube(X,Y,Z);
+    float y = map_cube(Y,X,Z);
+
+    _motors.set_forward(x);
+    _motors.set_lateral(y);
 }
 
 // Command an euler roll and pitch angle and an euler yaw rate with angular velocity feedforward and smoothing
-void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds)
+void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float fy, float fx, float euler_yaw_rate_cds)
 {
-    roll_pitch_transform(euler_roll_angle_cd, euler_pitch_angle_cd, euler_yaw_rate_cds); //Mathaus
+    roll_pitch_transform(fy, fx, euler_yaw_rate_cds); //Mathaus
 
     // Convert from centidegrees on public interface to radians
-    float euler_roll_angle = radians(euler_roll_angle_cd * 0.01f);
-    float euler_pitch_angle = radians(euler_pitch_angle_cd * 0.01f);
     float euler_yaw_rate = radians(euler_yaw_rate_cds * 0.01f);
 
     // calculate the attitude target euler angles
     _attitude_target_quat.to_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
 
     // Add roll trim to compensate tail rotor thrust in heli (will return zero on multirotors)
-    euler_roll_angle += get_roll_trim_rad();
+
 
     if (_rate_bf_ff_enabled) {
         // translate the roll pitch and yaw acceleration limits to the euler axis
@@ -368,8 +368,8 @@ void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float
         // When acceleration limiting and feedforward are enabled, the sqrt controller is used to compute an euler
         // angular velocity that will cause the euler angle to smoothly stop at the input angle with limited deceleration
         // and an exponential decay specified by smoothing_gain at the end.
-        _attitude_target_euler_rate.x = input_shaping_angle(wrap_PI(euler_roll_angle - _attitude_target_euler_angle.x)*0.0f, _input_tc, euler_accel.x, _attitude_target_euler_rate.x, _dt);
-        _attitude_target_euler_rate.y = input_shaping_angle(wrap_PI(euler_pitch_angle - _attitude_target_euler_angle.y)*0.0f, _input_tc, euler_accel.y, _attitude_target_euler_rate.y, _dt);
+        _attitude_target_euler_rate.x = 0.0f;
+        _attitude_target_euler_rate.y = 0.0f;
 
         // When yaw acceleration limiting is enabled, the yaw input shaper constrains angular acceleration about the yaw axis, slewing
         // the output rate towards the input rate.
@@ -383,8 +383,8 @@ void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float
         ang_vel_to_euler_rate(_attitude_target_euler_angle, _attitude_target_ang_vel, _attitude_target_euler_rate);
     } else {
         // When feedforward is not enabled, the target euler angle is input into the target and the feedforward rate is zeroed.
-        _attitude_target_euler_angle.x = euler_roll_angle;
-        _attitude_target_euler_angle.y = euler_pitch_angle;
+        _attitude_target_euler_angle.x = 0.0f;
+        _attitude_target_euler_angle.y = 0.0f;
         _attitude_target_euler_angle.z += euler_yaw_rate * _dt;
         // Compute quaternion target attitude
         _attitude_target_quat.from_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
@@ -508,6 +508,7 @@ void AC_AttitudeControl_River::rate_controller_run()
 {
     // move throttle vs attitude mixing towards desired (called from here because this is conveniently called on every iteration)
     update_throttle_rpy_mix();
+
     _rate_target_ang_vel += _rate_sysid_ang_vel;
     Vector3f gyro_latest = _ahrs.get_gyro_latest();
     _motors.set_roll(get_rate_roll_pid().update_all(_rate_target_ang_vel.x, gyro_latest.x, _motors.limit.roll) + _actuator_sysid.x);

@@ -11,7 +11,8 @@ float Copter::mapCube(float x, float y, float z){
 }
 
 float Copter::get_gain(){
-    return channel_gain->norm_input();
+    Gain = (float)(1.0f*channel_gain->get_radio_in() - channel_gain->get_radio_min())/(channel_gain->get_radio_max()-channel_gain->get_radio_min());
+    return Gain;
 }
 
 void Copter::get_pilot_desired_force_to_boat(){

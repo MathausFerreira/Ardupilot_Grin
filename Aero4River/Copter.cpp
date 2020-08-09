@@ -216,7 +216,7 @@ void Copter::fast_loop()
     ins.update();
 
     // run low level rate controllers that only require IMU data
-     attitude_control->rate_controller_run();
+    attitude_control->rate_controller_run();
 
     // send outputs to the motors library immediately
     motors_output();
@@ -490,9 +490,9 @@ void Copter::init_simple_bearing()
 }
 
 // update_simple_mode - rotates pilot input if we are in simple mode
-void Copter::update_simple_mode(void)
+void Copter::update_simple_mode(void) //mathaus
 {
-    float rollx, pitchx;
+    float fy, fx;
 
     // exit immediately if no new radio frame or not in simple mode
     if (ap.simple_mode == 0 || !ap.new_radio_frame) {
@@ -504,17 +504,18 @@ void Copter::update_simple_mode(void)
 
     if (ap.simple_mode == 1) {
         // rotate roll, pitch input by -initial simple heading (i.e. north facing)
-        rollx = channel_roll->get_control_in()*simple_cos_yaw - channel_pitch->get_control_in()*simple_sin_yaw;
-        pitchx = channel_roll->get_control_in()*simple_sin_yaw + channel_pitch->get_control_in()*simple_cos_yaw;
+        fy = channel_roll->get_control_in()*simple_cos_yaw - channel_pitch->get_control_in()*simple_sin_yaw;
+        fx = channel_roll->get_control_in()*simple_sin_yaw + channel_pitch->get_control_in()*simple_cos_yaw;
     }else{
         // rotate roll, pitch input by -super simple heading (reverse of heading to home)
-        rollx = channel_roll->get_control_in()*super_simple_cos_yaw - channel_pitch->get_control_in()*super_simple_sin_yaw;
-        pitchx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
+        fy = channel_roll->get_control_in()*super_simple_cos_yaw - channel_pitch->get_control_in()*super_simple_sin_yaw;
+        fx = channel_roll->get_control_in()*super_simple_sin_yaw + channel_pitch->get_control_in()*super_simple_cos_yaw;
     }
 
+    fx = -fx;
     // rotate roll, pitch input from north facing to vehicle's perspective
-    channel_roll->set_control_in(rollx*ahrs.cos_yaw() + pitchx*ahrs.sin_yaw());
-    channel_pitch->set_control_in(-rollx*ahrs.sin_yaw() + pitchx*ahrs.cos_yaw());
+    channel_roll->set_control_in(fy*ahrs.cos_yaw() + fx*ahrs.sin_yaw());
+    channel_pitch->set_control_in(-fy*ahrs.sin_yaw() + fx*ahrs.cos_yaw());
 }
 
 // update_super_simple_bearing - adjusts simple bearing based on location

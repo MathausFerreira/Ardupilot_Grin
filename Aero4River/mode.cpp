@@ -31,11 +31,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
     switch (mode)
     {
-        // #if MODE_ACRO_ENABLED == ENABLED
-        //         case Mode::Number::ACRO:
-        //             ret = &mode_acro;
-        //             break;
-        // #endif
 
     case Mode::Number::LAND:
     case Mode::Number::ALT_HOLD:
@@ -73,29 +68,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-// #if MODE_DRIFT_ENABLED == ENABLED
-//     case Mode::Number::DRIFT:
-//         ret = &mode_drift;
-//         break;
-// #endif
 
-        // #if MODE_SPORT_ENABLED == ENABLED
-        //         case Mode::Number::SPORT:
-        //             ret = &mode_sport;
-        //             break;
-        // #endif
-
-        // #if MODE_FLIP_ENABLED == ENABLED
-        //         case Mode::Number::FLIP:
-        //             ret = &mode_flip;
-        //             break;
-        // #endif
-
-// #if AUTOTUNE_ENABLED == ENABLED
-//     case Mode::Number::AUTOTUNE:
-//         ret = &mode_autotune;
-//         break;
-// #endif
 
 #if MODE_POSHOLD_ENABLED == ENABLED
     case Mode::Number::POSHOLD:
@@ -109,24 +82,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         break;
 #endif
 
-        // #if MODE_THROW_ENABLED == ENABLED
-        //         case Mode::Number::THROW:
-        //             ret = &mode_throw;
-        //             break;
-        // #endif
-
-// #if ADSB_ENABLED == ENABLED
-//     case Mode::Number::AVOID_ADSB:
-//         ret = &mode_avoid_adsb;
-//         break;
-// #endif
-
-// #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
-//     case Mode::Number::GUIDED_NOGPS:
-//         ret = &mode_guided_nogps;
-//         break;
-// #endif
-
 #if MODE_SMARTRTL_ENABLED == ENABLED
     case Mode::Number::SMART_RTL:
         ret = &mode_smartrtl;
@@ -137,19 +92,7 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
     case Mode::Number::FLOWHOLD:
         ret = (Mode *)g2.mode_flowhold_ptr;
         break;
-#endif
-
-// #if MODE_FOLLOW_ENABLED == ENABLED
-//     case Mode::Number::FOLLOW:
-//         ret = &mode_follow;
-//         break;
-// #endif
-
-// #if MODE_ZIGZAG_ENABLED == ENABLED
-//     case Mode::Number::ZIGZAG:
-//         ret = &mode_zigzag;
-//         break;
-// #endif
+#endif  
 
 #if MODE_SYSTEMID_ENABLED == ENABLED
     case Mode::Number::SYSTEMID:
@@ -162,6 +105,57 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         ret = &mode_autorotate;
         break;
 #endif
+
+// #if MODE_ACRO_ENABLED == ENABLED
+//         case Mode::Number::ACRO:
+//             ret = &mode_acro;
+//             break;
+// #endif
+// #if MODE_DRIFT_ENABLED == ENABLED
+//     case Mode::Number::DRIFT:
+//         ret = &mode_drift;
+//         break;
+// #endif
+// #if MODE_SPORT_ENABLED == ENABLED
+//         case Mode::Number::SPORT:
+//             ret = &mode_sport;
+//             break;
+// #endif
+// #if MODE_FLIP_ENABLED == ENABLED
+//         case Mode::Number::FLIP:
+//             ret = &mode_flip;
+//             break;
+// #endif
+// #if AUTOTUNE_ENABLED == ENABLED
+//     case Mode::Number::AUTOTUNE:
+//         ret = &mode_autotune;
+//         break;
+// #endif
+// #if MODE_THROW_ENABLED == ENABLED
+//         case Mode::Number::THROW:
+//             ret = &mode_throw;
+//             break;
+// #endif
+// #if ADSB_ENABLED == ENABLED
+//     case Mode::Number::AVOID_ADSB:
+//         ret = &mode_avoid_adsb;
+//         break;
+// #endif
+// #if MODE_GUIDED_NOGPS_ENABLED == ENABLED
+//     case Mode::Number::GUIDED_NOGPS:
+//         ret = &mode_guided_nogps;
+//         break;
+// #endif
+// #if MODE_FOLLOW_ENABLED == ENABLED
+//     case Mode::Number::FOLLOW:
+//         ret = &mode_follow;
+//         break;
+// #endif
+// #if MODE_ZIGZAG_ENABLED == ENABLED
+//     case Mode::Number::ZIGZAG:
+//         ret = &mode_zigzag;
+//         break;
+// #endif
 
     default:
         break;
@@ -291,12 +285,6 @@ void Copter::update_flight_mode()
 void Copter::exit_mode(Mode *&old_flightmode,
                        Mode *&new_flightmode)
 {
-// #if AUTOTUNE_ENABLED == ENABLED
-//     if (old_flightmode == &mode_autotune)
-//     {
-//         mode_autotune.stop();
-//     }
-// #endif
 
     // stop mission when we leave auto mode
 #if MODE_AUTO_ENABLED == ENABLED
@@ -330,13 +318,18 @@ void Copter::exit_mode(Mode *&old_flightmode,
     }
 #endif
 
+// #if AUTOTUNE_ENABLED == ENABLED
+//     if (old_flightmode == &mode_autotune)
+//     {
+//         mode_autotune.stop();
+//     }
+// #endif
 // #if MODE_FOLLOW_ENABLED == ENABLED
 //     if (old_flightmode == &mode_follow)
 //     {
 //         mode_follow.exit();
 //     }
 // #endif
-
 // #if MODE_ZIGZAG_ENABLED == ENABLED
 //     if (old_flightmode == &mode_zigzag)
 //     {
@@ -344,29 +337,6 @@ void Copter::exit_mode(Mode *&old_flightmode,
 //     }
 // #endif
 
-// #if FRAME_CONFIG == HELI_FRAME
-//     // firmly reset the flybar passthrough to false when exiting acro mode.
-//     if (old_flightmode == &mode_acro)
-//     {
-//         attitude_control->use_flybar_passthrough(false, false);
-//         motors->set_acro_tail(false);
-//     }
-
-//     // if we are changing from a mode that did not use manual throttle,
-//     // stab col ramp value should be pre-loaded to the correct value to avoid a twitch
-//     // heli_stab_col_ramp should really only be active switching between Stabilize and Acro modes
-//     if (!old_flightmode->has_manual_throttle())
-//     {
-//         if (new_flightmode == &mode_stabilize)
-//         {
-//             input_manager.set_stab_col_ramp(1.0);
-//         }
-//         else if (new_flightmode == &mode_acro)
-//         {
-//             input_manager.set_stab_col_ramp(0.0);
-//         }
-//     }
-// #endif //HELI_FRAME
 }
 
 // notify_flight_mode - sets notify object based on current flight mode.  Only used for OreoLED notify device
@@ -385,40 +355,40 @@ void Mode::update_navigation()
 
 // get_pilot_desired_angle - transform pilot's roll or pitch input into a desired lean angle
 // returns desired angle in centi-degrees
-void Mode::get_pilot_desired_lean_angles(float &roll_out, float &pitch_out, float angle_max, float angle_limit) const
+void Mode::get_pilot_desired_lean_angles(float &fy, float &fx, float angle_max, float angle_limit) const
 {
 
     // roll_out  = channel_roll->norm_input();
     // pitch_out = channel_pitch->norm_input();
     if (copter.failsafe.radio || !copter.ap.rc_receiver_present)
     {
-        roll_out = 0;
-        pitch_out = 0;
+        fy = 0;
+        fx = 0;
         return;
     }
     // fetch roll and pitch inputs
-    roll_out = channel_roll->get_control_in();
-    pitch_out = channel_pitch->get_control_in();
+    fy = channel_roll->get_control_in();
+    fx = channel_pitch->get_control_in();
 
     // limit max lean angle
     angle_limit = constrain_float(angle_limit, 1000.0f, angle_max);
 
     // scale roll and pitch inputs to ANGLE_MAX parameter range
     float scaler = angle_max / (float)ROLL_PITCH_YAW_INPUT_MAX;
-    roll_out *= scaler;
-    pitch_out *= scaler;
+    fy *= scaler;
+    fx *= scaler;
 
     // do circular limit
-    float total_in = norm(pitch_out, roll_out);
+    float total_in = norm(fx, fy);
     if (total_in > angle_limit)
     {
         float ratio = angle_limit / total_in;
-        roll_out *= ratio;
-        pitch_out *= ratio;
+        fy *= ratio;
+        fx *= ratio;
     }
 
     // do lateral tilt to euler roll conversion
-    roll_out = (18000 / M_PI) * atanf(cosf(pitch_out * (M_PI / 18000)) * tanf(roll_out * (M_PI / 18000)));
+    fy = (18000 / M_PI) * atanf(cosf(fx * (M_PI / 18000)) * tanf(fy * (M_PI / 18000)));
 
     // roll_out and pitch_out are returned
 }
@@ -630,7 +600,6 @@ void Mode::land_run_horizontal_control()
 // //         pos_control->override_vehicle_velocity_xy(-target_vel_rel);
 // //     }
 // // #endif
-
 //     // process roll, pitch inputs
 //     loiter_nav->set_pilot_desired_acceleration(target_roll, target_pitch, G_Dt);
 //     // run loiter controller

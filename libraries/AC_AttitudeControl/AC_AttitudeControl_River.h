@@ -74,7 +74,7 @@ public:
     virtual void input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw);
     virtual void input_euler_rate_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd);
 
-    float mapCube(float x, float y, float z);
+    float map_cube(float x, float y, float z);
     void roll_pitch_transform(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds);
     // input_euler_rate_yaw_euler_angle_pitch_bf_roll(bool plane_controls, float body_roll_cd, float euler_pitch_cd, float euler_yaw_rate_cds)
         // are we producing min throttle?
