@@ -448,18 +448,13 @@ private:
     void do_set_home(const AP_Mission::Mission_Command& cmd);
     void do_roi(const AP_Mission::Mission_Command& cmd);
     void do_mount_control(const AP_Mission::Mission_Command& cmd);
-// #if PARACHUTE == ENABLED
-//     void do_parachute(const AP_Mission::Mission_Command& cmd);
-// #endif
-#if WINCH_ENABLED == ENABLED
-    void do_winch(const AP_Mission::Mission_Command& cmd);
-#endif
-    void do_payload_place(const AP_Mission::Mission_Command& cmd);
+
+    // void do_payload_place(const AP_Mission::Mission_Command& cmd);
     void do_RTL(void);
 
     bool verify_takeoff();
     bool verify_land();
-    bool verify_payload_place();
+    // bool verify_payload_place();
     bool verify_loiter_unlimited();
     bool verify_loiter_time(const AP_Mission::Mission_Command& cmd);
     bool verify_loiter_to_alt();

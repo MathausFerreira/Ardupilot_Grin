@@ -429,10 +429,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         do_nav_delay(cmd);
         break;
 
-    case MAV_CMD_NAV_PAYLOAD_PLACE:              // 94 place at Waypoint
-        do_payload_place(cmd);
-        break;
-
     //
     // conditional commands
     //
@@ -623,9 +619,9 @@ bool ModeAuto::verify_command(const AP_Mission::Mission_Command& cmd)
         cmd_complete = verify_land();
         break;
 
-    case MAV_CMD_NAV_PAYLOAD_PLACE:
-        cmd_complete = verify_payload_place();
-        break;
+    // case MAV_CMD_NAV_PAYLOAD_PLACE:
+    //     cmd_complete = verify_payload_place();
+    //     break;
 
     case MAV_CMD_NAV_LOITER_UNLIM:
         cmd_complete = verify_loiter_unlimited();
@@ -1373,8 +1369,6 @@ void ModeAuto::do_yaw(const AP_Mission::Mission_Command& cmd)
 // Do (Now) commands
 /********************************************************************************/
 
-
-
 void ModeAuto::do_change_speed(const AP_Mission::Mission_Command& cmd)
 {
     if (cmd.content.speed.target_ms > 0) {
@@ -1419,51 +1413,6 @@ void ModeAuto::do_mount_control(const AP_Mission::Mission_Command& cmd)
     }
     copter.camera_mount.set_angle_targets(cmd.content.mount_control.roll, cmd.content.mount_control.pitch, cmd.content.mount_control.yaw);
 #endif
-}
-
-#if WINCH_ENABLED == ENABLED
-// control winch based on mission command
-void ModeAuto::do_winch(const AP_Mission::Mission_Command& cmd)
-{
-    // Note: we ignore the gripper num parameter because we only support one gripper
-    switch (cmd.content.winch.action) {
-        case WINCH_RELAXED:
-            g2.winch.relax();
-            AP::logger().Write_Event(LogEvent::WINCH_RELAXED);
-            break;
-        case WINCH_RELATIVE_LENGTH_CONTROL:
-            g2.winch.release_length(cmd.content.winch.release_length, cmd.content.winch.release_rate);
-            AP::logger().Write_Event(LogEvent::WINCH_LENGTH_CONTROL);
-            break;
-        case WINCH_RATE_CONTROL:
-            g2.winch.set_desired_rate(cmd.content.winch.release_rate);
-            AP::logger().Write_Event(LogEvent::WINCH_RATE_CONTROL);
-            break;
-        default:
-            // do nothing
-            break;
-    }
-}
-#endif
-
-// do_payload_place - initiate placing procedure
-void ModeAuto::do_payload_place(const AP_Mission::Mission_Command& cmd)
-{
-    // if location provided we fly to that location at current altitude
-    if (cmd.content.location.lat != 0 || cmd.content.location.lng != 0) {
-        // set state to fly to location
-        nav_payload_place.state = PayloadPlaceStateType_FlyToLocation;
-
-        const Location target_loc = terrain_adjusted_location(cmd);
-
-        wp_start(target_loc);
-    } else {
-        nav_payload_place.state = PayloadPlaceStateType_Calibrating_Hover_Start;
-
-        // initialise placing controller
-        payload_place_start();
-    }
-    nav_payload_place.descend_max = cmd.p1;
 }
 
 // do_RTL - start Return-to-Launch
@@ -1537,166 +1486,6 @@ bool ModeAuto::verify_land()
     return retval;
 }
 
-#define NAV_PAYLOAD_PLACE_DEBUGGING 0
-
-#if NAV_PAYLOAD_PLACE_DEBUGGING
-#include <stdio.h>
-#define debug(fmt, args ...)  do {::fprintf(stderr,"%s:%d: " fmt "\n", __FUNCTION__, __LINE__, ## args); } while(0)
-#else
-#define debug(fmt, args ...)
-#endif
-
-// verify_payload_place - returns true if placing has been completed
-bool ModeAuto::verify_payload_place()
-{
-    const uint16_t hover_throttle_calibrate_time = 2000; // milliseconds
-    const uint16_t descend_throttle_calibrate_time = 2000; // milliseconds
-    const float hover_throttle_placed_fraction = 0.7; // i.e. if throttle is less than 70% of hover we have placed
-    const float descent_throttle_placed_fraction = 0.9; // i.e. if throttle is less than 90% of descent throttle we have placed
-    const uint16_t placed_time = 500; // how long we have to be below a throttle threshold before considering placed
-
-    const float current_throttle_level = motors->get_throttle();
-    const uint32_t now =  AP_HAL::millis();
-
-    // if we discover we've landed then immediately release the load:
-    if (copter.ap.land_complete) {
-        switch (nav_payload_place.state) {
-        case PayloadPlaceStateType_FlyToLocation:
-        case PayloadPlaceStateType_Calibrating_Hover_Start:
-        case PayloadPlaceStateType_Calibrating_Hover:
-        case PayloadPlaceStateType_Descending_Start:
-        case PayloadPlaceStateType_Descending:
-            gcs().send_text(MAV_SEVERITY_INFO, "NAV_PLACE: landed");
-            nav_payload_place.state = PayloadPlaceStateType_Releasing_Start;
-            break;
-        case PayloadPlaceStateType_Releasing_Start:
-        case PayloadPlaceStateType_Releasing:
-        case PayloadPlaceStateType_Released:
-        case PayloadPlaceStateType_Ascending_Start:
-        case PayloadPlaceStateType_Ascending:
-        case PayloadPlaceStateType_Done:
-            break;
-        }
-    }
-
-    switch (nav_payload_place.state) {
-    case PayloadPlaceStateType_FlyToLocation:
-        if (!copter.wp_nav->reached_wp_destination()) {
-            return false;
-        }
-        payload_place_start();
-        return false;
-    case PayloadPlaceStateType_Calibrating_Hover_Start:
-        // hover for 1 second to get an idea of what our hover
-        // throttle looks like
-        debug("Calibrate start");
-        nav_payload_place.hover_start_timestamp = now;
-        nav_payload_place.state = PayloadPlaceStateType_Calibrating_Hover;
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Calibrating_Hover: {
-        if (now - nav_payload_place.hover_start_timestamp < hover_throttle_calibrate_time) {
-            // still calibrating...
-            debug("Calibrate Timer: %d", now - nav_payload_place.hover_start_timestamp);
-            return false;
-        }
-        // we have a valid calibration.  Hopefully.
-        nav_payload_place.hover_throttle_level = current_throttle_level;
-        const float hover_throttle_delta = fabsf(nav_payload_place.hover_throttle_level - motors->get_throttle_hover());
-        gcs().send_text(MAV_SEVERITY_INFO, "hover throttle delta: %f", static_cast<double>(hover_throttle_delta));
-        nav_payload_place.state = PayloadPlaceStateType_Descending_Start;
-        }
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Descending_Start:
-        nav_payload_place.descend_start_timestamp = now;
-        nav_payload_place.descend_start_altitude = inertial_nav.get_altitude();
-        nav_payload_place.descend_throttle_level = 0;
-        nav_payload_place.state = PayloadPlaceStateType_Descending;
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Descending:
-        // make sure we don't descend too far:
-        debug("descended: %f cm (%f cm max)", (nav_payload_place.descend_start_altitude - inertial_nav.get_altitude()), nav_payload_place.descend_max);
-        if (!is_zero(nav_payload_place.descend_max) &&
-            nav_payload_place.descend_start_altitude - inertial_nav.get_altitude()  > nav_payload_place.descend_max) {
-            nav_payload_place.state = PayloadPlaceStateType_Ascending;
-            gcs().send_text(MAV_SEVERITY_WARNING, "Reached maximum descent");
-            return false; // we'll do any cleanups required next time through the loop
-        }
-        // see if we've been descending long enough to calibrate a descend-throttle-level:
-        if (is_zero(nav_payload_place.descend_throttle_level) &&
-            now - nav_payload_place.descend_start_timestamp > descend_throttle_calibrate_time) {
-            nav_payload_place.descend_throttle_level = current_throttle_level;
-        }
-        // watch the throttle to determine whether the load has been placed
-        // debug("hover ratio: %f   descend ratio: %f\n", current_throttle_level/nav_payload_place.hover_throttle_level, ((nav_payload_place.descend_throttle_level == 0) ? -1.0f : current_throttle_level/nav_payload_place.descend_throttle_level));
-        if (current_throttle_level/nav_payload_place.hover_throttle_level > hover_throttle_placed_fraction &&
-            (is_zero(nav_payload_place.descend_throttle_level) ||
-             current_throttle_level/nav_payload_place.descend_throttle_level > descent_throttle_placed_fraction)) {
-            // throttle is above both threshold ratios (or above hover threshold ration and descent threshold ratio not yet valid)
-            nav_payload_place.place_start_timestamp = 0;
-            return false;
-        }
-        if (nav_payload_place.place_start_timestamp == 0) {
-            // we've only just now hit the correct throttle level
-            nav_payload_place.place_start_timestamp = now;
-            return false;
-        } else if (now - nav_payload_place.place_start_timestamp < placed_time) {
-            // keep going down....
-            debug("Place Timer: %d", now - nav_payload_place.place_start_timestamp);
-            return false;
-        }
-        nav_payload_place.state = PayloadPlaceStateType_Releasing_Start;
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Releasing_Start:
-#if GRIPPER_ENABLED == ENABLED
-        if (g2.gripper.valid()) {
-            gcs().send_text(MAV_SEVERITY_INFO, "Releasing the gripper");
-            g2.gripper.release();
-        } else {
-            gcs().send_text(MAV_SEVERITY_INFO, "Gripper not valid");
-            nav_payload_place.state = PayloadPlaceStateType_Ascending_Start;
-            break;
-        }
-#else
-        gcs().send_text(MAV_SEVERITY_INFO, "Gripper code disabled");
-#endif
-        nav_payload_place.state = PayloadPlaceStateType_Releasing;
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Releasing:
-#if GRIPPER_ENABLED == ENABLED
-        if (g2.gripper.valid() && !g2.gripper.released()) {
-            return false;
-        }
-#endif
-        nav_payload_place.state = PayloadPlaceStateType_Released;
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Released: {
-        nav_payload_place.state = PayloadPlaceStateType_Ascending_Start;
-        }
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Ascending_Start: {
-        Location target_loc = inertial_nav.get_position();
-        target_loc.alt = nav_payload_place.descend_start_altitude;
-        wp_start(target_loc);
-        nav_payload_place.state = PayloadPlaceStateType_Ascending;
-        }
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Ascending:
-        if (!copter.wp_nav->reached_wp_destination()) {
-            return false;
-        }
-        nav_payload_place.state = PayloadPlaceStateType_Done;
-        FALLTHROUGH;
-    case PayloadPlaceStateType_Done:
-        return true;
-    default:
-        // this should never happen
-        // TO-DO: log an error
-        return true;
-    }
-    // should never get here
-    return true;
-}
-#undef debug
 
 bool ModeAuto::verify_loiter_unlimited()
 {
