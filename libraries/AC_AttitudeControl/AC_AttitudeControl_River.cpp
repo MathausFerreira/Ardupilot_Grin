@@ -347,6 +347,19 @@ void AC_AttitudeControl_River::roll_pitch_transform(float fy, float fx, float eu
     _motors.set_lateral(y);
 }
 
+void AC_AttitudeControl_River::output_to_boat(float X, float Y, float Z){
+    
+    X*=-1.0f;
+
+    float fx = map_cube(X,Y,Z);
+    float fy = map_cube(Y,X,Z);
+    float tn = map_cube(Z,Y,X);
+
+    _motors.set_forward(fx);
+    _motors.set_lateral(fy);
+    _motors.set_yaw(tn);
+}
+
 // Command an euler roll and pitch angle and an euler yaw rate with angular velocity feedforward and smoothing
 void AC_AttitudeControl_River::input_euler_angle_roll_pitch_euler_rate_yaw(float fy, float fx, float euler_yaw_rate_cds) // Mathaus
 {

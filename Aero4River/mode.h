@@ -83,6 +83,9 @@ public:
 
     // pilot input processing
     void get_pilot_desired_lean_angles(float &roll_out, float &pitch_out, float angle_max, float angle_limit) const;
+     
+    void get_pilot_desired_forces(float &roll_out, float &pitch_out, float &yaw_out) const ;
+   
     float get_pilot_desired_yaw_rate(int16_t stick_angle);
     float get_pilot_desired_throttle() const;
 

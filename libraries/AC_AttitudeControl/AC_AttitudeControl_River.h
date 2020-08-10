@@ -70,6 +70,8 @@ public:
     float get_throttle_mix(void) const override { return _throttle_rpy_mix; }
 
     //Mathaus
+
+    virtual void output_to_boat(float fx, float fy, float tn);
     virtual void input_euler_angle_roll_pitch_euler_rate_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_rate_cds);
     virtual void input_euler_angle_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd, bool slew_yaw);
     virtual void input_euler_rate_roll_pitch_yaw(float euler_roll_angle_cd, float euler_pitch_angle_cd, float euler_yaw_angle_cd);
