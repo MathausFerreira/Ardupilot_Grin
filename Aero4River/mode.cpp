@@ -355,11 +355,7 @@ void Mode::update_navigation()
 
 void Mode::get_pilot_desired_forces(float &fx, float &fy, float &tn) const
 {
-
-    // roll_out  = channel_roll->norm_input();
-    // pitch_out = channel_pitch->norm_input();
-    if (copter.failsafe.radio || !copter.ap.rc_receiver_present)
-    {
+    if (copter.failsafe.radio || !copter.ap.rc_receiver_present){
         fy = 0.0f;
         fx = 0.0f;
         tn = 0.0f;
@@ -369,6 +365,11 @@ void Mode::get_pilot_desired_forces(float &fx, float &fy, float &tn) const
     fy = 1.0f * channel_roll->norm_input();
     fx = 1.0f * channel_pitch->norm_input();
     tn = 1.0f * channel_yaw->norm_input();
+
+    // Set para o simple mode
+    // channel_roll->set_control_in(fy);
+    // channel_pitch->set_control_in(fx);
+    // channel_yaw->set_control_in(tn);
 }
 
 // get_pilot_desired_angle - transform pilot's roll or pitch input into a desired lean angle

@@ -355,9 +355,11 @@ void AC_AttitudeControl_River::output_to_boat(float X, float Y, float Z){
     float fy = map_cube(Y,X,Z);
     float tn = map_cube(Z,Y,X);
 
+    // utilizado na alocação do barco
     _motors.set_forward(fx);
     _motors.set_lateral(fy);
     _motors.set_yaw(tn);
+
 }
 
 // Command an euler roll and pitch angle and an euler yaw rate with angular velocity feedforward and smoothing

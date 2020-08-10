@@ -20,16 +20,16 @@
  */
 
 // auto_init - initialise auto controller
-bool ModeAuto::init(bool ignore_checks)
+bool ModeAuto::init(bool ignore_checks) // mathaus
 {
     if (mission.num_commands() > 1 || ignore_checks) {
         _mode = Auto_Loiter;
 
         // reject switching to auto mode if landed with motors armed but first command is not a takeoff (reduce chance of flips)
-        if (motors->armed() && copter.ap.land_complete && !mission.starts_with_takeoff_cmd()) {
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto: Missing Takeoff Cmd");
-            return false;
-        }
+        // if (motors->armed() && copter.ap.land_complete && !mission.starts_with_takeoff_cmd()) {
+        //     gcs().send_text(MAV_SEVERITY_CRITICAL, "Auto: Missing Takeoff Cmd");
+        //     return false;
+        // }
 
         // stop ROI from carrying over from previous runs of the mission
         // To-Do: reset the yaw as part of auto_wp_start when the previous command was not a wp command to remove the need for this special ROI check
@@ -59,17 +59,17 @@ void ModeAuto::run()
     // call the correct auto controller
     switch (_mode) {
 
-    case Auto_TakeOff:
-        takeoff_run();
-        break;
+        // takeoff_run();
+        // break;
 
+        // land_run();
+        // break;
+
+    case Auto_TakeOff:
+    case Auto_Land:
     case Auto_WP:
     case Auto_CircleMoveToEdge:
         wp_run();
-        break;
-
-    case Auto_Land:
-        land_run();
         break;
 
     case Auto_RTL:
@@ -141,51 +141,51 @@ void ModeAuto::takeoff_start(const Location& dest_loc)
 {
     _mode = Auto_TakeOff;
 
-    Location dest(dest_loc);
+    // Location dest(dest_loc);
 
-    if (!copter.current_loc.initialised()) {
-        // vehicle doesn't know where it is ATM.  We should not
-        // initialise our takeoff destination without knowing this!
-        return;
-    }
+    // if (!copter.current_loc.initialised()) {
+    //     // vehicle doesn't know where it is ATM.  We should not
+    //     // initialise our takeoff destination without knowing this!
+    //     return;
+    // }
 
-    // set horizontal target
-    dest.lat = copter.current_loc.lat;
-    dest.lng = copter.current_loc.lng;
+    // // set horizontal target
+    // dest.lat = copter.current_loc.lat;
+    // dest.lng = copter.current_loc.lng;
 
-    // get altitude target
-    int32_t alt_target;
-    if (!dest.get_alt_cm(Location::AltFrame::ABOVE_HOME, alt_target)) {
-        // this failure could only happen if take-off alt was specified as an alt-above terrain and we have no terrain data
-        AP::logger().Write_Error(LogErrorSubsystem::TERRAIN, LogErrorCode::MISSING_TERRAIN_DATA);
-        // fall back to altitude above current altitude
-        alt_target = copter.current_loc.alt + dest.alt;
-    }
+    // // get altitude target
+    // int32_t alt_target;
+    // if (!dest.get_alt_cm(Location::AltFrame::ABOVE_HOME, alt_target)) {
+    //     // this failure could only happen if take-off alt was specified as an alt-above terrain and we have no terrain data
+    //     AP::logger().Write_Error(LogErrorSubsystem::TERRAIN, LogErrorCode::MISSING_TERRAIN_DATA);
+    //     // fall back to altitude above current altitude
+    //     alt_target = copter.current_loc.alt + dest.alt;
+    // }
 
-    // sanity check target
-    if (alt_target < copter.current_loc.alt) {
-        dest.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
-    }
-    // Note: if taking off from below home this could cause a climb to an unexpectedly high altitude
-    if (alt_target < 100) {
-        dest.set_alt_cm(100, Location::AltFrame::ABOVE_HOME);
-    }
+    // // sanity check target
+    // if (alt_target < copter.current_loc.alt) {
+    //     dest.set_alt_cm(copter.current_loc.alt, Location::AltFrame::ABOVE_HOME);
+    // }
+    // // Note: if taking off from below home this could cause a climb to an unexpectedly high altitude
+    // if (alt_target < 100) {
+    //     dest.set_alt_cm(100, Location::AltFrame::ABOVE_HOME);
+    // }
 
-    // set waypoint controller target
-    if (!wp_nav->set_wp_destination(dest)) {
-        // failure to set destination can only be because of missing terrain data
-        copter.failsafe_terrain_on_event();
-        return;
-    }
+    // // set waypoint controller target
+    // if (!wp_nav->set_wp_destination(dest)) {
+    //     // failure to set destination can only be because of missing terrain data
+    //     copter.failsafe_terrain_on_event();
+    //     return;
+    // }
 
-    // initialise yaw
-    auto_yaw.set_mode(AUTO_YAW_HOLD);
+    // // initialise yaw
+    // auto_yaw.set_mode(AUTO_YAW_HOLD);
 
-    // clear i term when we're taking off
-    set_throttle_takeoff();
+    // // clear i term when we're taking off
+    // set_throttle_takeoff();
 
-    // get initial alt for WP_NAVALT_MIN
-    auto_takeoff_set_start_alt();
+    // // get initial alt for WP_NAVALT_MIN
+    // auto_takeoff_set_start_alt();
 }
 
 // auto_wp_start - initialises waypoint controller to implement flying to a particular destination
@@ -210,12 +210,12 @@ void ModeAuto::wp_start(const Location& dest_loc)
 // auto_land_start - initialises controller to implement a landing
 void ModeAuto::land_start()
 {
-    // set target to stopping point
-    Vector3f stopping_point;
-    loiter_nav->get_stopping_point_xy(stopping_point);
+    // // set target to stopping point
+    // Vector3f stopping_point;
+    // loiter_nav->get_stopping_point_xy(stopping_point);
 
-    // call location specific land start function
-    land_start(stopping_point);
+    // // call location specific land start function
+    // land_start(stopping_point);
 }
 
 // auto_land_start - initialises controller to implement a landing
@@ -308,9 +308,7 @@ void ModeAuto::circle_start()
 
 // auto_spline_start - initialises waypoint controller to implement flying to a particular destination using the spline controller
 //  seg_end_type can be SEGMENT_END_STOP, SEGMENT_END_STRAIGHT or SEGMENT_END_SPLINE.  If Straight or Spline the next_destination should be provided
-void ModeAuto::spline_start(const Location& destination, bool stopped_at_start,
-                               AC_WPNav::spline_segment_end_type seg_end_type, 
-                               const Location& next_destination)
+void ModeAuto::spline_start(const Location& destination, bool stopped_at_start,AC_WPNav::spline_segment_end_type seg_end_type, const Location& next_destination)
 {
     _mode = Auto_Spline;
 
@@ -386,7 +384,7 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
     /// navigation commands
     ///
     case MAV_CMD_NAV_TAKEOFF:                   // 22
-        do_takeoff(cmd);
+        // do_takeoff(cmd);
         break;
 
     case MAV_CMD_NAV_WAYPOINT:                  // 16  Navigate to Waypoint
@@ -394,7 +392,7 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         break;
 
     case MAV_CMD_NAV_LAND:              // 21 LAND to Waypoint
-        do_land(cmd);
+        // do_land(cmd);
         break;
 
     case MAV_CMD_NAV_LOITER_UNLIM:              // 17 Loiter indefinitely
@@ -489,11 +487,6 @@ bool ModeAuto::start_command(const AP_Mission::Mission_Command& cmd)
         break;
 #endif
 
-#if WINCH_ENABLED == ENABLED
-    case MAV_CMD_DO_WINCH:                             // Mission command to control winch
-        do_winch(cmd);
-        break;
-#endif
 
     default:
         // unable to use the command, allow the vehicle to try the next command
