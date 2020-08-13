@@ -170,7 +170,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 // ACRO, STABILIZE, ALTHOLD, LAND, DRIFT and SPORT can always be set successfully but the return state of other flight modes should be checked and the caller should deal with failures appropriately
 bool Copter::set_mode(Mode::Number mode, ModeReason reason)
 {
-
     // return immediately if we are already in the desired mode
     if (mode == control_mode)
     {
@@ -361,7 +360,7 @@ void Mode::get_pilot_desired_forces(float &fx, float &fy, float &tn) const
         tn = 0.0f;
         return;
     }
-    // fetch roll and pitch inputs
+    // fetch Fx Fy and Yaw inputs
     fy = 1.0f * channel_roll->norm_input();
     fx = 1.0f * channel_pitch->norm_input();
     tn = 1.0f * channel_yaw->norm_input();
@@ -376,9 +375,6 @@ void Mode::get_pilot_desired_forces(float &fx, float &fy, float &tn) const
 // returns desired angle in centi-degrees
 void Mode::get_pilot_desired_lean_angles(float &fy, float &fx, float angle_max, float angle_limit) const
 {
-
-    // roll_out  = channel_roll->norm_input();
-    // pitch_out = channel_pitch->norm_input();
     if (copter.failsafe.radio || !copter.ap.rc_receiver_present)
     {
         fy = 0.0f;
@@ -389,27 +385,6 @@ void Mode::get_pilot_desired_lean_angles(float &fy, float &fx, float angle_max, 
     fy = 1.0f * channel_roll->norm_input();
     fx = 1.0f * channel_pitch->norm_input();
 
-    // // limit max lean angle
-    // angle_limit = constrain_float(angle_limit, 1000.0f, angle_max);
-
-    // // scale roll and pitch inputs to ANGLE_MAX parameter range
-    // float scaler = angle_max / (float)ROLL_PITCH_YAW_INPUT_MAX;
-    // fy *= scaler;
-    // fx *= scaler;
-
-    // // do circular limit
-    // float total_in = norm(fx, fy);
-    // if (total_in > angle_limit)
-    // {
-    //     float ratio = angle_limit / total_in;
-    //     fy *= ratio;
-    //     fx *= ratio;
-    // }
-
-    // // do lateral tilt to euler roll conversion
-    // fy = (18000 / M_PI) * atanf(cosf(fx * (M_PI / 18000)) * tanf(fy * (M_PI / 18000)));
-
-    // roll_out and pitch_out are returned
 }
 
 bool Mode::_TakeOff::triggered(const float target_climb_rate) const
@@ -453,7 +428,7 @@ void Mode::zero_throttle_and_relax_ac(bool spool_up)
     {
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
     }
-    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(0.0f, 0.0f, 0.0f);
+    attitude_control->input_fx_fy_rate_yaw(0.0f, 0.0f, 0.0f);
     attitude_control->set_throttle_out(0.0f, false, copter.g.throttle_filt);
 }
 
@@ -488,7 +463,7 @@ void Mode::make_safe_spool_down()
     pos_control->relax_alt_hold_controllers(0.0f); // forces throttle output to go to zero
     pos_control->update_z_controller();
     // we may need to move this out
-    attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(0.0f, 0.0f, 0.0f);
+    attitude_control->input_fx_fy_rate_yaw(0.0f, 0.0f, 0.0f);
 }
 
 /*
@@ -649,7 +624,7 @@ void Mode::land_run_horizontal_control()
 //     if (auto_yaw.mode() == AUTO_YAW_HOLD)
 //     {
 //         // roll & pitch from waypoint controller, yaw rate from pilot
-//         attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(nav_roll, nav_pitch, target_yaw_rate);
+//         attitude_control->input_fx_fy_rate_yaw(nav_roll, nav_pitch, target_yaw_rate);
 //     }
 //     else
 //     {
@@ -759,14 +734,6 @@ Mode::AltHoldModeState Mode::get_alt_hold_state(float target_climb_rate_cms)
         return AltHold_Flying;
     }
 }
-
-// pass-through functions to reduce code churn on conversion;
-// these are candidates for moving into the Mode base
-// class.
-// void Mode::get_pilot_desired_force_to_boat()
-// {
-//     copter.get_pilot_desired_force_to_boat();
-// }
 
 float Mode::get_pilot_desired_yaw_rate(int16_t stick_angle)
 {

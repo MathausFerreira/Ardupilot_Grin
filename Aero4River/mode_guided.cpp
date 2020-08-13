@@ -347,11 +347,11 @@ void ModeGuided::run()
     // call the correct auto controller
     switch (guided_mode) {
 
-    case Guided_TakeOff:
         // run takeoff controller
-        takeoff_run();
-        break;
+        // takeoff_run();
+        // break;
 
+    case Guided_TakeOff:
     case Guided_WP:
         // run position controller
         pos_control_run();
@@ -473,10 +473,10 @@ void ModeGuided::vel_control_run()
     // call attitude controller
     if (auto_yaw.mode() == AUTO_YAW_HOLD) {
         // roll & pitch from waypoint controller, yaw rate from pilot
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), target_yaw_rate);
+        attitude_control->input_fx_fy_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), target_yaw_rate);
     } else if (auto_yaw.mode() == AUTO_YAW_RATE) {
         // roll & pitch from velocity controller, yaw rate from mavlink command or mission item
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), auto_yaw.rate_cds());
+        attitude_control->input_fx_fy_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), auto_yaw.rate_cds());
     } else {
         // roll, pitch from waypoint controller, yaw heading from GCS or auto_heading()
         attitude_control->input_euler_angle_roll_pitch_yaw(pos_control->get_roll(), pos_control->get_pitch(), auto_yaw.yaw(), true);
@@ -538,10 +538,10 @@ void ModeGuided::posvel_control_run()
     // call attitude controller
     if (auto_yaw.mode() == AUTO_YAW_HOLD) {
         // roll & pitch from waypoint controller, yaw rate from pilot
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), target_yaw_rate);
+        attitude_control->input_fx_fy_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), target_yaw_rate);
     } else if (auto_yaw.mode() == AUTO_YAW_RATE) {
         // roll & pitch from position-velocity controller, yaw rate from mavlink command or mission item
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), auto_yaw.rate_cds());
+        attitude_control->input_fx_fy_rate_yaw(pos_control->get_roll(), pos_control->get_pitch(), auto_yaw.rate_cds());
     } else {
         // roll, pitch from waypoint controller, yaw heading from GCS or auto_heading()
         attitude_control->input_euler_angle_roll_pitch_yaw(pos_control->get_roll(), pos_control->get_pitch(), auto_yaw.yaw(), true);
@@ -605,7 +605,7 @@ void ModeGuided::angle_control_run()
 
     // call attitude controller
     if (guided_angle_state.use_yaw_rate) {
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(roll_in, pitch_in, yaw_rate_in);
+        attitude_control->input_fx_fy_rate_yaw(roll_in, pitch_in, yaw_rate_in);
     } else {
         attitude_control->input_euler_angle_roll_pitch_yaw(roll_in, pitch_in, yaw_in, true);
     }

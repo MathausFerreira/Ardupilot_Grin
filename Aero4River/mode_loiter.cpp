@@ -121,7 +121,7 @@ void ModeLoiter::run()
         attitude_control->set_yaw_target_to_current_heading();
         pos_control->relax_alt_hold_controllers(0.0f);   // forces throttle output to go to zero
         loiter_nav->init_target();
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
+        attitude_control->input_fx_fy_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
         pos_control->update_z_controller();
         break;
 
@@ -141,7 +141,7 @@ void ModeLoiter::run()
         loiter_nav->update();
 
         // call attitude controller
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
+        attitude_control->input_fx_fy_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
 
         // update altitude target and call position controller
         pos_control->set_alt_target_from_climb_rate_ff(target_climb_rate, G_Dt, false);
@@ -156,7 +156,7 @@ void ModeLoiter::run()
     case AltHold_Landed_Pre_Takeoff:
         attitude_control->reset_rate_controller_I_terms();
         loiter_nav->init_target();
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(0.0f, 0.0f, 0.0f);
+        attitude_control->input_fx_fy_rate_yaw(0.0f, 0.0f, 0.0f);
         pos_control->relax_alt_hold_controllers(0.0f);   // forces throttle output to go to zero
         pos_control->update_z_controller();
         break;
@@ -175,7 +175,7 @@ void ModeLoiter::run()
         loiter_nav->update();
 
         // call attitude controller
-        attitude_control->input_euler_angle_roll_pitch_euler_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
+        attitude_control->input_fx_fy_rate_yaw(loiter_nav->get_roll(), loiter_nav->get_pitch(), target_yaw_rate);
 
         // adjust climb rate using rangefinder
         target_climb_rate = copter.surface_tracking.adjust_climb_rate(target_climb_rate);
