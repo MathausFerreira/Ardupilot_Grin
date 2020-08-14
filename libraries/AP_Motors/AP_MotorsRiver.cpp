@@ -148,11 +148,11 @@ uint16_t AP_MotorsRiver::get_motor_mask()
 /* ****************************** Mathaus *********************************
 ***************************************************************************/
 
-// void AP_MotorsRiver::Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4){
-//     FX_out = (float)(PWM1*k1*cosf(Theta1) + PWM2*k2*cosf(Theta2) + PWM3*k3*cosf(Theta3) + PWM4*k4*cosf(Theta4));
-//     FY_out = (float)(PWM1*k1*sinf(Theta1) + PWM2*k2*sinf(Theta2) + PWM3*k3*sinf(Theta3) + PWM4*k4*sinf(Theta4));
-//     TN_out = (float)(Lx*(PWM1*k1*sinf(Theta1) - PWM2*k2*sinf(Theta2) + PWM3*k3*sinf(Theta3) - PWM4*k4*sinf(Theta4)) - Ly*(PWM1*k1*cosf(Theta1) - PWM2*k2*cosf(Theta2) - PWM3*k3*cosf(Theta3) + PWM4*k4*cosf(Theta4)));
-// }
+void AP_MotorsRiver::direct_allocation(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4){
+    Fx_out = (float)(PWM1*k1*cosf(Theta1) + PWM2*k2*cosf(Theta2) + PWM3*k3*cosf(Theta3) + PWM4*k4*cosf(Theta4));
+    Fy_out = (float)(PWM1*k1*sinf(Theta1) + PWM2*k2*sinf(Theta2) + PWM3*k3*sinf(Theta3) + PWM4*k4*sinf(Theta4));
+    Tn_out = (float)(Lx*(PWM1*k1*sinf(Theta1) - PWM2*k2*sinf(Theta2) + PWM3*k3*sinf(Theta3) - PWM4*k4*sinf(Theta4)) - Ly*(PWM1*k1*cosf(Theta1) - PWM2*k2*cosf(Theta2) - PWM3*k3*cosf(Theta3) + PWM4*k4*cosf(Theta4)));
+}
 
 float AP_MotorsRiver::PWMtoNorm(float pwm){
     /// Entra um valor de PWM e sai de 0 a 1
@@ -275,7 +275,7 @@ void AP_MotorsRiver::FOSSEN_alocation_matrix(float FX,float FY,float TN,float &T
         Theta4 = constrain_float(Theta4,-M_PI,M_PI);
     }
 
-    //  Allocacao_Direta(Theta1, Theta2, Theta3, Theta4, PWM1, PWM2, PWM3, PWM4);
+    direct_allocation(Theta1, Theta2, Theta3, Theta4, PWM1, PWM2, PWM3, PWM4);
 
     // Normaliza o valor de PWM encontrado entre 0 e 1 para ativar a saida entre mínima e maxima potência
     PWM1 = PWMtoNorm(PWM1);
@@ -505,23 +505,12 @@ void AP_MotorsRiver::output_armed_stabilizing(){
     //     _throttle_out = throttle_thrust_best_plus_adj / compensation_gain;
     //     //check for failed motor
     //     // check_for_failed_motor(throttle_thrust_best_plus_adj);
+    Fx = get_forward();
+    Fy = get_lateral();
+    Tn = get_yaw();
 
-    FOSSEN_alocation_matrix(get_forward(), get_lateral(), get_yaw(), theta_m1, theta_m2, theta_m3, theta_m4, Pwm1, Pwm2, Pwm3, Pwm4);
+    FOSSEN_alocation_matrix(Fx, Fy, Tn, theta_m1, theta_m2, theta_m3, theta_m4, Pwm1, Pwm2, Pwm3, Pwm4);
     
-    // float ang1 = 0.0f;
-    // float ang2 = 0.0f;
-    // float ang3 = 0.0f;
-    // float ang4 = 0.0f;
-
-    // pwm_servo_angle(ang1, ang2, ang3, ang4, theta_m1, theta_m2, theta_m3, theta_m4);
-    
-    // counter++;
-    // if (counter > 50){
-    //     counter = 0;
-    //     // gcs().send_text(MAV_SEVERITY_CRITICAL, "_pitch_in:  %5.3f, _roll_in:  %5.3f, _yaw_in:  %5.3f,", _pitch_in, _roll_in, _yaw_in);
-    //     gcs().send_text(MAV_SEVERITY_CRITICAL, "Ang1:  %5.3f, Ang2:  %5.3f, Ang3:  %5.3f, Ang4:  %5.3f", ang1, ang1, ang1, ang1);
-    // }
-
     motor_enabled[0] ? _thrust_rpyt_out[0] = Pwm1 : _thrust_rpyt_out[0] = 0.0f;
     motor_enabled[1] ? _thrust_rpyt_out[1] = Pwm2 : _thrust_rpyt_out[1] = 0.0f;
     motor_enabled[2] ? _thrust_rpyt_out[2] = Pwm3 : _thrust_rpyt_out[2] = 0.0f;

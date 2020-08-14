@@ -5,6 +5,147 @@
 // Code to Write and Read packets from AP_Logger log memory
 // Code to interact with the user to dump or erase logs
 
+// ==========================================================================================
+struct PACKED log_Mathaus{
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    float theta1;
+    float theta2;
+    float theta3;
+    float theta4;
+    float pwm1;
+    float pwm2;
+    float pwm3;
+    float pwm4;
+    float fx;
+    float fy;
+    float Tn;
+    float fxo;
+    float fyo;
+    float Tno;
+};
+
+// Write mathaus Packet
+void Copter::Log_Write_Mathaus()
+{
+    struct log_Mathaus pkt={
+        LOG_PACKET_HEADER_INIT(LOG_MATHAUS_MSG),
+        time_us         :   AP_HAL::micros64(),
+        theta1          :   copter.motors->theta_m1,
+        theta2          :   copter.motors->theta_m2,
+        theta3          :   copter.motors->theta_m3,
+        theta4          :   copter.motors->theta_m4,
+        pwm1            :   copter.motors->Pwm1,
+        pwm2            :   copter.motors->Pwm2,
+        pwm3            :   copter.motors->Pwm3,
+        pwm4            :   copter.motors->Pwm4,
+        fx              :   copter.motors->Fx,
+        fy              :   copter.motors->Fy,
+        Tn              :   copter.motors->Tn,
+        fxo             :   copter.motors->Fx_out,
+        fyo             :   copter.motors->Fy_out,
+        Tno             :   copter.motors->Tn_out,
+
+    };
+    logger.WriteBlock(&pkt, sizeof(pkt));
+}
+
+struct PACKED log_Grin{
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    float Lat;
+    float Lon;
+    float Px;
+    float Py;
+    float Vx;
+    float Vy;
+    float yaw;
+    float cyaw;
+    float syaw;
+};
+
+// Write mathaus Packet
+void Copter::Log_Write_Grin()
+{
+    float cy = ahrs.cos_yaw();
+    float sy = ahrs.sin_yaw();
+    float yw = ahrs.yaw_sensor;
+    float lat = current_loc.lat;
+    float lon = current_loc.lng;
+    const Vector3f &position = inertial_nav.get_position();
+    const Vector3f &velocity = inertial_nav.get_velocity();
+
+    struct log_Grin pkt={
+        LOG_PACKET_HEADER_INIT(LOG_GRIN_MSG),
+        time_us         :   AP_HAL::micros64(),
+        Lat          :   lat,
+        Lon          :   lon,
+        Px           :   position.x,
+        Py           :   position.y,
+        Vx           :   velocity.x,
+        Vy           :   velocity.y,
+        yaw          :   yw,
+        cyaw         :   cy,
+        syaw         :   sy,
+    };
+    logger.WriteBlock(&pkt, sizeof(pkt));
+}
+
+//==================================================================================================
+// Accacio
+
+  struct PACKED log_Accacio{
+        LOG_PACKET_HEADER;
+        uint64_t time_us;
+        float Lat;
+        float Lon;
+        float roll;
+        float pitch;
+        float yaw;
+        float Vx;
+        float Vy;
+        float r;
+        int16_t fx;
+        int16_t fy;
+        int16_t tn;
+};
+ void Copter::Log_Write_Accacio()
+  {
+      float lat = current_loc.lat;
+      float lon = current_loc.lng;
+      float Roll  = ahrs.roll;
+      float Pitch = ahrs.pitch;
+      float Yaw   = ahrs.yaw;
+
+     //const Vector3f &position = inertial_nav.get_position();
+     const Vector3f &velocity = inertial_nav.get_velocity();
+     const Vector3f &gyro     = ins.get_gyro();
+
+     // Body Velocity
+     float vx_body = +cosf(Yaw)*(velocity.x) + sinf(Yaw)*(velocity.y);
+     float vy_body = -sinf(Yaw)*(velocity.x) + cosf(Yaw)*(velocity.y);
+
+     struct log_Accacio pkt={
+         LOG_PACKET_HEADER_INIT(LOG_ACCACIO_MSG),
+         time_us      : AP_HAL::micros64(),
+         Lat          : lat,
+         Lon          : lon,
+         roll         : Roll,
+         pitch        : Pitch,
+         yaw          : Yaw,
+         Vx           : vx_body,
+         Vy           : vy_body,
+         r            : gyro.z,
+         fx           : channel_pitch->get_radio_in(),
+         fy           : channel_roll->get_radio_in(),
+         tn           : channel_yaw->get_radio_in(),
+     };
+     logger.WriteBlock(&pkt, sizeof(pkt));
+}
+
+//==================================================================================================
+
+
 struct PACKED log_Control_Tuning {
     LOG_PACKET_HEADER;
     uint64_t time_us;
@@ -605,6 +746,15 @@ const struct LogStructure Copter::log_structure[] = {
     
     { LOG_GUIDEDTARGET_MSG, sizeof(log_GuidedTarget),
       "GUID",  "QBffffff",    "TimeUS,Type,pX,pY,pZ,vX,vY,vZ", "s-mmmnnn", "F-000000" },
+
+    // mathaus
+
+    { LOG_MATHAUS_MSG, sizeof(log_Mathaus),
+      "MAT",   "Qffffffffffffff","TimeUS,Th1,Th2,Th3,Th4,Pwm1,Pwm2,Pwm3,Pwm4,Fx,Fy,TN,FxO,FyO,TNO" },
+    { LOG_GRIN_MSG, sizeof(log_Grin),
+      "GRIN",   "Qfffffffff","TimeUS,Lat,Lon,Px,Py,Vx,Vy,yaw,cyaw,syaw" },
+    { LOG_ACCACIO_MSG, sizeof(log_Accacio),
+      "AFSN",   "Qffffffffhhh","TimeUS,Lat,Lon,Roll,Pitch,Yaw,Vx,Vy,r,fx,fy,tn" },
 };
 
 void Copter::Log_Write_Vehicle_Startup_Messages()

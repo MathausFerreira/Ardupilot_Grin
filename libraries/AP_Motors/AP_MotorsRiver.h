@@ -55,6 +55,15 @@ public:
     float Pwm3 = 0.0f;
     float Pwm4 = 0.0f;
 
+    // Para o Log
+    float Fx = 0.0f;
+    float Fy = 0.0f;
+    float Tn = 0.0f;
+
+    float Fx_out = 0.0f;
+    float Fy_out = 0.0f;
+    float Tn_out = 0.0f;  
+
     /// Constructor
     AP_MotorsRiver(uint16_t loop_rate, uint16_t speed_hz = AP_MOTORS_SPEED_DEFAULT) :
         AP_MotorsMulticopter(loop_rate, speed_hz)
@@ -103,6 +112,7 @@ protected:
     void pwm_servo_angle(float &Pwm_servo_m1,float &Pwm_servo_m2,float &Pwm_servo_m3,float &Pwm_servo_m4,float theta_m1,float theta_m2,float theta_m3,float theta_m4);
     float PWMtoNorm(float pwm);
     float NormtoPWM(float pwm);
+    void direct_allocation(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
 
     // output - sends commands to the motors
     void                output_armed_stabilizing() override;

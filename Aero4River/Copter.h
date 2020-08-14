@@ -565,9 +565,7 @@ private:
     void update_using_interlock();
 
     // Copter.cpp
-    void get_scheduler_tasks(const AP_Scheduler::Task *&tasks,
-                             uint8_t &task_count,
-                             uint32_t &log_bit) override;
+    void get_scheduler_tasks(const AP_Scheduler::Task *&tasks, uint8_t &task_count, uint32_t &log_bit) override;
     void fast_loop() override;
     // bool start_takeoff(float alt) override;
     bool set_target_location(const Location& target_loc) override;
@@ -605,16 +603,6 @@ private:
     /// Declaração de Variáveis ( Mathaus )
     /////////////////////////////////////////////////////////////////////////////////////
 
-    //    Forcas enviadas para a alocacao
-    float Fx = 0.0f;
-    float Fy = 0.0f;
-    float Tn = 0.0f;
-
-    //    Forcas Alocadas realmente
-    float FX_out = 0.0f;
-    float FY_out = 0.0f;
-    float TN_out = 0.0f;
-
     // Variáveis auxiliares para Fx e Fy
     float X = 0.0f;
     float Y = 0.0f;
@@ -624,18 +612,10 @@ private:
     ////////////////////////////    Funções    ///////////////////////////////////
     
     float servo_pwm_to_angle(int PWM_aux);
-    // float mapCube(float x, float y, float z);
     void Allocacao_Direta(float &Theta1,float &Theta2,float &Theta3,float &Theta4,float &PWM1,float &PWM2,float &PWM3,float &PWM4);
     void pwm_servo_angle();
-    // void FxFy_calc(float roll, float pitch);
-    // void get_pilot_desired_force_to_boat();
     float get_gain();
     
-    // log grin
-    void Log_Write_Mathaus();
-    void Log_Write_Grin();
-    void Log_Write_Accacio();
-
     // commands.cpp
     void update_home_from_EKF();
     void set_home_to_current_location_inflight();
@@ -696,18 +676,6 @@ private:
     // fence.cpp
     void fence_check();
 
-//     // heli.cpp
-//     void heli_init();
-//     void check_dynamic_flight(void);
-//     bool should_use_landing_swash() const;
-//     void update_heli_control_dynamics(void);
-//     void heli_update_landing_swash();
-//     float get_pilot_desired_rotor_speed() const;
-//     void heli_update_rotor_speed_targets();
-//     void heli_update_autorotation();
-// #if MODE_AUTOROTATE_ENABLED == ENABLED
-//     void heli_set_autorotation(bool autotrotation);
-// #endif
     // inertia.cpp
     void read_inertia();
 
@@ -743,6 +711,10 @@ private:
     void Log_Write_SysID_Data(float waveform_time, float waveform_sample, float waveform_freq, float angle_x, float angle_y, float angle_z, float accel_x, float accel_y, float accel_z);
     void Log_Write_Vehicle_Startup_Messages();
     void log_init(void);
+    // log grin
+    void Log_Write_Mathaus();
+    void Log_Write_Grin();
+    void Log_Write_Accacio();
 
     // mode.cpp
     bool set_mode(Mode::Number mode, ModeReason reason);
