@@ -101,9 +101,9 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(update_batt_compass,   10,    120),
     SCHED_TASK_CLASS(RC_Channels,          (RC_Channels*)&copter.g2.rc_channels,      read_aux_all,    10,     50),
     SCHED_TASK(arm_motors_check,      10,     50),
-#if TOY_MODE_ENABLED == ENABLED
-    SCHED_TASK_CLASS(ToyMode,              &copter.g2.toy_mode,         update,          10,  50),
-#endif
+// #if TOY_MODE_ENABLED == ENABLED
+//     SCHED_TASK_CLASS(ToyMode,              &copter.g2.toy_mode,         update,          10,  50),
+// #endif
     SCHED_TASK(auto_disarm_check,     10,     50),
     SCHED_TASK(auto_trim,             10,     75),
 #if RANGEFINDER_ENABLED == ENABLED
@@ -168,27 +168,27 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #if AC_TERRAIN == ENABLED
     SCHED_TASK(terrain_update,        10,    100),
 #endif
-#if GRIPPER_ENABLED == ENABLED
-    SCHED_TASK_CLASS(AP_Gripper,           &copter.g2.gripper,          update,          10,  75),
-#endif
-#if WINCH_ENABLED == ENABLED
-    SCHED_TASK(winch_update,          10,     50),
-#endif
-#ifdef USERHOOK_FASTLOOP
-    SCHED_TASK(userhook_FastLoop,    100,     75),
-#endif
-#ifdef USERHOOK_50HZLOOP
-    SCHED_TASK(userhook_50Hz,         50,     75),
-#endif
-#ifdef USERHOOK_MEDIUMLOOP
-    SCHED_TASK(userhook_MediumLoop,   10,     75),
-#endif
-#ifdef USERHOOK_SLOWLOOP
-    SCHED_TASK(userhook_SlowLoop,     3.3,    75),
-#endif
-#ifdef USERHOOK_SUPERSLOWLOOP
-    SCHED_TASK(userhook_SuperSlowLoop, 1,   75),
-#endif
+// #if GRIPPER_ENABLED == ENABLED
+//     SCHED_TASK_CLASS(AP_Gripper,           &copter.g2.gripper,          update,          10,  75),
+// #endif
+// #if WINCH_ENABLED == ENABLED
+//     SCHED_TASK(winch_update,          10,     50),
+// #endif
+// #ifdef USERHOOK_FASTLOOP
+//     SCHED_TASK(userhook_FastLoop,    100,     75),
+// #endif
+// #ifdef USERHOOK_50HZLOOP
+//     SCHED_TASK(userhook_50Hz,         50,     75),
+// #endif
+// #ifdef USERHOOK_MEDIUMLOOP
+//     SCHED_TASK(userhook_MediumLoop,   10,     75),
+// #endif
+// #ifdef USERHOOK_SLOWLOOP
+//     SCHED_TASK(userhook_SlowLoop,     3.3,    75),
+// #endif
+// #ifdef USERHOOK_SUPERSLOWLOOP
+//     SCHED_TASK(userhook_SuperSlowLoop, 1,   75),
+// #endif
 #if BUTTON_ENABLED == ENABLED
     SCHED_TASK_CLASS(AP_Button,            &copter.button,           update,           5, 100),
 #endif
