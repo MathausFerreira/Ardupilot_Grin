@@ -15,7 +15,6 @@ void AP_Arming_Copter::update(void)
         display_fail = true;
         pre_arm_display_counter = 0;
     }
-
     pre_arm_checks(display_fail);
 }
 
@@ -118,7 +117,6 @@ bool AP_Arming_Copter::ins_checks(bool display_failure)
             ret = false;
         }
     }
-
     return ret;
 }
 
