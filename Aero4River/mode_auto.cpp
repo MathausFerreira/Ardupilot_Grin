@@ -13,7 +13,6 @@
  * The main loop (i.e. fast loop) will call update_flight_modes() which will in turn call auto_run() which, based upon the auto_mode variable will call
  *      correct auto_wp_run, auto_takeoff_run or auto_land_run to actually implement the feature
  */
-
 /*
  *  While in the auto flight mode, navigation or do/now commands can be run.
  *  Code in this file implements the navigation commands
