@@ -60,7 +60,6 @@ void ModeAuto::run()
 
         // takeoff_run();
         // break;
-
         // land_run();
         // break;
 
