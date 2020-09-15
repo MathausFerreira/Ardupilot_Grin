@@ -489,7 +489,7 @@ void AC_AttitudeControl_River::input_euler_rate_roll_pitch_yaw(float roll, float
 
         // Set rate feedforward requests to zero
         _attitude_target_euler_rate = Vector3f(0.0f, 0.0f, 0.0f);
-        _attitude_target_ang_vel = Vector3f(0.0f, 0.0f, 0.0f);
+        _attitude_target_ang_vel     = Vector3f(0.0f, 0.0f, 0.0f);
 
         // Compute quaternion target attitude
         _attitude_target_quat.from_euler(_attitude_target_euler_angle.x, _attitude_target_euler_angle.y, _attitude_target_euler_angle.z);
