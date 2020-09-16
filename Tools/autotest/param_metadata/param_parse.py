@@ -88,6 +88,7 @@ truename_map = {
     "ArduCopter": "Copter",
     "ArduPlane": "Plane",
     "AntennaTracker": "Tracker",
+    "Aero4River": "River"
 }
 for vehicle_path in vehicle_paths:
     name = os.path.basename(os.path.dirname(vehicle_path))
