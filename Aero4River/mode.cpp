@@ -31,7 +31,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 
     switch (mode)
     {
-
     case Mode::Number::LAND:
     case Mode::Number::ALT_HOLD:
     case Mode::Number::STABILIZE:
@@ -67,7 +66,6 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
         ret = &mode_rtl;
         break;
 #endif
-
 
 
 #if MODE_POSHOLD_ENABLED == ENABLED

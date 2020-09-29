@@ -89,14 +89,14 @@ void ModeAuto::run()
         break;
 
     case Auto_Loiter:
+    case Auto_NavPayloadPlace:
+    case Auto_LoiterToAlt:
         loiter_run();
         break;
 
-    case Auto_LoiterToAlt:
         loiter_to_alt_run();
         break;
 
-    case Auto_NavPayloadPlace:
         payload_place_run();
         break;
     }

@@ -92,9 +92,9 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(rc_loop,              100,    130),
     SCHED_TASK(throttle_loop,         50,     75),
     SCHED_TASK(update_GPS,            50,    200),
-    SCHED_TASK(Log_Write_Mathaus,     10,    100),
+    SCHED_TASK(Log_Write_Mathaus,     20,    100),
     SCHED_TASK(Log_Write_Grin,        20,    100),
-    SCHED_TASK(Log_Write_Accacio,     10,    100),
+    SCHED_TASK(Log_Write_Accacio,     20,    100),
     SCHED_TASK(update_batt_compass,   10,    120),
     SCHED_TASK_CLASS(RC_Channels,          (RC_Channels*)&copter.g2.rc_channels,      read_aux_all,    10,     50),
     SCHED_TASK(arm_motors_check,      10,     50),
@@ -117,7 +117,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
 #endif
 
     SCHED_TASK(three_hz_loop,          3,     75),
-    SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,     75),
+    SCHED_TASK_CLASS(AP_ServoRelayEvents,  &copter.ServoRelayEvents,      update_events, 50,  75),
     SCHED_TASK_CLASS(AP_Baro,              &copter.barometer,           accumulate,      50,  90),
 #if AC_FENCE == ENABLED
     SCHED_TASK_CLASS(AC_Fence,             &copter.fence,               update,          10, 100),
@@ -191,17 +191,15 @@ void Copter::fast_loop()
     ins.update();
 
     // run low level rate controllers that only require IMU data
-    // attitude_control->rate_controller_run();
+    //attitude_control->rate_controller_run();
 
     // send outputs to the motors library immediately
     motors_output();
 
     // run EKF state estimator (expensive)
-    // --------------------
     read_AHRS();
 
     // Inertial Nav
-    // --------------------
     read_inertia();
 
     // check if ekf has reset target heading or position
@@ -214,7 +212,7 @@ void Copter::fast_loop()
     update_home_from_EKF();
 
     // check if we've landed or crashed
-    // update_land_and_crash_detectors();
+    update_land_and_crash_detectors();
 
 #if MOUNT == ENABLED
     // camera mount's fast update
